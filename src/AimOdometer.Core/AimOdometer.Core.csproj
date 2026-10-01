@@ -2,6 +2,14 @@
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
     <IsAotCompatible>true</IsAotCompatible>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <RootNamespace>AimOdometer.Core</RootNamespace>
   </PropertyGroup>
+  <ItemGroup>
+    <!-- Native SQLite build only (e_sqlite3.dll); the managed wrapper is our own (NativeAOT-friendly). -->
+    <PackageReference Include="SQLitePCLRaw.lib.e_sqlite3" />
+  </ItemGroup>
+  <ItemGroup>
+    <InternalsVisibleTo Include="AimOdometer.Core.Tests" />
+  </ItemGroup>
 </Project>
