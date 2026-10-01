@@ -1,0 +1,53 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: windows-latest
+    env:
+      DOTNET_CLI_TELEMETRY_OPTOUT: 1
+      DOTNET_NOLOGO: 1
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: global.json
+
+      - name: Restore
+        run: dotnet restore
+
+      - name: Check formatting
+        run: dotnet format --verify-no-changes --no-restore
+
+      - name: Build (Release, warnings as errors)
+        run: dotnet build -c Release --no-restore
+
+      - name: Test
+        run: dotnet test -c Release --no-build
+
+      - name: Publish tracker (NativeAOT)
+        run: dotnet publish src/AimOdometer.Tracker -c Release -o artifacts/tracker
+
+      - name: Report tracker size
+        shell: pwsh
+        run: |
+          $exe = Get-Item artifacts/tracker/AimOdometer.Tracker.exe
+          "Tracker exe: {0:N0} KB" -f ($exe.Length / 1KB) | Tee-Object -FilePath $env:GITHUB_STEP_SUMMARY -Append
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: tracker-win-x64
+          path: artifacts/tracker/AimOdometer.Tracker.exe
+          if-no-files-found: error

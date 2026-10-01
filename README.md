@@ -1,0 +1,38 @@
+<p align="center"><img src="assets/logo-512.png" width="128" alt="AimOdometer logo"></p>
+
+<h1 align="center">AimOdometer</h1>
+
+<p align="center">How far does your mouse really travel? Real centimeters on the pad — per game, per mouse, per day.</p>
+
+<p align="center"><a href="README.ru.md">Русская версия</a></p>
+
+> **Status: early development.** Nothing is released yet. See [docs/PLAN.md](docs/PLAN.md) for the roadmap (in Russian) and [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for the design.
+
+## Why another mouse odometer?
+
+Classic tools (Mousotron, Mouse Odometer, …) measure the **cursor** in screen pixels. In shooters like CS2, Apex or Valorant the cursor is locked to the center while the game reads raw input, so those tools miss most of the movement.
+
+AimOdometer reads **raw sensor counts** through the Windows Raw Input API and converts them using your mouse DPI:
+
+```
+centimeters = counts / DPI × 2.54
+```
+
+## Principles
+
+- **Featherweight background process.** A tiny NativeAOT tracker, event-driven, no polling. Target: ≤ 15 MB RAM, ~0% CPU when idle.
+- **Anti-cheat friendly.** No hooks, no injection, no overlays, no game memory access. Only passive Raw Input and the name of the active app.
+- **Private.** The keyboard is never read. Without Steam sign-in, AimOdometer makes no network requests except an optional update check.
+
+## Building from source
+
+Requirements: Windows 10 22H2+ / 11 x64, [.NET 10 SDK](https://dotnet.microsoft.com/download/dotnet/10.0). Publishing the NativeAOT tracker also needs the Visual Studio Build Tools C++ workload.
+
+```bash
+dotnet build -c Release
+dotnet test -c Release
+```
+
+## License
+
+[MIT](LICENSE)

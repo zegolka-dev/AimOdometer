@@ -1,0 +1,23 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <RootNamespace>AimOdometer.Tracker</RootNamespace>
+    <ApplicationIcon>..\..\assets\icon.ico</ApplicationIcon>
+
+    <!-- NativeAOT: tiny, fast-starting native exe without JIT (budget: <= 15 MB private working set). -->
+    <PublishAot>true</PublishAot>
+    <OptimizationPreference>Size</OptimizationPreference>
+    <InvariantGlobalization>true</InvariantGlobalization>
+    <UseSystemResourceKeys>true</UseSystemResourceKeys>
+    <ServerGarbageCollection>false</ServerGarbageCollection>
+    <ConcurrentGarbageCollection>false</ConcurrentGarbageCollection>
+    <EventSourceSupport>false</EventSourceSupport>
+    <DebuggerSupport>false</DebuggerSupport>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\AimOdometer.Core\AimOdometer.Core.csproj" />
+    <ProjectReference Include="..\AimOdometer.Win32\AimOdometer.Win32.csproj" />
+  </ItemGroup>
+</Project>

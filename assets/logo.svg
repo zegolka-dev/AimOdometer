@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="256" height="256">
+  <!-- AimOdometer logo: odometer gauge + crosshair. Replaceable; regenerate icon.ico with tools/IconGen. -->
+  <rect x="0" y="0" width="256" height="256" rx="56" fill="#0B0D10"/>
+  <path d="M 65.77 190.23 A 88 88 0 1 1 190.23 190.23" fill="none" stroke="#2A2F38" stroke-width="20" stroke-linecap="round"/>
+  <path d="M 65.77 190.23 A 88 88 0 1 1 204.21 84" fill="none" stroke="#B6FF3B" stroke-width="20" stroke-linecap="round"/>
+  <path d="M 128 72 L 128 100 M 128 156 L 128 184 M 72 128 L 100 128 M 156 128 L 184 128" fill="none" stroke="#E8EDF2" stroke-width="14" stroke-linecap="round"/>
+  <circle cx="128" cy="128" r="12" fill="#B6FF3B"/>
+</svg>

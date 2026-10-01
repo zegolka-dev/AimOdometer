@@ -1,0 +1,28 @@
+# Build output
+bin/
+obj/
+artifacts/
+publish/
+TestResults/
+BenchmarkDotNet.Artifacts/
+
+# IDE
+.vs/
+.vscode/
+.idea/
+*.user
+*.suo
+
+# Secrets
+.env
+.env.*
+!.env.example
+supabase/.temp/
+supabase/.branches/
+
+# OS
+Thumbs.db
+.DS_Store
+
+# Velopack output
+Releases/

@@ -1,0 +1,14 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/AimOdometer.App/AimOdometer.App.csproj" />
+    <Project Path="src/AimOdometer.Core/AimOdometer.Core.csproj" />
+    <Project Path="src/AimOdometer.Tracker/AimOdometer.Tracker.csproj" />
+    <Project Path="src/AimOdometer.Win32/AimOdometer.Win32.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/AimOdometer.Core.Tests/AimOdometer.Core.Tests.csproj" />
+  </Folder>
+  <Folder Name="/tools/">
+    <Project Path="tools/IconGen/IconGen.csproj" />
+  </Folder>
+</Solution>

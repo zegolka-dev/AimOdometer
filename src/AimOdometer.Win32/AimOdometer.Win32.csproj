@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <IsAotCompatible>true</IsAotCompatible>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <RootNamespace>AimOdometer.Win32</RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <!-- Raw P/Invoke surface is internal; only our own processes and tests may use it. -->
+    <InternalsVisibleTo Include="AimOdometer.Tracker" />
+    <InternalsVisibleTo Include="AimOdometer.App" />
+    <InternalsVisibleTo Include="AimOdometer.Tracker.Tests" />
+  </ItemGroup>
+</Project>

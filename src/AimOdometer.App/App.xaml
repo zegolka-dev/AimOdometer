@@ -1,0 +1,14 @@
+<Application x:Class="AimOdometer.App.App"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             StartupUri="MainWindow.xaml">
+  <Application.Resources>
+    <!-- Temporary neutral dark tokens; the final palette is chosen in phase 4 (docs/PLAN.md, section 8). -->
+    <SolidColorBrush x:Key="BackgroundBrush" Color="#0B0D10" />
+    <SolidColorBrush x:Key="SurfaceBrush" Color="#14171C" />
+    <SolidColorBrush x:Key="BorderBrush" Color="#2A2F38" />
+    <SolidColorBrush x:Key="TextPrimaryBrush" Color="#E8EDF2" />
+    <SolidColorBrush x:Key="TextSecondaryBrush" Color="#8B95A3" />
+    <SolidColorBrush x:Key="AccentBrush" Color="#B6FF3B" />
+  </Application.Resources>
+</Application>
