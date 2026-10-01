@@ -1,6 +1,6 @@
 # AimOdometer — план проекта
 
-> Статус: **одобрен автором 2026-10-01** (синхронизация — только из окна приложения, допущение A9). Текущая фаза: **1 — Фундамент**.
+> Статус: **одобрен автором 2026-10-01** (синхронизация — только из окна приложения, допущение A9). Фаза 1 завершена 2026-10-02. Текущая фаза: **2 — Трекер-ядро**.
 > Язык этого документа — русский (он для автора). Код, комментарии, коммиты, README — на английском.
 > Легенда: `[ ]` — не начато, `[~]` — в работе, `[x]` — готово.
 
@@ -169,12 +169,12 @@ AimOdometer/
 
 Порядок как в ТЗ, с тремя улучшениями (обоснование в конце раздела). После каждой фазы: сборка без ошибок и предупреждений, тесты зелёные, коммит, обновлены PLAN.md и CHANGELOG.md, отчёт с шагами ручной проверки.
 
-### Фаза 1 — Фундамент
+### Фаза 1 — Фундамент ✅
 - [x] Установка .NET 10 SDK (10.0.401).
 - [x] Установка VS Build Tools 2026 (C++) для локальной NativeAOT-публикации. Базовый замер пустого AOT-трекера: exe 864 КБ, private bytes 4.9 МБ, working set 9.8 МБ, CPU в простое 0 (16 мс за старт).
 - [x] `git init`, solution (`AimOdometer.slnx`), проекты, `Directory.Build.props` (nullable, анализаторы, `TreatWarningsAsErrors` в Release, `LangVersion latest`), `Directory.Packages.props` (центральные версии), `.editorconfig`, `global.json`.
 - [x] Каркасы проектов, которые собираются и запускаются: Tracker (NativeAOT, пустой цикл сообщений + mutex), App (пустое тёмное окно), тест-проекты с реальными тестами. Пустые проекты (Cloud, Tracker.Tests, бенчмарки) создаются в той фазе, где они нужны.
-- [~] GitHub Actions (`ci.yml` написан, ждёт первого пуша): build + test + `dotnet format --verify-no-changes` на `windows-latest`; публикация Tracker через NativeAOT в CI.
+- [x] GitHub Actions (первый прогон зелёный): build + test + `dotnet format --verify-no-changes` на `windows-latest`; публикация Tracker через NativeAOT в CI.
 - [x] `docs/ARCHITECTURE.md` (на основе раздела 2), `LICENSE` (MIT), `README.md` (черновик), `.gitignore`, `.env.example`, `CHANGELOG.md`.
 - [x] Логотип: простой векторный `logo.svg` → `icon.ico` (16–256 px) через `tools/IconGen`.
 - **Критерии приёмки:** `dotnet build -c Release` без предупреждений; `dotnet test` зелёный; NativeAOT-публикация трекера даёт один exe; CI зелёный на GitHub.
