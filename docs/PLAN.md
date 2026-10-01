@@ -171,7 +171,7 @@ AimOdometer/
 
 ### Фаза 1 — Фундамент
 - [x] Установка .NET 10 SDK (10.0.401).
-- [ ] Установка VS Build Tools (C++) для локальной NativeAOT-публикации — первая попытка отменена (код 1602), ждёт повтора.
+- [x] Установка VS Build Tools 2026 (C++) для локальной NativeAOT-публикации. Базовый замер пустого AOT-трекера: exe 864 КБ, private bytes 4.9 МБ, working set 9.8 МБ, CPU в простое 0 (16 мс за старт).
 - [x] `git init`, solution (`AimOdometer.slnx`), проекты, `Directory.Build.props` (nullable, анализаторы, `TreatWarningsAsErrors` в Release, `LangVersion latest`), `Directory.Packages.props` (центральные версии), `.editorconfig`, `global.json`.
 - [x] Каркасы проектов, которые собираются и запускаются: Tracker (NativeAOT, пустой цикл сообщений + mutex), App (пустое тёмное окно), тест-проекты с реальными тестами. Пустые проекты (Cloud, Tracker.Tests, бенчмарки) создаются в той фазе, где они нужны.
 - [~] GitHub Actions (`ci.yml` написан, ждёт первого пуша): build + test + `dotnet format --verify-no-changes` на `windows-latest`; публикация Tracker через NativeAOT в CI.
