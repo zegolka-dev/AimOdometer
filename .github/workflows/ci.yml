@@ -49,5 +49,7 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: tracker-win-x64
-          path: artifacts/tracker/AimOdometer.Tracker.exe
+          path: |
+            artifacts/tracker/AimOdometer.Tracker.exe
+            artifacts/tracker/e_sqlite3.dll
           if-no-files-found: error

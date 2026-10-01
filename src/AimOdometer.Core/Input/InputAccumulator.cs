@@ -291,7 +291,8 @@ public sealed unsafe class InputAccumulator
             var sentAt = *(uint*)(mouse + 20);
             if (sentAt != 0)
             {
-                var latency = (long)unchecked((uint)timestamp - sentAt);
+                // Signed 32-bit difference handles wrap-around; events generated after our timestamp count as 0.
+                var latency = Math.Max(0L, unchecked((int)((uint)timestamp - sentAt)));
                 LatencySamples++;
                 LatencyTicksTotal += latency;
                 LatencyTicksMax = Math.Max(LatencyTicksMax, latency);

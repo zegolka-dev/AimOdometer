@@ -17,6 +17,9 @@
     <DebuggerSupport>false</DebuggerSupport>
   </PropertyGroup>
   <ItemGroup>
+    <InternalsVisibleTo Include="AimOdometer.Tracker.Tests" />
+  </ItemGroup>
+  <ItemGroup>
     <ProjectReference Include="..\AimOdometer.Core\AimOdometer.Core.csproj" />
     <ProjectReference Include="..\AimOdometer.Win32\AimOdometer.Win32.csproj" />
   </ItemGroup>

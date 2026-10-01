@@ -7,8 +7,12 @@
   </Folder>
   <Folder Name="/tests/">
     <Project Path="tests/AimOdometer.Core.Tests/AimOdometer.Core.Tests.csproj" />
+    <Project Path="tests/AimOdometer.Tracker.Tests/AimOdometer.Tracker.Tests.csproj" />
   </Folder>
   <Folder Name="/tools/">
     <Project Path="tools/IconGen/IconGen.csproj" />
+    <Project Path="tools/InputProbe/InputProbe.csproj" />
+    <Project Path="tools/InputSimulator/InputSimulator.csproj" />
+    <Project Path="tools/PerfProbe/PerfProbe.csproj" />
   </Folder>
 </Solution>
