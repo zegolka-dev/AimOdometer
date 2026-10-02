@@ -11,7 +11,9 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), ver
     minimized, locked, asleep or paused); movement is attributed to the active app.
   - Steam library detection without sign-in (own VDF/ACF parser), built-in list of 55 non-Steam games
     (`data/games.json`, extendable with a user file), user rules (game / not a game / excluded / merge / rename).
-  - Per-game summary: distance, foreground time, km/h, clicks, peak speed (`PerfProbe --games`).
+  - Per-game summary: distance, foreground time, km/h, clicks, peak speed (`PerfProbe --games`); per-app
+    diagnostics (`--apps`), live event monitor (`--watch`), settings (`--set`), debug log of foreground changes.
+  - Verified with CS2 (VAC) and Apex Legends (EAC, fullscreen).
   - Database schema v2 (`app_time`, `app_rules`, `game_names`); existing databases are upgraded in place.
 - Phase 2 tracker core:
   - Raw Input collection for all mice with `RIDEV_INPUTSINK`, batched wake-ups (at most one per 16 ms) and an

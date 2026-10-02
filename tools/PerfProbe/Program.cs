@@ -57,6 +57,26 @@ internal static unsafe partial class Program
             return PrintGames(args.Length > 1 ? args[1] : AimOdometer.Core.Storage.StatsStore.DefaultPath);
         }
 
+        if (args is ["--apps", ..])
+        {
+            return PrintApps(args.Length > 1 ? args[1] : AimOdometer.Core.Storage.StatsStore.DefaultPath);
+        }
+
+        if (args is ["--set", var key, var value, ..])
+        {
+            using (var store = AimOdometer.Core.Storage.StatsStore.Open(AimOdometer.Core.Storage.StatsStore.DefaultPath))
+            {
+                store.SetSetting(key, value);
+            }
+
+            return TrackerClient.Send(TrackerCommand.ReloadSettings) is [TrackerProtocol.StatusOk, ..] ? 0 : 1;
+        }
+
+        if (args is ["--watch", var watchSeconds, ..])
+        {
+            return Watch(int.Parse(watchSeconds, CultureInfo.InvariantCulture));
+        }
+
         if (args is ["--flush", ..])
         {
             return TrackerClient.Send(TrackerCommand.Flush) is [TrackerProtocol.StatusOk, ..] ? 0 : 1;
@@ -156,6 +176,62 @@ internal static unsafe partial class Program
             }
 
             Console.WriteLine();
+        }
+
+        return 0;
+    }
+
+    [LibraryImport("user32.dll")]
+    private static partial nint GetForegroundWindow();
+
+    [LibraryImport("user32.dll")]
+    private static partial uint GetWindowThreadProcessId(nint hwnd, uint* processId);
+
+    /// <summary>Once per second: events the tracker received and the foreground process (diagnostics).</summary>
+    private static int Watch(int seconds)
+    {
+        var last = TrackerClient.GetStatus();
+        for (var i = 0; i < seconds; i++)
+        {
+            Thread.Sleep(1000);
+            var now = TrackerClient.GetStatus();
+            uint pid = 0;
+            _ = GetWindowThreadProcessId(GetForegroundWindow(), &pid);
+            string name;
+            try
+            {
+                using var process = Process.GetProcessById((int)pid);
+                name = process.ProcessName;
+            }
+            catch (ArgumentException)
+            {
+                name = "?";
+            }
+
+            var events = now is not null && last is not null ? now.EventsProcessed - last.EventsProcessed : -1;
+            var wakeUps = now is not null && last is not null ? now.WakeUps - last.WakeUps : -1;
+            Console.WriteLine($"{DateTime.Now:HH:mm:ss} events {events,6} wake-ups {wakeUps,4} foreground {name} ({pid})");
+            Console.Out.Flush();
+            last = now;
+        }
+
+        return 0;
+    }
+
+    /// <summary>Prints today's totals per executable with its classification (diagnostics).</summary>
+    private static int PrintApps(string path)
+    {
+        _ = TrackerClient.Send(TrackerCommand.Flush);
+        using var store = AimOdometer.Core.Storage.StatsStore.Open(path);
+        var catalog = AimOdometer.Core.Games.GameCatalog.Create(store);
+        var apps = store.GetApps().ToDictionary(a => a.Id);
+        Console.WriteLine("| App id | Exe path | Classified as | cm | Foreground s | Clicks |");
+        Console.WriteLine("|---|---|---|---|---|---|");
+        foreach (var u in store.GetAppUsage(DateOnly.FromDateTime(DateTime.Now)).OrderByDescending(u => u.ForegroundSeconds))
+        {
+            var app = apps.GetValueOrDefault(u.AppId);
+            var classification = app is null ? "(none)" : catalog.Classify(app.Id, app.ExePath) is { Game: { } g } ? g.Name : catalog.Classify(app.Id, app.ExePath).Category.ToString();
+            Console.WriteLine($"| {u.AppId} | {app?.ExePath ?? "-"} | {classification} | {u.Centimeters:0} | {u.ForegroundSeconds:0} | {u.Clicks} |");
         }
 
         return 0;

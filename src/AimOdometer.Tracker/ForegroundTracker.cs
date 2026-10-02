@@ -128,6 +128,7 @@ internal sealed unsafe class ForegroundTracker : IDisposable
             {
                 tracker.CloseSegment();
                 tracker._minimized = eventType == WinEvents.EventSystemMinimizeStart;
+                Log.Debug($"Foreground window 0x{hwnd:X} {(tracker._minimized ? "minimized" : "restored")}");
             }
         }
         catch (Exception ex)
@@ -143,6 +144,11 @@ internal sealed unsafe class ForegroundTracker : IDisposable
         _minimized = hwnd != 0 && WinEvents.IsIconic(hwnd);
 
         var appId = hwnd == 0 ? 0 : ResolveAppId(hwnd);
+        if (Log.MinimumLevel <= LogLevel.Debug)
+        {
+            Log.Debug($"Foreground window 0x{hwnd:X}: app {appId}{(_minimized ? " (minimized)" : string.Empty)}");
+        }
+
         if (appId != _currentAppId)
         {
             _currentAppId = appId;
@@ -185,6 +191,7 @@ internal sealed unsafe class ForegroundTracker : IDisposable
             return 0;
         }
 
+        Log.Debug($"Process {processId}: {path}");
         if (!_appIdByPath.TryGetValue(path, out var appId))
         {
             try
