@@ -24,6 +24,13 @@ centimeters = counts / DPI × 2.54
 - **Anti-cheat friendly.** No hooks, no injection, no overlays, no game memory access. Only passive Raw Input and the name of the active app.
 - **Private.** The keyboard is never read. Without Steam sign-in, AimOdometer makes no network requests except an optional update check.
 
+## Known limitations
+
+- On Windows 11, background apps receive mouse input merged into ~125 reports per second. Straight movements are
+  measured exactly, but during intense aiming the tracker records about 2 % less path than the mouse really travelled
+  (measured: −2.3 %). See [docs/PERFORMANCE.md](docs/PERFORMANCE.md).
+- If you change DPI with a button on the mouse, AimOdometer cannot see it: set the new DPI in the tray menu.
+
 ## Building from source
 
 Requirements: Windows 10 22H2+ / 11 x64, [.NET 10 SDK](https://dotnet.microsoft.com/download/dotnet/10.0). Publishing the NativeAOT tracker also needs the Visual Studio Build Tools C++ workload.

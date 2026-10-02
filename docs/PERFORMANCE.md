@@ -7,7 +7,7 @@ Budget for the always-running tracker (from the project brief):
 | Private working set | ≤ 15 MB | **4.2 MB** (worker 2.45 MB + supervisor 1.77 MB) | ✅ |
 | CPU when the mouse is idle | ≈ 0 % | **0.000 %** (no wake-ups at all) | ✅ |
 | CPU, 1000 Hz mouse | — | **0.34 %** of one core | ✅ |
-| CPU, 8000 Hz mouse in a game | < 0.5 % of one core | **0.61 %** with *synthetic* 8000 Hz input; real-mouse measurement pending | ⚠️ see below |
+| CPU, 8000 Hz mouse in a game | < 0.5 % of one core | **0.116 %** with the author's real ~6000 Hz mouse (2 min); 0.61 % with synthetic input | ✅ |
 | Managed allocations on the input path | 0 | **0 bytes** (unit test + live counter) | ✅ |
 | Data lost on a crash | ≤ 60 s | ≤ 60 s (flush every 60 s, on sleep, lock, logoff, exit) | ✅ |
 
@@ -96,8 +96,27 @@ chord instead of an arc. For an arc of length *L* on a circle of radius *R* the 
 - 1 mm circles at ~7500 Hz (the synthetic worst case above): measured 0.82 %.
 - Typical aim movement (radius ≥ 2 cm, 50 cm/s, ~8 ms merges): about 0.2 % or less.
 
-The real-mouse value is measured with `tools/InputProbe` (a focused window reading raw input at the full rate,
-compared with the background tracker over the same period). **Pending:** run on the author's mouse and record here.
+### Real mouse (2026-10-02)
+
+Measured with `tools/InputProbe` (a focused window reading raw input at the full rate, compared with the background
+tracker over the same period), author's wireless mouse, 800 DPI, vigorous aim-like circles and flicks for 62 s:
+
+| Reader | Reports | Path |
+|---|---|---|
+| Foreground, full rate | 372,307 (5,986/s) | 1,023,375 counts |
+| Background tracker (coalesced by Windows) | ~125/s while moving | 999,622 counts |
+| **Difference** | | **−2.32 %** |
+
+This is far more than the 0.2 % estimated above: fast, tight micro-corrections bend the path a lot within 8 ms.
+The ruler test (straight strokes) is unaffected: 4 strokes of 57 cm were recorded as 247 cm, with about 19 cm of
+extra positioning moves in the same period.
+
+**Status:** accepted as a known limitation (the author considers up to ~2 % acceptable). Background raw input on
+Windows 11 has no documented opt-out. A research spike on Microsoft GameInput as an alternative input source is
+planned for phase 10.
+
+The same 2-minute run measured the tracker at **0.116 % of one core** and 2.96 MB private working set:
+Windows delivered on average 70 reports/s (125/s while moving) instead of ~6000.
 
 ## Crash recovery
 
@@ -115,7 +134,7 @@ Verified with the `--crash-after 10` test hook: the worker fast-failed, was rest
 
 ## Open items
 
-- Real 8000 Hz mouse in a real game: verify that Windows 11 coalesces hardware input for background listeners more
-  aggressively than injected input (expected ~125 deliveries/s → well under 0.5 %).
+- ~~Real high-rate mouse~~: confirmed, hardware input is coalesced to ~125/s for background listeners (0.116 % CPU).
+- Accuracy loss from coalescing during intense aim (−2.3 % measured): GameInput spike.
 - Windows 10 has no background coalescing; an 8000 Hz mouse there would deliver 8000 reports/s. Estimated cost from
   the kernel-dominated profile: roughly 1–1.5 % of one core. Needs a Windows 10 machine to confirm.

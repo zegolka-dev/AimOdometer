@@ -20,6 +20,11 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), ver
   - Rotating file log (5 MB x 2).
   - Tools: InputSimulator (up to 8000 Hz), PerfProbe (precise CPU via cycle counts, memory, DB dump),
     InputProbe (coalescing accuracy), `Run-Benchmarks.ps1`; results in `docs/PERFORMANCE.md`.
+  - Verified on real hardware: 0.116 % of one core with a ~6000 Hz mouse, no anti-cheat complaints in CS2 (VAC) with
+    FACEIT AC running.
+
+### Known issues
+- Windows 11 coalesces background mouse input; during intense aiming about 2 % of the path is not recorded.
 - Phase 1 foundation: .NET 10 solution (`AimOdometer.slnx`) with Core, Win32, Tracker (NativeAOT) and App (WPF) projects.
 - Tracker skeleton: single instance per session (named mutex), hidden message window, `--stop` command.
 - App skeleton: dark window that shows whether the tracker is running.
