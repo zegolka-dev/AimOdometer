@@ -681,7 +681,7 @@ internal sealed unsafe class TrackerHost : IDisposable
                 break;
             case CmdAutostart:
                 var enable = !Autostart.IsEnabled();
-                Autostart.Set(enable);
+                Autostart.Set(enable, Environment.ProcessPath!);
                 _store.SetSetting(SettingKeys.Autostart, enable ? "1" : "0");
                 break;
             case CmdExit:
@@ -778,16 +778,16 @@ internal sealed unsafe class TrackerHost : IDisposable
         if (setting is null)
         {
             // On by default for installed copies; developer builds never register themselves.
-            var enable = Autostart.IsInstalledLocation;
+            var enable = Autostart.IsInstalledLocation(Environment.ProcessPath);
             _store.SetSetting(SettingKeys.Autostart, enable ? "1" : "0");
             if (enable)
             {
-                Autostart.Set(true);
+                Autostart.Set(true, Environment.ProcessPath!);
             }
         }
         else if (setting == "1")
         {
-            Autostart.Set(true); // refresh the path in case the exe moved after an update
+            Autostart.Set(true, Environment.ProcessPath!); // refresh the path in case the exe moved after an update
         }
     }
 

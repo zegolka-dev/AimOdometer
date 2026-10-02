@@ -1,14 +1,31 @@
 <Application x:Class="AimOdometer.App.App"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             StartupUri="MainWindow.xaml">
+             xmlns:vm="clr-namespace:AimOdometer.App.ViewModels"
+             xmlns:v="clr-namespace:AimOdometer.App.Views"
+             xmlns:c="clr-namespace:AimOdometer.App.Controls"
+             ThemeMode="Dark"
+             ShutdownMode="OnMainWindowClose">
   <Application.Resources>
-    <!-- Temporary neutral dark tokens; the final palette is chosen in phase 4 (docs/PLAN.md, section 8). -->
-    <SolidColorBrush x:Key="BackgroundBrush" Color="#0B0D10" />
-    <SolidColorBrush x:Key="SurfaceBrush" Color="#14171C" />
-    <SolidColorBrush x:Key="BorderBrush" Color="#2A2F38" />
-    <SolidColorBrush x:Key="TextPrimaryBrush" Color="#E8EDF2" />
-    <SolidColorBrush x:Key="TextSecondaryBrush" Color="#8B95A3" />
-    <SolidColorBrush x:Key="AccentBrush" Color="#B6FF3B" />
+    <ResourceDictionary>
+      <ResourceDictionary.MergedDictionaries>
+        <ResourceDictionary Source="Themes/Palette.xaml" />
+        <ResourceDictionary Source="Themes/Controls.xaml" />
+      </ResourceDictionary.MergedDictionaries>
+
+      <BooleanToVisibilityConverter x:Key="BoolToVisibility" />
+      <c:InverseBoolToVisibilityConverter x:Key="InverseBoolToVisibility" />
+      <c:NullToCollapsedConverter x:Key="NullToCollapsed" />
+      <c:EnumEqualsConverter x:Key="EnumEquals" />
+      <c:InverseBoolConverter x:Key="InverseBool" />
+      <c:LanguageLabelConverter x:Key="LanguageLabel" />
+      <c:ShareToStarConverter x:Key="ShareToStar" />
+
+      <DataTemplate DataType="{x:Type vm:OverviewViewModel}"><v:OverviewView /></DataTemplate>
+      <DataTemplate DataType="{x:Type vm:GamesViewModel}"><v:GamesView /></DataTemplate>
+      <DataTemplate DataType="{x:Type vm:StatisticsViewModel}"><v:StatisticsView /></DataTemplate>
+      <DataTemplate DataType="{x:Type vm:GearViewModel}"><v:GearView /></DataTemplate>
+      <DataTemplate DataType="{x:Type vm:SettingsViewModel}"><v:SettingsView /></DataTemplate>
+    </ResourceDictionary>
   </Application.Resources>
 </Application>

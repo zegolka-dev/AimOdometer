@@ -1,0 +1,104 @@
+<UserControl x:Class="AimOdometer.App.Views.OverviewView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:l="clr-namespace:AimOdometer.App.Localization"
+             xmlns:c="clr-namespace:AimOdometer.App.Controls">
+  <StackPanel>
+    <TextBlock Style="{StaticResource PageTitle}" Text="{l:T Overview.Title}" />
+    <TextBlock Style="{StaticResource PageSubtitle}" Text="{l:T Overview.Subtitle}" Margin="0,0,0,24" />
+
+    <!-- Today, live -->
+    <Border Style="{StaticResource AccentCard}" Padding="28,22">
+      <Grid>
+        <Grid.ColumnDefinitions>
+          <ColumnDefinition Width="*" />
+          <ColumnDefinition Width="Auto" />
+        </Grid.ColumnDefinitions>
+        <StackPanel>
+          <TextBlock Style="{StaticResource CardLabel}" Text="{l:T Common.Today}" FontSize="14" />
+          <StackPanel Orientation="Horizontal" Margin="0,2,0,0">
+            <TextBlock Style="{StaticResource HeroNumber}" Text="{Binding TodayNumber}" />
+            <TextBlock Text="{Binding TodayUnit}" FontFamily="{StaticResource NumberFont}" FontSize="26"
+                       Foreground="{StaticResource AccentTextBrush}" VerticalAlignment="Bottom" Margin="10,0,0,12" />
+          </StackPanel>
+          <TextBlock Style="{StaticResource Hint}" Text="{Binding StreakText}" FontSize="13" />
+        </StackPanel>
+        <StackPanel Grid.Column="1" VerticalAlignment="Center" MinWidth="200">
+          <TextBlock Style="{StaticResource CardLabel}" Text="{l:T Overview.Clicks}" />
+          <TextBlock Style="{StaticResource MediumNumber}" Text="{Binding TodayClicks}" Margin="0,0,0,10" />
+          <TextBlock Style="{StaticResource CardLabel}" Text="{l:T Overview.ActiveTime}" />
+          <TextBlock Style="{StaticResource MediumNumber}" Text="{Binding TodayActive}" Margin="0,0,0,10" />
+          <TextBlock Style="{StaticResource CardLabel}" Text="{l:T Overview.PeakSpeed}" />
+          <TextBlock Style="{StaticResource MediumNumber}" Text="{Binding TodayPeak}" />
+        </StackPanel>
+      </Grid>
+    </Border>
+
+    <!-- Periods -->
+    <UniformGrid Columns="3" Margin="-6,16,-6,0">
+      <Border Style="{StaticResource Card}" Margin="6,0">
+        <StackPanel>
+          <TextBlock Style="{StaticResource CardLabel}" Text="{l:T Common.ThisWeek}" />
+          <TextBlock Style="{StaticResource BigNumber}" Text="{Binding Week}" />
+        </StackPanel>
+      </Border>
+      <Border Style="{StaticResource Card}" Margin="6,0">
+        <StackPanel>
+          <TextBlock Style="{StaticResource CardLabel}" Text="{l:T Common.ThisMonth}" />
+          <TextBlock Style="{StaticResource BigNumber}" Text="{Binding Month}" />
+        </StackPanel>
+      </Border>
+      <Border Style="{StaticResource Card}" Margin="6,0">
+        <StackPanel>
+          <TextBlock Style="{StaticResource CardLabel}" Text="{l:T Common.AllTime}" />
+          <TextBlock Style="{StaticResource BigNumber}" Text="{Binding AllTime}" />
+        </StackPanel>
+      </Border>
+    </UniformGrid>
+
+    <Grid Margin="0,16,0,0">
+      <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="2*" />
+        <ColumnDefinition Width="16" />
+        <ColumnDefinition Width="*" />
+      </Grid.ColumnDefinitions>
+
+      <Border Style="{StaticResource Card}">
+        <StackPanel>
+          <TextBlock Style="{StaticResource SectionTitle}" Text="{l:T Overview.Last14Days}" />
+          <c:BarChart Bars="{Binding Bars}" Height="190" />
+        </StackPanel>
+      </Border>
+
+      <Border Grid.Column="2" Style="{StaticResource Card}">
+        <StackPanel>
+          <TextBlock Style="{StaticResource SectionTitle}" Text="{l:T Overview.TopGamesToday}" />
+          <TextBlock Style="{StaticResource Hint}" Text="{l:T Overview.NoGamesToday}" FontSize="13"
+                     Visibility="{Binding HasGamesToday, Converter={StaticResource InverseBoolToVisibility}}" />
+          <ItemsControl ItemsSource="{Binding TopGames}">
+            <ItemsControl.ItemTemplate>
+              <DataTemplate>
+                <Grid Margin="0,0,0,14">
+                  <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                  </Grid.ColumnDefinitions>
+                  <Border Width="32" Height="32" CornerRadius="8" Background="{StaticResource SurfaceElevatedBrush}" Margin="0,0,12,0">
+                    <Image Source="{Binding Icon}" Width="22" Height="22" />
+                  </Border>
+                  <StackPanel Grid.Column="1">
+                    <DockPanel>
+                      <TextBlock DockPanel.Dock="Right" Text="{Binding Distance}" FontFamily="{StaticResource NumberFont}" FontSize="14" />
+                      <TextBlock Text="{Binding Name}" FontSize="14" TextTrimming="CharacterEllipsis" Margin="0,0,8,0" />
+                    </DockPanel>
+                    <ProgressBar Style="{StaticResource ShareBar}" Value="{Binding Share, Mode=OneWay}" Foreground="{Binding Brush}" Margin="0,6,0,0" />
+                  </StackPanel>
+                </Grid>
+              </DataTemplate>
+            </ItemsControl.ItemTemplate>
+          </ItemsControl>
+        </StackPanel>
+      </Border>
+    </Grid>
+  </StackPanel>
+</UserControl>

@@ -3,19 +3,30 @@
     <OutputType>WinExe</OutputType>
     <TargetFramework>net10.0-windows</TargetFramework>
     <UseWPF>true</UseWPF>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <RootNamespace>AimOdometer.App</RootNamespace>
     <ApplicationIcon>..\..\assets\icon.ico</ApplicationIcon>
-    <!-- Precompiled code for faster first frame (target: < 1.5 s). -->
+    <!-- Precompiled code for a faster first frame (target: < 1.5 s). -->
     <PublishReadyToRun>true</PublishReadyToRun>
     <SelfContained>false</SelfContained>
     <TieredPGO>true</TieredPGO>
+    <!-- WPF Fluent theme (ThemeMode) is marked experimental; we rely on it for native Windows 11 control styles. -->
+    <NoWarn>$(NoWarn);WPF0001</NoWarn>
   </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="CommunityToolkit.Mvvm" />
+  </ItemGroup>
   <ItemGroup>
     <Resource Include="..\..\assets\icon.ico" Link="Assets\icon.ico" />
     <Resource Include="..\..\assets\logo-512.png" Link="Assets\logo.png" />
+    <!-- Languages are plain JSON files next to the exe: adding a language = adding one file. -->
+    <None Include="..\..\data\i18n\*.json" Link="i18n\%(Filename)%(Extension)" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\AimOdometer.Core\AimOdometer.Core.csproj" />
     <ProjectReference Include="..\AimOdometer.Win32\AimOdometer.Win32.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <InternalsVisibleTo Include="AimOdometer.App.Tests" />
   </ItemGroup>
 </Project>

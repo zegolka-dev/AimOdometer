@@ -9,6 +9,7 @@ Budget for the always-running tracker (from the project brief):
 | CPU, 1000 Hz mouse | — | **0.34 %** of one core | ✅ |
 | CPU, 8000 Hz mouse in a game | < 0.5 % of one core | **0.116 %** with the author's real ~6000 Hz mouse (2 min); 0.61 % with synthetic input | ✅ |
 | Managed allocations on the input path | 0 | **0 bytes** (unit test + live counter) | ✅ |
+| Statistics window: time to first window | < 1.5 s | **~0.6 s** (published, ReadyToRun; 3 runs: 616, 582, 585 ms) | ✅ |
 | Data lost on a crash | ≤ 60 s | ≤ 60 s (flush every 60 s, on sleep, lock, logoff, exit) | ✅ |
 
 ## Test system

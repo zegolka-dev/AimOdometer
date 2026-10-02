@@ -1,18 +1,18 @@
 using Microsoft.Win32;
 
-namespace AimOdometer.Tracker;
+namespace AimOdometer.Core;
 
 /// <summary>Start-with-Windows through HKCU\...\Run (per user, no admin rights needed).</summary>
-internal static class Autostart
+public static class Autostart
 {
     private const string RunKey = @"Software\Microsoft\Windows\CurrentVersion\Run";
     private const string ValueName = "AimOdometer";
 
-    public static string Command => $"\"{Environment.ProcessPath}\" --autostart";
+    public static string CommandFor(string trackerExePath) => $"\"{trackerExePath}\" --autostart";
 
-    /// <summary>True when the tracker runs from the installed location (not from a developer build folder).</summary>
-    public static bool IsInstalledLocation =>
-        Environment.ProcessPath?.Contains(@"\AimOdometerApp\", StringComparison.OrdinalIgnoreCase) == true;
+    /// <summary>True for the installed copy (not a developer build folder); autostart is on by default only there.</summary>
+    public static bool IsInstalledLocation(string? exePath) =>
+        exePath?.Contains(@"\AimOdometerApp\", StringComparison.OrdinalIgnoreCase) == true;
 
     public static bool IsEnabled()
     {
@@ -20,13 +20,14 @@ internal static class Autostart
         return key?.GetValue(ValueName) is string value && value.Length > 0;
     }
 
-    public static void Set(bool enabled)
+    /// <summary>Enables (pointing at <paramref name="trackerExePath"/>) or disables autostart.</summary>
+    public static void Set(bool enabled, string trackerExePath)
     {
         using var key = Registry.CurrentUser.CreateSubKey(RunKey, writable: true);
         if (enabled)
         {
             // Rewrites the path too, so it follows the exe if it moved.
-            key.SetValue(ValueName, Command, RegistryValueKind.String);
+            key.SetValue(ValueName, CommandFor(trackerExePath), RegistryValueKind.String);
         }
         else if (key.GetValue(ValueName) is not null)
         {

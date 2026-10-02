@@ -1,0 +1,75 @@
+<Window x:Class="AimOdometer.App.Views.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:l="clr-namespace:AimOdometer.App.Localization"
+        xmlns:v="clr-namespace:AimOdometer.App.Views"
+        Title="AimOdometer"
+        Width="1180" Height="760" MinWidth="900" MinHeight="600"
+        WindowStartupLocation="CenterScreen"
+        Icon="/Assets/icon.ico"
+        Background="{StaticResource BackgroundBrush}"
+        Foreground="{StaticResource TextPrimaryBrush}"
+        FontFamily="{StaticResource TextFont}"
+        UseLayoutRounding="True">
+  <Grid>
+    <Grid.ColumnDefinitions>
+      <ColumnDefinition Width="232" />
+      <ColumnDefinition Width="*" />
+    </Grid.ColumnDefinitions>
+
+    <!-- Sidebar -->
+    <Border Background="{StaticResource SurfaceBrush}" BorderBrush="{StaticResource BorderBrush}" BorderThickness="0,0,1,0">
+      <DockPanel Margin="16,20,16,16">
+        <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Margin="4,0,0,24">
+          <Image Source="/Assets/logo.png" Width="32" Height="32" RenderOptions.BitmapScalingMode="HighQuality" />
+          <TextBlock Text="AimOdometer" FontSize="17" FontWeight="SemiBold" Margin="10,0,0,0" VerticalAlignment="Center" />
+        </StackPanel>
+
+        <!-- Live tracker status -->
+        <Border DockPanel.Dock="Bottom" Background="{StaticResource SurfaceElevatedBrush}" CornerRadius="10" Padding="12,10">
+          <StackPanel Orientation="Horizontal">
+            <Ellipse x:Name="StatusDot" Width="8" Height="8" Margin="0,0,10,0" VerticalAlignment="Center">
+              <Ellipse.Style>
+                <Style TargetType="Ellipse">
+                  <Setter Property="Fill" Value="{StaticResource TextMutedBrush}" />
+                  <Style.Triggers>
+                    <DataTrigger Binding="{Binding Status}" Value="Tracking"><Setter Property="Fill" Value="{StaticResource SuccessBrush}" /></DataTrigger>
+                    <DataTrigger Binding="{Binding Status}" Value="Paused"><Setter Property="Fill" Value="{StaticResource WarningBrush}" /></DataTrigger>
+                    <DataTrigger Binding="{Binding Status}" Value="Stopped"><Setter Property="Fill" Value="{StaticResource DangerBrush}" /></DataTrigger>
+                  </Style.Triggers>
+                </Style>
+              </Ellipse.Style>
+            </Ellipse>
+            <TextBlock Text="{Binding StatusText}" FontSize="13" Foreground="{StaticResource TextSecondaryBrush}" TextWrapping="Wrap" MaxWidth="160" />
+          </StackPanel>
+        </Border>
+
+        <ItemsControl ItemsSource="{Binding Pages}" KeyboardNavigation.TabNavigation="Cycle">
+          <ItemsControl.ItemTemplate>
+            <DataTemplate>
+              <RadioButton Style="{StaticResource NavItem}" GroupName="Nav" Tag="{Binding Icon}"
+                           IsChecked="{Binding IsCurrent}"
+                           AutomationProperties.Name="{Binding Title}"
+                           Content="{Binding Title}" />
+            </DataTemplate>
+          </ItemsControl.ItemTemplate>
+        </ItemsControl>
+      </DockPanel>
+    </Border>
+
+    <!-- Page -->
+    <ScrollViewer Grid.Column="1" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Focusable="False">
+      <ContentControl x:Name="PageHost" Content="{Binding CurrentPage}" Margin="36,28,36,32" Focusable="False">
+        <ContentControl.RenderTransform>
+          <TranslateTransform />
+        </ContentControl.RenderTransform>
+      </ContentControl>
+    </ScrollViewer>
+
+    <!-- Overlays -->
+    <Grid Grid.ColumnSpan="2" Background="#CC07071A" Visibility="{Binding HasOverlay, Converter={StaticResource BoolToVisibility}}">
+      <v:OnboardingView DataContext="{Binding Onboarding}" Visibility="{Binding DataContext.IsOnboardingVisible, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource BoolToVisibility}}" />
+      <v:CalibrationView DataContext="{Binding Calibration}" Visibility="{Binding DataContext.IsCalibrationVisible, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource BoolToVisibility}}" />
+    </Grid>
+  </Grid>
+</Window>

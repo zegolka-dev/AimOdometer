@@ -43,6 +43,20 @@ public sealed record AppUsage(
     double ForegroundSeconds,
     double PeakSpeedCmPerSecond);
 
+/// <summary>Totals of one local date.</summary>
+public sealed record DayTotal(
+    DateOnly Date,
+    double Centimeters,
+    double XCentimeters,
+    double YCentimeters,
+    long Clicks,
+    double WheelNotches,
+    long MoveSeconds,
+    double PeakSpeedCmPerSecond);
+
+/// <summary>Distance moved in one hour-of-day on one weekday, summed over a period.</summary>
+public sealed record HourOfWeekTotal(DayOfWeek Day, int Hour, double Centimeters);
+
 /// <summary>Typed access to the local statistics database.</summary>
 public sealed class StatsStore : IDisposable
 {
@@ -302,6 +316,97 @@ public sealed class StatsStore : IDisposable
         }
 
         return result;
+    }
+
+    /// <summary>Per local date totals over devices that count toward totals, oldest first. Days without data are absent.</summary>
+    public IReadOnlyList<DayTotal> GetDailyTotals(DateOnly? from = null, DateOnly? to = null)
+    {
+        using var select = _db.Prepare("""
+            SELECT h.local_date,
+                   sum(h.path_counts / h.dpi) * 2.54, sum(h.x_counts / h.dpi) * 2.54, sum(h.y_counts / h.dpi) * 2.54,
+                   sum(h.clicks_left + h.clicks_right + h.clicks_middle + h.clicks_x1 + h.clicks_x2),
+                   sum(h.wheel_notches), sum(h.move_seconds), max(h.peak_speed / h.dpi) * 2.54
+            FROM hourly h JOIN devices d ON d.id = h.device_id
+            WHERE d.excluded = 0 AND h.local_date BETWEEN ?1 AND ?2
+            GROUP BY h.local_date ORDER BY h.local_date;
+            """);
+        select.Bind(1, from?.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture) ?? "0000-01-01")
+            .Bind(2, to?.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture) ?? "9999-12-31");
+        var result = new List<DayTotal>();
+        while (select.Step())
+        {
+            result.Add(new DayTotal(
+                DateOnly.ParseExact(select.GetString(0)!, "yyyy-MM-dd", CultureInfo.InvariantCulture),
+                select.GetDouble(1), select.GetDouble(2), select.GetDouble(3), select.GetInt64(4),
+                select.GetDouble(5), select.GetInt64(6), select.GetDouble(7)));
+        }
+
+        return result;
+    }
+
+    /// <summary>Movement per local hour of day (0..23) and weekday, for the activity heat map.</summary>
+    public IReadOnlyList<HourOfWeekTotal> GetHourOfWeekTotals(DateOnly? from = null, DateOnly? to = null)
+    {
+        using var select = _db.Prepare("""
+            SELECT h.local_date, h.local_hour, sum(h.path_counts / h.dpi) * 2.54
+            FROM hourly h JOIN devices d ON d.id = h.device_id
+            WHERE d.excluded = 0 AND h.local_date BETWEEN ?1 AND ?2
+            GROUP BY h.local_date, h.local_hour;
+            """);
+        select.Bind(1, from?.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture) ?? "0000-01-01")
+            .Bind(2, to?.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture) ?? "9999-12-31");
+        var cells = new Dictionary<(DayOfWeek, int), double>();
+        while (select.Step())
+        {
+            var day = DateOnly.ParseExact(select.GetString(0)!, "yyyy-MM-dd", CultureInfo.InvariantCulture).DayOfWeek;
+            var key = (day, (int)select.GetInt64(1));
+            cells[key] = cells.GetValueOrDefault(key) + select.GetDouble(2);
+        }
+
+        return [.. cells.Select(c => new HourOfWeekTotal(c.Key.Item1, c.Key.Item2, c.Value))];
+    }
+
+    /// <summary>Distance per device over all time (including excluded devices, flagged).</summary>
+    public IReadOnlyList<(DeviceRecord Device, double Centimeters)> GetDeviceTotals()
+    {
+        var devices = GetDevices().ToDictionary(d => d.Id);
+        using var select = _db.Prepare(
+            "SELECT device_id, coalesce(sum(path_counts / dpi), 0) * 2.54 FROM hourly GROUP BY device_id;");
+        var totals = new Dictionary<long, double>();
+        while (select.Step())
+        {
+            totals[select.GetInt64(0)] = select.GetDouble(1);
+        }
+
+        return [.. devices.Values.Select(d => (d, totals.GetValueOrDefault(d.Id))).OrderByDescending(t => t.Item2)];
+    }
+
+    /// <summary>The fastest flick ever recorded: speed, local date and foreground app; null without data.</summary>
+    public (double CmPerSecond, DateOnly Date, long AppId)? GetPeakSpeedRecord()
+    {
+        using var select = _db.Prepare("""
+            SELECT h.peak_speed / h.dpi * 2.54 AS speed, h.local_date, h.app_id
+            FROM hourly h JOIN devices d ON d.id = h.device_id
+            WHERE d.excluded = 0 AND h.peak_speed > 0
+            ORDER BY speed DESC LIMIT 1;
+            """);
+        return select.Step()
+            ? (select.GetDouble(0), DateOnly.ParseExact(select.GetString(1)!, "yyyy-MM-dd", CultureInfo.InvariantCulture), select.GetInt64(2))
+            : null;
+    }
+
+    /// <summary>Changes a device's display name (null or empty restores the product name).</summary>
+    public void SetDeviceName(long deviceId, string? displayName)
+    {
+        using var update = _db.Prepare("UPDATE devices SET display_name = ?1 WHERE id = ?2;");
+        update.Bind(1, string.IsNullOrWhiteSpace(displayName) ? null : displayName.Trim()).Bind(2, deviceId).Run();
+    }
+
+    /// <summary>Includes or excludes a device from totals (e.g. a touchpad).</summary>
+    public void SetDeviceExcluded(long deviceId, bool excluded)
+    {
+        using var update = _db.Prepare("UPDATE devices SET excluded = ?1 WHERE id = ?2;");
+        update.Bind(1, excluded ? 1L : 0L).Bind(2, deviceId).Run();
     }
 
     public IReadOnlyDictionary<long, AppRule> GetAppRules()

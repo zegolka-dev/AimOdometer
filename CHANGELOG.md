@@ -6,6 +6,17 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), ver
 ## [Unreleased]
 
 ### Added
+- Phase 4 window (WPF, palette "Neon Violet", Fluent dark theme):
+  - Overview with a live today counter, week/month/all time, 14-day chart, top games today, streak.
+  - Statistics for any period: totals, averages per active and calendar day, records (best day/week, streak,
+    fastest flick with game), daily/weekly chart, horizontal vs vertical, clicks per minute and per meter.
+  - Games: share donut, distance/time/km/h per game with exe icons, rename, merge, not a game, hide, restore.
+  - Gear: mice with exact DPI, presets, DPI calibration wizard (ruler or bank card, 3 tries), include/exclude
+    devices (touchpads).
+  - Settings: language (live switch), metric/imperial, start with Windows, always show the tray icon, data folder.
+  - First-run onboarding in 5 steps; single window instance; the window starts the tracker if needed.
+  - English and Russian UI from JSON files; adding a language is one file.
+  - `tools/Publish-Local.ps1` publishes window and tracker into one folder (installed layout).
 - Phase 3 games:
   - Foreground app tracking with out-of-context WinEvent hooks; foreground time per app and hour (not counted while
     minimized, locked, asleep or paused); movement is attributed to the active app.
@@ -31,6 +42,10 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), ver
     InputProbe (coalescing accuracy), `Run-Benchmarks.ps1`; results in `docs/PERFORMANCE.md`.
   - Verified on real hardware: 0.116 % of one core with a ~6000 Hz mouse, no anti-cheat complaints in CS2 (VAC) with
     FACEIT AC running.
+
+### Changed
+- Logo recolored to the chosen palette.
+- Autostart logic moved to Core (shared by tracker and window).
 
 ### Known issues
 - Windows 11 coalesces background mouse input; during intense aiming about 2 % of the path is not recorded.

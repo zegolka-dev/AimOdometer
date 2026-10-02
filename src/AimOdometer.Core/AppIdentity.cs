@@ -11,7 +11,12 @@ public static class AppIdentity
     /// <summary>Window class of the tracker's hidden window.</summary>
     public const string TrackerWindowClass = "AimOdometer.Tracker.Window";
 
-    /// <summary>Folder with all user data: %LOCALAPPDATA%\AimOdometer.</summary>
+    /// <summary>Environment variable that points the app at another data folder (testing, screenshots).</summary>
+    public const string DataDirectoryVariable = "AIMODOMETER_DATA_DIR";
+
+    /// <summary>Folder with all user data: %LOCALAPPDATA%\AimOdometer (or <see cref="DataDirectoryVariable"/>).</summary>
     public static string DataDirectory =>
-        Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), ProductName);
+        Environment.GetEnvironmentVariable(DataDirectoryVariable) is { Length: > 0 } custom
+            ? Path.GetFullPath(custom)
+            : Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), ProductName);
 }

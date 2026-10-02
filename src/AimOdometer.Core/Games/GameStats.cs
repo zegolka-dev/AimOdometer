@@ -11,7 +11,8 @@ public sealed record GameTotal(
     double ForegroundSeconds,
     long Clicks,
     double PeakSpeedCmPerSecond,
-    IReadOnlyList<string> Executables)
+    IReadOnlyList<string> Executables,
+    IReadOnlyList<long>? AppIds = null)
 {
     /// <summary>Key of the "Desktop &amp; apps" group.</summary>
     public const string OtherKey = "other";
@@ -63,6 +64,7 @@ public static class GameStats
     private sealed class Group(string name, AppCategory category)
     {
         private readonly SortedSet<string> _executables = new(StringComparer.OrdinalIgnoreCase);
+        private readonly List<long> _appIds = [];
         private double _centimeters;
         private double _foregroundSeconds;
         private long _clicks;
@@ -70,6 +72,7 @@ public static class GameStats
 
         public void Add(AppUsage row, string? exeName)
         {
+            _appIds.Add(row.AppId);
             _centimeters += row.Centimeters;
             _foregroundSeconds += row.ForegroundSeconds;
             _clicks += row.Clicks;
@@ -81,6 +84,6 @@ public static class GameStats
         }
 
         public GameTotal ToTotal(string key) =>
-            new(key, name, category, _centimeters, _foregroundSeconds, _clicks, _peak, [.. _executables]);
+            new(key, name, category, _centimeters, _foregroundSeconds, _clicks, _peak, [.. _executables], [.. _appIds]);
     }
 }

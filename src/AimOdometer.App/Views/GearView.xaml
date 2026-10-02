@@ -1,0 +1,92 @@
+<UserControl x:Class="AimOdometer.App.Views.GearView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:l="clr-namespace:AimOdometer.App.Localization"
+             xmlns:vm="clr-namespace:AimOdometer.App.ViewModels">
+  <StackPanel>
+    <TextBlock Style="{StaticResource PageTitle}" Text="{l:T Gear.Title}" />
+    <TextBlock Style="{StaticResource PageSubtitle}" Text="{l:T Gear.Subtitle}" Margin="0,0,0,16" />
+
+    <Border Background="{StaticResource AccentSoftBrush}" CornerRadius="10" Padding="16,12" Margin="0,0,0,16">
+      <StackPanel Orientation="Horizontal">
+        <TextBlock Style="{StaticResource Icon}" Text="&#xE946;" Foreground="{StaticResource AccentTextBrush}" Margin="0,0,12,0" VerticalAlignment="Top" />
+        <TextBlock Text="{l:T Gear.DpiButtonWarning}" TextWrapping="Wrap" FontSize="13" MaxWidth="760" />
+      </StackPanel>
+    </Border>
+
+    <TextBlock Text="{Binding Saved}" Foreground="{StaticResource SuccessBrush}" FontSize="13" Margin="0,0,0,10"
+               Visibility="{Binding Saved, Converter={StaticResource NullToCollapsed}}" />
+
+    <ItemsControl ItemsSource="{Binding Devices}">
+      <ItemsControl.ItemTemplate>
+        <DataTemplate>
+          <Border Style="{StaticResource Card}" Margin="0,0,0,12">
+            <Grid>
+              <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+              </Grid.ColumnDefinitions>
+              <Border Width="48" Height="48" CornerRadius="12" Background="{StaticResource SurfaceElevatedBrush}" Margin="0,0,16,0" VerticalAlignment="Top">
+                <TextBlock Style="{StaticResource Icon}" Text="{Binding Glyph}" FontSize="22" HorizontalAlignment="Center" Foreground="{StaticResource AccentTextBrush}" />
+              </Border>
+
+              <StackPanel Grid.Column="1">
+                <StackPanel Orientation="Horizontal">
+                  <TextBox Text="{Binding Name, UpdateSourceTrigger=PropertyChanged}" MinWidth="260" FontSize="15"
+                           AutomationProperties.Name="{l:T Gear.Name}">
+                    <TextBox.InputBindings>
+                      <KeyBinding Key="Enter" Command="{Binding SaveNameCommand}" />
+                    </TextBox.InputBindings>
+                  </TextBox>
+                  <Button Style="{StaticResource SecondaryButton}" Content="{l:T Common.Save}" Command="{Binding SaveNameCommand}" Margin="8,0,0,0" />
+                </StackPanel>
+                <TextBlock Style="{StaticResource Hint}" Margin="0,6,0,12">
+                  <Run Text="{Binding KindText, Mode=OneWay}" /><Run Text=" · " /><Run Text="{l:T Gear.AllTime}" /><Run Text=" " /><Run Text="{Binding Distance, Mode=OneWay}" />
+                </TextBlock>
+
+                <TextBlock Style="{StaticResource CardLabel}" Text="{l:T Gear.Dpi}" Margin="0,0,0,6" />
+                <WrapPanel>
+                  <TextBox Text="{Binding DpiText, UpdateSourceTrigger=PropertyChanged}" Width="100" FontFamily="{StaticResource NumberFont}" FontSize="15"
+                           AutomationProperties.Name="{l:T Gear.Dpi}">
+                    <TextBox.InputBindings>
+                      <KeyBinding Key="Enter" Command="{Binding SaveDpiCommand}" />
+                    </TextBox.InputBindings>
+                  </TextBox>
+                  <Button Style="{StaticResource PrimaryButton}" Content="{l:T Common.Save}" Command="{Binding SaveDpiCommand}" Margin="8,0,16,0" MinWidth="90" />
+                  <ItemsControl ItemsSource="{x:Static vm:GearViewModel.DpiPresets}" VerticalAlignment="Center">
+                    <ItemsControl.ItemsPanel>
+                      <ItemsPanelTemplate><StackPanel Orientation="Horizontal" /></ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemTemplate>
+                      <DataTemplate>
+                        <Button Style="{StaticResource SecondaryButton}" Content="{Binding}" Margin="0,0,6,0"
+                                Command="{Binding DataContext.SetPresetCommand, RelativeSource={RelativeSource AncestorType=WrapPanel}}"
+                                CommandParameter="{Binding}" />
+                      </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                  </ItemsControl>
+                </WrapPanel>
+                <TextBlock Text="{Binding DpiError}" Foreground="{StaticResource DangerBrush}" FontSize="13" Margin="0,6,0,0"
+                           Visibility="{Binding DpiError, Converter={StaticResource NullToCollapsed}}" />
+              </StackPanel>
+
+              <StackPanel Grid.Column="2" VerticalAlignment="Top" HorizontalAlignment="Right">
+                <Button Style="{StaticResource SecondaryButton}" Command="{Binding CalibrateCommand}" Margin="0,0,0,12"
+                        Visibility="{Binding CanCalibrate, Converter={StaticResource BoolToVisibility}}">
+                  <StackPanel Orientation="Horizontal">
+                    <TextBlock Style="{StaticResource Icon}" Text="&#xE7C9;" Margin="0,0,8,0" />
+                    <TextBlock Text="{l:T Gear.Calibrate}" />
+                  </StackPanel>
+                </Button>
+                <CheckBox IsChecked="{Binding Included}" Content="{l:T Gear.CountInStats}" />
+              </StackPanel>
+            </Grid>
+          </Border>
+        </DataTemplate>
+      </ItemsControl.ItemTemplate>
+    </ItemsControl>
+
+    <TextBlock Style="{StaticResource Hint}" Text="{l:T Gear.PadsLater}" FontSize="13" Margin="0,8,0,0" />
+  </StackPanel>
+</UserControl>

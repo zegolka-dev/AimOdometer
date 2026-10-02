@@ -1,0 +1,142 @@
+<UserControl x:Class="AimOdometer.App.Views.StatisticsView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:l="clr-namespace:AimOdometer.App.Localization"
+             xmlns:c="clr-namespace:AimOdometer.App.Controls">
+  <StackPanel>
+    <TextBlock Style="{StaticResource PageTitle}" Text="{l:T Stats.Title}" />
+    <TextBlock Style="{StaticResource PageSubtitle}" Text="{l:T Stats.Subtitle}" Margin="0,0,0,20" />
+
+    <!-- Period -->
+    <WrapPanel Margin="0,0,0,20">
+      <RadioButton Style="{StaticResource Segment}" GroupName="Range" Content="{l:T Stats.Range7}" IsChecked="{Binding Range, Converter={StaticResource EnumEquals}, ConverterParameter=Days7}" />
+      <RadioButton Style="{StaticResource Segment}" GroupName="Range" Content="{l:T Stats.Range30}" IsChecked="{Binding Range, Converter={StaticResource EnumEquals}, ConverterParameter=Days30}" />
+      <RadioButton Style="{StaticResource Segment}" GroupName="Range" Content="{l:T Stats.Range90}" IsChecked="{Binding Range, Converter={StaticResource EnumEquals}, ConverterParameter=Days90}" />
+      <RadioButton Style="{StaticResource Segment}" GroupName="Range" Content="{l:T Stats.Range365}" IsChecked="{Binding Range, Converter={StaticResource EnumEquals}, ConverterParameter=Days365}" />
+      <RadioButton Style="{StaticResource Segment}" GroupName="Range" Content="{l:T Stats.RangeAll}" IsChecked="{Binding Range, Converter={StaticResource EnumEquals}, ConverterParameter=All}" />
+      <RadioButton Style="{StaticResource Segment}" GroupName="Range" Content="{l:T Stats.RangeCustom}" IsChecked="{Binding Range, Converter={StaticResource EnumEquals}, ConverterParameter=Custom}" />
+      <StackPanel Orientation="Horizontal" Margin="8,0,0,0" Visibility="{Binding IsCustom, Converter={StaticResource BoolToVisibility}}">
+        <DatePicker SelectedDate="{Binding CustomFrom}" Width="140" />
+        <TextBlock Text="—" Margin="8,0" VerticalAlignment="Center" Foreground="{StaticResource TextSecondaryBrush}" />
+        <DatePicker SelectedDate="{Binding CustomTo}" Width="140" />
+      </StackPanel>
+    </WrapPanel>
+
+    <!-- Totals -->
+    <UniformGrid Columns="3" Margin="-6,0">
+      <Border Style="{StaticResource AccentCard}" Margin="6,0">
+        <StackPanel>
+          <TextBlock Style="{StaticResource CardLabel}" Text="{l:T Stats.Distance}" />
+          <TextBlock Style="{StaticResource BigNumber}" Text="{Binding Total}" />
+        </StackPanel>
+      </Border>
+      <Border Style="{StaticResource Card}" Margin="6,0">
+        <StackPanel>
+          <TextBlock Style="{StaticResource CardLabel}" Text="{l:T Stats.Clicks}" />
+          <TextBlock Style="{StaticResource BigNumber}" Text="{Binding Clicks}" />
+        </StackPanel>
+      </Border>
+      <Border Style="{StaticResource Card}" Margin="6,0">
+        <StackPanel>
+          <TextBlock Style="{StaticResource CardLabel}" Text="{l:T Stats.ActiveTime}" />
+          <TextBlock Style="{StaticResource BigNumber}" Text="{Binding ActiveTime}" />
+        </StackPanel>
+      </Border>
+    </UniformGrid>
+
+    <!-- Chart -->
+    <Border Style="{StaticResource Card}" Margin="0,16,0,0">
+      <StackPanel>
+        <TextBlock Style="{StaticResource SectionTitle}" Text="{Binding ChartTitle}" />
+        <c:BarChart Bars="{Binding Bars}" Height="220" />
+      </StackPanel>
+    </Border>
+
+    <Grid Margin="0,16,0,0">
+      <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="*" />
+        <ColumnDefinition Width="16" />
+        <ColumnDefinition Width="*" />
+      </Grid.ColumnDefinitions>
+
+      <!-- Averages -->
+      <Border Style="{StaticResource Card}">
+        <StackPanel>
+          <TextBlock Style="{StaticResource SectionTitle}" Text="{l:T Stats.Averages}" />
+          <TextBlock Style="{StaticResource CardLabel}" Text="{l:T Stats.PerActiveDay}" />
+          <TextBlock Style="{StaticResource BigNumber}" Text="{Binding PerActiveDay}" Margin="0,2,0,2" />
+          <TextBlock Style="{StaticResource Hint}" Text="{Binding ActiveDaysText}" Margin="0,0,0,14" />
+          <Grid>
+            <Grid.ColumnDefinitions>
+              <ColumnDefinition Width="*" />
+              <ColumnDefinition Width="*" />
+              <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+            <StackPanel>
+              <TextBlock Style="{StaticResource CardLabel}" Text="{l:T Stats.PerCalendarDay}" />
+              <TextBlock Style="{StaticResource MediumNumber}" Text="{Binding PerCalendarDay}" />
+            </StackPanel>
+            <StackPanel Grid.Column="1">
+              <TextBlock Style="{StaticResource CardLabel}" Text="{l:T Stats.PerWeek}" />
+              <TextBlock Style="{StaticResource MediumNumber}" Text="{Binding PerWeek}" />
+            </StackPanel>
+            <StackPanel Grid.Column="2">
+              <TextBlock Style="{StaticResource CardLabel}" Text="{l:T Stats.PerMonth}" />
+              <TextBlock Style="{StaticResource MediumNumber}" Text="{Binding PerMonth}" />
+            </StackPanel>
+          </Grid>
+          <TextBlock Style="{StaticResource Hint}" Text="{l:T Stats.AveragesHint}" Margin="0,14,0,0" />
+        </StackPanel>
+      </Border>
+
+      <!-- Records -->
+      <Border Grid.Column="2" Style="{StaticResource Card}">
+        <StackPanel>
+          <TextBlock Style="{StaticResource SectionTitle}" Text="{l:T Stats.Records}" />
+          <TextBlock Style="{StaticResource CardLabel}" Text="{l:T Stats.BestDay}" />
+          <TextBlock Text="{Binding BestDay}" FontSize="15" Margin="0,2,0,12" TextWrapping="Wrap" />
+          <TextBlock Style="{StaticResource CardLabel}" Text="{l:T Stats.BestWeek}" />
+          <TextBlock Text="{Binding BestWeek}" FontSize="15" Margin="0,2,0,12" TextWrapping="Wrap" />
+          <TextBlock Style="{StaticResource CardLabel}" Text="{l:T Stats.LongestStreak}" />
+          <TextBlock Text="{Binding LongestStreak}" FontSize="15" Margin="0,2,0,12" TextWrapping="Wrap" />
+          <TextBlock Style="{StaticResource CardLabel}" Text="{l:T Stats.FlickRecord}" />
+          <TextBlock Text="{Binding FlickRecord}" FontSize="15" Margin="0,2,0,0" TextWrapping="Wrap" />
+        </StackPanel>
+      </Border>
+    </Grid>
+
+    <!-- Style of play -->
+    <Border Style="{StaticResource Card}" Margin="0,16,0,0">
+      <StackPanel>
+        <TextBlock Style="{StaticResource SectionTitle}" Text="{l:T Stats.HowYouMove}" />
+        <DockPanel Margin="0,0,0,6">
+          <TextBlock DockPanel.Dock="Left" Style="{StaticResource CardLabel}" Text="{l:T Stats.Horizontal}" />
+          <TextBlock DockPanel.Dock="Right" Style="{StaticResource CardLabel}" Text="{l:T Stats.Vertical}" />
+          <TextBlock Text="{Binding AxisSplit}" HorizontalAlignment="Center" FontSize="13" />
+        </DockPanel>
+        <Grid Height="10">
+          <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="{Binding HorizontalShare, Converter={StaticResource ShareToStar}}" />
+            <ColumnDefinition Width="{Binding HorizontalShare, Converter={StaticResource ShareToStar}, ConverterParameter=rest}" />
+          </Grid.ColumnDefinitions>
+          <Border Background="{StaticResource AccentBrush}" CornerRadius="5,0,0,5" Margin="0,0,1,0" />
+          <Border Grid.Column="1" Background="{StaticResource Accent2Brush}" CornerRadius="0,5,5,0" Margin="1,0,0,0" />
+        </Grid>
+        <UniformGrid Columns="3" Margin="0,18,0,0">
+          <StackPanel>
+            <TextBlock Style="{StaticResource CardLabel}" Text="{l:T Stats.ClicksPerMinute}" />
+            <TextBlock Style="{StaticResource MediumNumber}" Text="{Binding ClicksPerMinute}" />
+          </StackPanel>
+          <StackPanel>
+            <TextBlock Style="{StaticResource CardLabel}" Text="{l:T Stats.ClicksPerMeter}" />
+            <TextBlock Style="{StaticResource MediumNumber}" Text="{Binding ClicksPerMeter}" />
+          </StackPanel>
+          <StackPanel>
+            <TextBlock Style="{StaticResource CardLabel}" Text="{l:T Stats.WheelNotches}" />
+            <TextBlock Style="{StaticResource MediumNumber}" Text="{Binding WheelNotches}" />
+          </StackPanel>
+        </UniformGrid>
+      </StackPanel>
+    </Border>
+  </StackPanel>
+</UserControl>
