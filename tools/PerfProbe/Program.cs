@@ -52,6 +52,11 @@ internal static unsafe partial class Program
             return DumpDatabase(dbPath);
         }
 
+        if (args is ["--games", ..])
+        {
+            return PrintGames(args.Length > 1 ? args[1] : AimOdometer.Core.Storage.StatsStore.DefaultPath);
+        }
+
         if (args is ["--flush", ..])
         {
             return TrackerClient.Send(TrackerCommand.Flush) is [TrackerProtocol.StatusOk, ..] ? 0 : 1;
@@ -125,6 +130,34 @@ internal static unsafe partial class Program
         Console.WriteLine();
         Console.WriteLine("| Scenario | CPU % of one core (cycles) | Private WS max MB | Events/s | Wake-ups/s | Alloc bytes |");
         Console.WriteLine($"| {label} | {cyclePercent:0.000} | {F(privateWs.DefaultIfEmpty().Max())} | {F(events / (double)seconds)} | {F(batches / (double)seconds)} | {allocated:N0} |");
+        return 0;
+    }
+
+    /// <summary>Prints distance and time per game for today, the last 7 days and all time.</summary>
+    private static int PrintGames(string path)
+    {
+        _ = TrackerClient.Send(TrackerCommand.Flush);
+        using var store = AimOdometer.Core.Storage.StatsStore.Open(path);
+        var catalog = AimOdometer.Core.Games.GameCatalog.Create(store);
+        var apps = store.GetApps();
+        var today = DateOnly.FromDateTime(DateTime.Now);
+        foreach (var (title, from) in new (string, DateOnly?)[] { ("Today", today), ("Last 7 days", today.AddDays(-6)), ("All time", null) })
+        {
+            Console.WriteLine($"## {title}");
+            Console.WriteLine("| Game | Distance | Foreground time | km/h | Clicks | Peak cm/s | Executables |");
+            Console.WriteLine("|---|---|---|---|---|---|---|");
+            foreach (var t in AimOdometer.Core.Games.GameStats.Summarize(catalog, apps, store.GetAppUsage(from), "Desktop & apps"))
+            {
+                var distance = AimOdometer.Core.DistanceFormat.Format(t.Centimeters, AimOdometer.Core.UnitSystem.Metric, AimOdometer.Core.UnitLabels.English, CultureInfo.InvariantCulture);
+                var span = TimeSpan.FromSeconds(t.ForegroundSeconds);
+                var time = $"{(int)span.TotalHours}:{span.ToString(@"mm\:ss", CultureInfo.InvariantCulture)}";
+                var kmh = t.KilometersPerHour is { } v ? v.ToString("0.00", CultureInfo.InvariantCulture) : "-";
+                Console.WriteLine($"| {t.Name} | {distance} | {time} | {kmh} | {t.Clicks} | {t.PeakSpeedCmPerSecond:0} | {string.Join(", ", t.Executables.Take(4))} |");
+            }
+
+            Console.WriteLine();
+        }
+
         return 0;
     }
 

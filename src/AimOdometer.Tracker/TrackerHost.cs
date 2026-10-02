@@ -49,6 +49,9 @@ internal sealed unsafe class TrackerHost : IDisposable
     private nint _hwnd;
     private TrayIcon? _tray;
     private PipeServer? _pipe;
+    private ForegroundTracker? _foreground;
+    private bool _locked;
+    private bool _sleeping;
     private HourKey _hour;
     private double _storedTodayCm;
     private bool _paused;
@@ -113,6 +116,9 @@ internal sealed unsafe class TrackerHost : IDisposable
             _ = User32.SetTimer(_hwnd, CrashTestTimerId, (uint)_options.CrashAfterSeconds * 1000, 0);
         }
 
+        _foreground = new ForegroundTracker(_store, _accumulator, Flush);
+        _foreground.Start();
+
         using var process = Process.GetCurrentProcess();
         _pipe = new PipeServer(_hwnd, process.SessionId);
         Log.Info($"Tracker started (pid {Environment.ProcessId}, {_options})");
@@ -131,6 +137,7 @@ internal sealed unsafe class TrackerHost : IDisposable
     public void Dispose()
     {
         Flush();
+        _foreground?.Dispose();
         _pipe?.Dispose();
         _tray?.Dispose();
         NativeMemory.AlignedFree(_rawBuffer);
@@ -234,7 +241,14 @@ internal sealed unsafe class TrackerHost : IDisposable
                 if (wParam is Wtsapi32.WtsSessionLock or Wtsapi32.WtsSessionLogoff
                     or Wtsapi32.WtsConsoleDisconnect or Wtsapi32.WtsRemoteDisconnect)
                 {
+                    _locked = true;
+                    UpdateForegroundCounting();
                     Flush();
+                }
+                else if (wParam is Wtsapi32.WtsSessionUnlock or Wtsapi32.WtsConsoleConnect or Wtsapi32.WtsRemoteConnect)
+                {
+                    _locked = false;
+                    UpdateForegroundCounting();
                 }
 
                 return 0;
@@ -370,7 +384,8 @@ internal sealed unsafe class TrackerHost : IDisposable
 
     private void Flush()
     {
-        if (!_accumulator.HasPendingData() && _failedWrites.Count == 0)
+        var appSeconds = _foreground?.TakePendingSeconds() ?? [];
+        if (!_accumulator.HasPendingData() && _failedWrites.Count == 0 && appSeconds.Count == 0)
         {
             return;
         }
@@ -381,12 +396,14 @@ internal sealed unsafe class TrackerHost : IDisposable
         {
             RetryFailedWrites();
             _store.WriteHour(_hour, _drainBuffer);
+            _store.WriteAppTime(_hour, appSeconds);
             _storedTodayCm = _store.CentimetersOn(_hour.LocalDate);
         }
         catch (SqliteException ex)
         {
             // Keep the data in memory and retry on the next flush (e.g. the disk was briefly unavailable).
             Log.Error("Writing statistics failed; will retry", ex);
+            _foreground?.RestorePendingSeconds(appSeconds);
             if (_failedWrites.Count < MaxRetainedFailedRows)
             {
                 foreach (var delta in _drainBuffer)
@@ -433,10 +450,14 @@ internal sealed unsafe class TrackerHost : IDisposable
 
         if (eventType == PbtApmSuspend)
         {
+            _sleeping = true;
+            UpdateForegroundCounting();
             Flush();
         }
         else if (eventType is PbtApmResumeAutomatic or PbtApmResumeSuspend)
         {
+            _sleeping = false;
+            UpdateForegroundCounting();
             _accumulator.ResetFlickWindows();
             CheckHour();
             ArmHourTimer();
@@ -453,6 +474,7 @@ internal sealed unsafe class TrackerHost : IDisposable
     {
         Flush();
         _paused = true;
+        UpdateForegroundCounting();
         RegisterRawInput(enable: false); // no input at all while paused: zero CPU
         _accumulator.ResetFlickWindows();
         if (minutes > 0)
@@ -480,10 +502,14 @@ internal sealed unsafe class TrackerHost : IDisposable
 
         _paused = false;
         _pausedUntilUtc = null;
+        UpdateForegroundCounting();
         RegisterRawInput(enable: true);
         UpdateTooltip(force: true);
         Log.Info("Resumed");
     }
+
+    /// <summary>Foreground time counts only while unlocked, awake and not paused.</summary>
+    private void UpdateForegroundCounting() => _foreground?.SetSessionActive(!_locked && !_sleeping && !_paused);
 
     // ---------------------------------------------------------------- tray
 

@@ -1,4 +1,5 @@
 using System.Globalization;
+using AimOdometer.Core.Games;
 using AimOdometer.Core.Input;
 
 namespace AimOdometer.Core.Storage;
@@ -27,6 +28,21 @@ public sealed record DeviceRecord(
         };
 }
 
+/// <summary>An executable that was in the foreground at some point.</summary>
+public sealed record AppRecord(long Id, string ExePath, string ExeName);
+
+/// <summary>Totals of one app over a period (only devices that count toward totals).</summary>
+public sealed record AppUsage(
+    long AppId,
+    double Centimeters,
+    double XCentimeters,
+    double YCentimeters,
+    long Clicks,
+    double WheelNotches,
+    long MoveSeconds,
+    double ForegroundSeconds,
+    double PeakSpeedCmPerSecond);
+
 /// <summary>Typed access to the local statistics database.</summary>
 public sealed class StatsStore : IDisposable
 {
@@ -36,8 +52,8 @@ public sealed class StatsStore : IDisposable
         INSERT INTO hourly (local_date, local_hour, utc_offset_min, device_id, app_id, dpi,
                             path_counts, x_counts, y_counts, abs_events,
                             clicks_left, clicks_right, clicks_middle, clicks_x1, clicks_x2,
-                            wheel_notches, move_seconds, fg_seconds, peak_speed)
-        VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11, ?12, ?13, ?14, ?15, ?16, ?17, ?18, ?19)
+                            wheel_notches, move_seconds, peak_speed)
+        VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11, ?12, ?13, ?14, ?15, ?16, ?17, ?18)
         ON CONFLICT (local_date, local_hour, utc_offset_min, device_id, app_id, dpi) DO UPDATE SET
             path_counts   = path_counts   + excluded.path_counts,
             x_counts      = x_counts      + excluded.x_counts,
@@ -50,7 +66,6 @@ public sealed class StatsStore : IDisposable
             clicks_x2     = clicks_x2     + excluded.clicks_x2,
             wheel_notches = wheel_notches + excluded.wheel_notches,
             move_seconds  = move_seconds  + excluded.move_seconds,
-            fg_seconds    = fg_seconds    + excluded.fg_seconds,
             peak_speed    = max(peak_speed, excluded.peak_speed);
         """;
 
@@ -165,8 +180,8 @@ public sealed class StatsStore : IDisposable
                     .Bind(7, b.PathCounts).Bind(8, b.XCounts).Bind(9, b.YCounts).Bind(10, b.AbsoluteEvents)
                     .Bind(11, b.ClicksLeft).Bind(12, b.ClicksRight).Bind(13, b.ClicksMiddle)
                     .Bind(14, b.ClicksX1).Bind(15, b.ClicksX2)
-                    .Bind(16, b.WheelNotches).Bind(17, b.MoveSeconds).Bind(18, b.ForegroundSeconds)
-                    .Bind(19, b.PeakSpeed)
+                    .Bind(16, b.WheelNotches).Bind(17, b.MoveSeconds)
+                    .Bind(18, b.PeakSpeed)
                     .Run();
             }
 
@@ -189,6 +204,161 @@ public sealed class StatsStore : IDisposable
             """);
         select.Bind(1, localDate.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture));
         return select.Step() ? select.GetDouble(0) : 0;
+    }
+
+    /// <summary>Returns the id of an executable, adding it on first sight. The path is matched case-insensitively.</summary>
+    public long GetOrCreateApp(string exePath, DateTime utcNow)
+    {
+        ArgumentException.ThrowIfNullOrEmpty(exePath);
+        using (var insert = _db.Prepare(
+            "INSERT INTO apps (exe_path, exe_name, first_seen) VALUES (?1, ?2, ?3) ON CONFLICT (exe_path) DO NOTHING;"))
+        {
+            insert.Bind(1, exePath).Bind(2, Path.GetFileName(exePath)).Bind(3, utcNow.ToString("O", CultureInfo.InvariantCulture)).Run();
+        }
+
+        using var select = _db.Prepare("SELECT id FROM apps WHERE exe_path = ?1;");
+        select.Bind(1, exePath);
+        return select.Step() ? select.GetInt64(0) : throw new InvalidOperationException("App row vanished after insert.");
+    }
+
+    public IReadOnlyList<AppRecord> GetApps()
+    {
+        using var select = _db.Prepare("SELECT id, exe_path, exe_name FROM apps ORDER BY id;");
+        var result = new List<AppRecord>();
+        while (select.Step())
+        {
+            result.Add(new AppRecord(select.GetInt64(0), select.GetString(1)!, select.GetString(2)!));
+        }
+
+        return result;
+    }
+
+    /// <summary>Adds foreground seconds per app for one hour, in a single transaction.</summary>
+    public void WriteAppTime(HourKey hour, IReadOnlyCollection<KeyValuePair<long, double>> secondsByApp)
+    {
+        ArgumentNullException.ThrowIfNull(secondsByApp);
+        if (secondsByApp.Count == 0)
+        {
+            return;
+        }
+
+        using var upsert = _db.Prepare("""
+            INSERT INTO app_time (local_date, local_hour, utc_offset_min, app_id, fg_seconds) VALUES (?1, ?2, ?3, ?4, ?5)
+            ON CONFLICT (local_date, local_hour, utc_offset_min, app_id) DO UPDATE SET fg_seconds = fg_seconds + excluded.fg_seconds;
+            """);
+        _db.BeginTransaction();
+        try
+        {
+            foreach (var (appId, seconds) in secondsByApp)
+            {
+                upsert.Reset();
+                upsert.Bind(1, hour.LocalDateText).Bind(2, hour.LocalHour).Bind(3, hour.UtcOffsetMinutes)
+                    .Bind(4, appId).Bind(5, seconds).Run();
+            }
+
+            _db.Commit();
+        }
+        catch
+        {
+            _db.Rollback();
+            throw;
+        }
+    }
+
+    /// <summary>Per-app totals for local dates in [from, to] (both inclusive; null = unbounded).</summary>
+    public IReadOnlyList<AppUsage> GetAppUsage(DateOnly? from = null, DateOnly? to = null)
+    {
+        var fromText = from?.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture) ?? "0000-01-01";
+        var toText = to?.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture) ?? "9999-12-31";
+        using var select = _db.Prepare("""
+            WITH movement AS (
+                SELECT h.app_id,
+                       sum(h.path_counts / h.dpi) * 2.54 AS cm,
+                       sum(h.x_counts / h.dpi) * 2.54 AS x_cm,
+                       sum(h.y_counts / h.dpi) * 2.54 AS y_cm,
+                       sum(h.clicks_left + h.clicks_right + h.clicks_middle + h.clicks_x1 + h.clicks_x2) AS clicks,
+                       sum(h.wheel_notches) AS wheel,
+                       sum(h.move_seconds) AS move_seconds,
+                       max(h.peak_speed / h.dpi) * 2.54 AS peak
+                FROM hourly h JOIN devices d ON d.id = h.device_id
+                WHERE d.excluded = 0 AND h.local_date BETWEEN ?1 AND ?2
+                GROUP BY h.app_id),
+            focus AS (
+                SELECT app_id, sum(fg_seconds) AS fg FROM app_time
+                WHERE local_date BETWEEN ?1 AND ?2 GROUP BY app_id),
+            ids AS (SELECT app_id FROM movement UNION SELECT app_id FROM focus)
+            SELECT ids.app_id, coalesce(m.cm, 0), coalesce(m.x_cm, 0), coalesce(m.y_cm, 0), coalesce(m.clicks, 0),
+                   coalesce(m.wheel, 0), coalesce(m.move_seconds, 0), coalesce(f.fg, 0), coalesce(m.peak, 0)
+            FROM ids LEFT JOIN movement m ON m.app_id = ids.app_id LEFT JOIN focus f ON f.app_id = ids.app_id
+            ORDER BY ids.app_id;
+            """);
+        select.Bind(1, fromText).Bind(2, toText);
+        var result = new List<AppUsage>();
+        while (select.Step())
+        {
+            result.Add(new AppUsage(
+                select.GetInt64(0), select.GetDouble(1), select.GetDouble(2), select.GetDouble(3), select.GetInt64(4),
+                select.GetDouble(5), select.GetInt64(6), select.GetDouble(7), select.GetDouble(8)));
+        }
+
+        return result;
+    }
+
+    public IReadOnlyDictionary<long, AppRule> GetAppRules()
+    {
+        using var select = _db.Prepare("SELECT app_id, category, game_key FROM app_rules;");
+        var result = new Dictionary<long, AppRule>();
+        while (select.Step())
+        {
+            result[select.GetInt64(0)] = new AppRule((AppCategory)select.GetInt64(1), select.GetString(2));
+        }
+
+        return result;
+    }
+
+    /// <summary>Sets or (with null) removes the user's rule for an app.</summary>
+    public void SetAppRule(long appId, AppRule? rule)
+    {
+        if (rule is null)
+        {
+            using var delete = _db.Prepare("DELETE FROM app_rules WHERE app_id = ?1;");
+            delete.Bind(1, appId).Run();
+            return;
+        }
+
+        using var upsert = _db.Prepare("""
+            INSERT INTO app_rules (app_id, category, game_key) VALUES (?1, ?2, ?3)
+            ON CONFLICT (app_id) DO UPDATE SET category = excluded.category, game_key = excluded.game_key;
+            """);
+        upsert.Bind(1, appId).Bind(2, (long)rule.Category).Bind(3, rule.GameKey).Run();
+    }
+
+    public IReadOnlyDictionary<string, string> GetGameNames()
+    {
+        using var select = _db.Prepare("SELECT game_key, display_name FROM game_names;");
+        var result = new Dictionary<string, string>(StringComparer.Ordinal);
+        while (select.Step())
+        {
+            result[select.GetString(0)!] = select.GetString(1)!;
+        }
+
+        return result;
+    }
+
+    /// <summary>Renames a game for display; null or empty restores the detected name.</summary>
+    public void SetGameName(string gameKey, string? displayName)
+    {
+        ArgumentException.ThrowIfNullOrEmpty(gameKey);
+        if (string.IsNullOrWhiteSpace(displayName))
+        {
+            using var delete = _db.Prepare("DELETE FROM game_names WHERE game_key = ?1;");
+            delete.Bind(1, gameKey).Run();
+            return;
+        }
+
+        using var upsert = _db.Prepare(
+            "INSERT INTO game_names (game_key, display_name) VALUES (?1, ?2) ON CONFLICT (game_key) DO UPDATE SET display_name = excluded.display_name;");
+        upsert.Bind(1, gameKey).Bind(2, displayName.Trim()).Run();
     }
 
     public string? GetSetting(string key)

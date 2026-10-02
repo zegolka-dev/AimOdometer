@@ -16,7 +16,6 @@ public struct UsageBucket
     public long ClicksX2 { get; set; }
     public double WheelNotches { get; set; }
     public int MoveSeconds { get; set; }
-    public int ForegroundSeconds { get; set; }
     public double PeakSpeed { get; set; }
     public bool Dirty { get; set; }
 }
@@ -365,14 +364,6 @@ public sealed unsafe class InputAccumulator
         {
             window.Reset();
         }
-    }
-
-    /// <summary>Adds foreground time to the current app for every active device slot (used from phase 3).</summary>
-    public void AddForegroundSeconds(int seconds, int slot)
-    {
-        ref var bucket = ref _buckets[(slot * MaxApps) + _currentApp];
-        bucket.ForegroundSeconds += seconds;
-        bucket.Dirty = true;
     }
 
     /// <summary>Centimeters accumulated in memory and not yet flushed, for devices that count toward totals.</summary>

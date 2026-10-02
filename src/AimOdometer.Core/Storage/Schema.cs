@@ -67,6 +67,33 @@ public static class Schema
             value  TEXT NOT NULL
         ) WITHOUT ROWID;
         """,
+
+        // v2: foreground time per app (independent of which mouse moved), user rules for apps, custom game names.
+        """
+        ALTER TABLE hourly DROP COLUMN fg_seconds;
+
+        CREATE TABLE app_time (
+            local_date      TEXT    NOT NULL,
+            local_hour      INTEGER NOT NULL,
+            utc_offset_min  INTEGER NOT NULL,
+            app_id          INTEGER NOT NULL,           -- 0 = no foreground window (e.g. locked desktop)
+            fg_seconds      REAL    NOT NULL DEFAULT 0,
+            PRIMARY KEY (local_date, local_hour, utc_offset_min, app_id)
+        ) WITHOUT ROWID;
+
+        -- category: 0 game, 1 not a game ("Desktop & apps"), 2 excluded from statistics.
+        -- game_key groups several executables into one game (e.g. "steam:730", "valorant", "exe:mygame.exe").
+        CREATE TABLE app_rules (
+            app_id    INTEGER PRIMARY KEY REFERENCES apps(id),
+            category  INTEGER NOT NULL,
+            game_key  TEXT
+        );
+
+        CREATE TABLE game_names (
+            game_key      TEXT PRIMARY KEY,
+            display_name  TEXT NOT NULL
+        ) WITHOUT ROWID;
+        """,
     ];
 
     public static int LatestVersion => Migrations.Length;

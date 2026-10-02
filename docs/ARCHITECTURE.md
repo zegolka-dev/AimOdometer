@@ -63,6 +63,25 @@ Measured cost of the always-running pair: 4.2 MB private memory, 0 % CPU when th
 | `WM_TIMECHANGE` | Clock or time zone changed: flush under the old hour, start a new one |
 | `TaskbarCreated` | Explorer restarted: add the tray icon again |
 
+### Foreground app and games
+
+- `SetWinEventHook(EVENT_SYSTEM_FOREGROUND)` and `MINIMIZESTART/END` with `WINEVENT_OUTOFCONTEXT`: Windows calls
+  the tracker on its own thread through the message loop; nothing is injected into other processes.
+- On each switch the tracker gets the exe path with `OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION)` +
+  `QueryFullProcessImageNameW` (the minimal right Task Manager also uses: no memory access) and closes the handle at
+  once. If a protected game refuses even that, the exe name is taken from a process snapshot without opening it.
+- The tracker stores only the exe path (`apps`) and foreground seconds per app and hour (`app_time`); movement buckets
+  carry the app id. Time is not counted while the window is minimized, the session is locked, the PC sleeps or
+  tracking is paused.
+- Which exe is which game is decided outside the tracker by `GameCatalog` (Core), in this order:
+  1. the user's rules (`app_rules`: game / not a game / excluded, optional game key to merge several exes),
+  2. Steam: the exe lies inside an installed app's folder (libraries from `libraryfolders.vdf`, apps from
+     `appmanifest_*.acf`, read with our own KeyValues parser; no sign-in, no network),
+  3. the built-in list `data/games.json` (+ optional user `games.json` in the data folder), matched by exe name,
+  4. otherwise "Desktop & apps".
+  `game_names` holds user renames. A built-in entry with `steamAppId` shares the Steam game's key, so a copy from
+  another store adds up with the Steam version.
+
 ### Devices
 
 - Identified by the HID device path (`RIDI_DEVICENAME`): VID/PID and interface, without the USB instance, so the same

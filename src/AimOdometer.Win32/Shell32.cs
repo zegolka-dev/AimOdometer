@@ -60,10 +60,13 @@ internal static partial class Wtsapi32
 {
     public const uint NotifyForThisSession = 0;
 
+    public const nuint WtsConsoleConnect = 0x1;
     public const nuint WtsConsoleDisconnect = 0x2;
+    public const nuint WtsRemoteConnect = 0x3;
     public const nuint WtsRemoteDisconnect = 0x4;
     public const nuint WtsSessionLogoff = 0x6;
     public const nuint WtsSessionLock = 0x7;
+    public const nuint WtsSessionUnlock = 0x8;
 
     [LibraryImport("wtsapi32.dll", SetLastError = true)]
     [return: MarshalAs(UnmanagedType.Bool)]

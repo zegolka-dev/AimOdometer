@@ -6,6 +6,13 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), ver
 ## [Unreleased]
 
 ### Added
+- Phase 3 games:
+  - Foreground app tracking with out-of-context WinEvent hooks; foreground time per app and hour (not counted while
+    minimized, locked, asleep or paused); movement is attributed to the active app.
+  - Steam library detection without sign-in (own VDF/ACF parser), built-in list of 55 non-Steam games
+    (`data/games.json`, extendable with a user file), user rules (game / not a game / excluded / merge / rename).
+  - Per-game summary: distance, foreground time, km/h, clicks, peak speed (`PerfProbe --games`).
+  - Database schema v2 (`app_time`, `app_rules`, `game_names`); existing databases are upgraded in place.
 - Phase 2 tracker core:
   - Raw Input collection for all mice with `RIDEV_INPUTSINK`, batched wake-ups (at most one per 16 ms) and an
     allocation-free accumulator: path, X/Y, clicks per button, wheel notches, active seconds, peak flick speed.

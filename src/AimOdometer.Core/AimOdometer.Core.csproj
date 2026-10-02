@@ -10,6 +10,9 @@
     <PackageReference Include="SQLitePCLRaw.lib.e_sqlite3" />
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="..\..\data\games.json" LogicalName="AimOdometer.Data.games.json" />
+  </ItemGroup>
+  <ItemGroup>
     <InternalsVisibleTo Include="AimOdometer.Core.Tests" />
   </ItemGroup>
 </Project>
