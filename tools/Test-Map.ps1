@@ -9,6 +9,7 @@
 param(
     [string]$From = "Chisinau",
     [string]$To = "Odesa",
+    [switch]$OnlyStart,             # test only the random destination (no own destination)
     [string]$SeedDatabase = "",
     [string]$App = (Join-Path (Split-Path $PSScriptRoot -Parent) "artifacts\app\AimOdometer.App.exe"),
     [string]$ScreenshotDir = ""
@@ -63,7 +64,7 @@ try {
     function Wait-For([scriptblock]$condition, [int]$seconds, [string]$what) {
         $until = (Get-Date).AddSeconds($seconds)
         while (-not (& $condition)) {
-            if ((Get-Date) -gt $until) { throw "Timed out waiting for $what." }
+            if ((Get-Date) -gt $until) { Save-Shot "timeout"; throw "Timed out waiting for $what." }
             Start-Sleep -Milliseconds 500
         }
     }
@@ -77,7 +78,12 @@ try {
     Wait-For { (Get-MapBrowsers).Count -gt 0 } 20 "WebView2 to start"
     "map browser processes: $((Get-MapBrowsers).Count)"
 
-    foreach ($city in @($From, $To)) {
+    function Show-Captions {
+        All | Where-Object { $_.Current.ControlType -eq [Windows.Automation.ControlType]::Text } | ForEach-Object { $_.Current.Name } |
+            Where-Object { $_ -match '\u2192|km|\u043a\u043c' } | ForEach-Object { "caption: $_" }
+    }
+
+    foreach ($city in @($From) + @(if (-not $OnlyStart) { $To })) {
         $box = Id "MapSearch"
         $box.GetCurrentPattern([Windows.Automation.ValuePattern]::Pattern).SetValue($city)
         Invoke-Element (Id "MapFind")
@@ -85,12 +91,24 @@ try {
         $hit = All | Where-Object { $_.Current.ControlType -eq [Windows.Automation.ControlType]::Button -and $_.Current.Name -like "*,*" } | Select-Object -First 1
         "picked: $($hit.Current.Name)"
         Invoke-Element $hit
+
+        if ($city -eq $From) {
+            # Only a start: the map walks towards a random well-known city right away.
+            Wait-For { Id "MapShuffle" } 20 "a random destination"
+            Start-Sleep -Seconds 6
+            Save-Shot "auto"
+            Show-Captions
+            Invoke-Element (Id "MapShuffle")
+            Start-Sleep -Seconds 4
+            Save-Shot "auto-shuffled"
+            "after shuffle:"
+            Show-Captions
+        }
     }
 
     Start-Sleep -Seconds 8   # route + tiles
     Save-Shot "map"
-    $texts = All | Where-Object { $_.Current.ControlType -eq [Windows.Automation.ControlType]::Text } | ForEach-Object { $_.Current.Name } | Where-Object { $_ -match '\u2192|km|\u043a\u043c' }
-    $texts | ForEach-Object { "caption: $_" }
+    Show-Captions
 
     Invoke-Element (Id "Nav.Overview")
     Wait-For { (Get-MapBrowsers).Count -eq 0 } 15 "WebView2 processes to exit after leaving the tab"

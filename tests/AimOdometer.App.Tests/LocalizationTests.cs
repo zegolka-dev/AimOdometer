@@ -87,7 +87,7 @@ public partial class LocalizationTests
     [Fact]
     public void DataDrivenKeysExist()
     {
-        // Keys built at run time: achievements, comparisons, gear kinds and share card kinds.
+        // Keys built at run time: achievements, comparisons, cities, map periods, gear kinds and share card kinds.
         var english = Language("en");
         var expected = new List<string>();
         using (var achievements = JsonDocument.Parse(File.ReadAllText(Path.Combine(RepoRoot, "data", "achievements.json"))))
@@ -105,6 +105,12 @@ public partial class LocalizationTests
             expected.AddRange(comparisons.RootElement.GetProperty("comparisons").EnumerateArray().Select(c => $"Cmp.{c.GetProperty("id").GetString()}"));
         }
 
+        using (var cities = JsonDocument.Parse(File.ReadAllText(Path.Combine(RepoRoot, "data", "cities.json"))))
+        {
+            expected.AddRange(cities.RootElement.GetProperty("cities").EnumerateArray().Select(c => $"City.{c.GetProperty("id").GetString()}"));
+        }
+
+        expected.AddRange(EnumMembers(Path.Combine(AppSource, "ViewModels", "MapViewModel.cs"), "MapPeriod").SelectMany(m => new[] { $"Map.Period.{m}", $"Map.Lead.{m}" }));
         expected.AddRange(EnumMembers(Path.Combine(RepoRoot, "src", "AimOdometer.Core", "Storage", "StatsStore.cs"), "GearKind").Select(m => $"Gear.Kind.{m}"));
         expected.AddRange(EnumMembers(Path.Combine(AppSource, "ViewModels", "ShareViewModel.cs"), "ShareKind").Select(m => $"Share.Kind.{m}"));
         expected.AddRange(["Share.Card.Day", "Share.Card.Week", "Share.Card.Month", "Share.Card.AllTime"]);

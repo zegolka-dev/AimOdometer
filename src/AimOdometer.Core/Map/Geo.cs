@@ -3,8 +3,9 @@ namespace AimOdometer.Core.Map;
 /// <summary>A point on Earth in degrees. Longitude may leave [-180, 180] on lines that cross the antimeridian.</summary>
 public readonly record struct GeoPoint(double Lat, double Lon)
 {
-    /// <summary>The same point with longitude wrapped into [-180, 180).</summary>
-    public GeoPoint Normalized => new(Lat, ((((Lon + 180) % 360) + 360) % 360) - 180);
+    /// <summary>The same point with longitude wrapped into [-180, 180). A method, not a property: a record prints its
+    /// properties in ToString, and a property of its own type would recurse forever.</summary>
+    public GeoPoint Normalize() => new(Lat, ((((Lon + 180) % 360) + 360) % 360) - 180);
 }
 
 /// <summary>Spherical geometry for routes: distances, points along a line, great circles.</summary>

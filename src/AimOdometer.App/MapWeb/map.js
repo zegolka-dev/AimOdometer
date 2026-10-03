@@ -8,6 +8,8 @@ let loaded = false;
 let pending = [];
 let markers = [];
 let tilesErrorReported = false;
+let routeBounds = null;   // last fitted route, re-fitted when the map resizes
+let userMoved = false;    // until the user pans or zooms
 
 const post = message => host.postMessage(message);
 
@@ -66,6 +68,18 @@ function init(message) {
     post({ type: 'loaded' });
   });
 
+  // The panel above the map can grow (hints), which shrinks the map: keep the whole route in view until the user moves.
+  map.on('resize', () => {
+    if (routeBounds && !userMoved) {
+      map.fitBounds(routeBounds, { padding: 70, maxZoom: 12, duration: 0 });
+    }
+  });
+  map.on('movestart', e => {
+    if (e.originalEvent) {
+      userMoved = true;
+    }
+  });
+
   map.on('error', e => {
     // A missing tile is normal while offline; report once so the window can say so.
     if (!loaded) {
@@ -106,16 +120,18 @@ function showRoute(message) {
   });
   clearMarkers('place');
   for (const place of message.places) {
-    const marker = new Marker({ element: element('place', place.name) }).setLngLat([place.lon, place.lat]).addTo(map);
+    const marker = new Marker({ element: element(place.auto ? 'place auto' : 'place', place.name) }).setLngLat([place.lon, place.lat]).addTo(map);
     markers.push({ kind: 'place', marker });
   }
 
   const points = message.legs.flatMap(leg => leg.line);
+  userMoved = false;
+  routeBounds = null;
   if (points.length === 0 && message.places.length > 0) {
     map.flyTo({ center: [message.places[0].lon, message.places[0].lat], zoom: 8 });
   } else if (points.length > 0) {
-    const bounds = points.reduce((b, p) => b.extend(p), new LngLatBounds(points[0], points[0]));
-    map.fitBounds(bounds, { padding: 70, maxZoom: 12, duration: 600 });
+    routeBounds = points.reduce((b, p) => b.extend(p), new LngLatBounds(points[0], points[0]));
+    map.fitBounds(routeBounds, { padding: 70, maxZoom: 12, duration: 600 });
   }
 }
 

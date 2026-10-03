@@ -692,4 +692,5 @@ public static class SettingKeys
     public const string MapEnabled = "map_enabled";
     public const string MapPlaces = "map_places";
     public const string MapPeriod = "map_period";
+    public const string MapAutoTarget = "map_auto_target";
 }

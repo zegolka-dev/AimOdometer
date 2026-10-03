@@ -115,7 +115,7 @@ public sealed class MapClient : IDisposable
     /// <summary>The city, town or village at a point (cached per ~1 km), or null at sea.</summary>
     public async Task<string?> PlaceNameAtAsync(GeoPoint point, string language, CancellationToken cancellation)
     {
-        var p = point.Normalized;
+        var p = point.Normalize();
         var lat = p.Lat.ToString("0.00", CultureInfo.InvariantCulture);
         var lon = p.Lon.ToString("0.00", CultureInfo.InvariantCulture);
         var body = await CachedAsync("reverse", $"{language}|{lat},{lon}", async () =>
@@ -137,7 +137,7 @@ public sealed class MapClient : IDisposable
         ArgumentNullException.ThrowIfNull(to);
         var coordinates = string.Create(CultureInfo.InvariantCulture,
             $"{from.Point.Lon:0.#####},{from.Point.Lat:0.#####};{to.Point.Lon:0.#####},{to.Point.Lat:0.#####}");
-        const string Kind = "route";
+        const string Kind = "route-full";
         if (_store.GetGeoCache(Kind, coordinates) is { } cached)
         {
             return ToLeg(from, to, cached.Value);
@@ -147,7 +147,7 @@ public sealed class MapClient : IDisposable
         {
             try
             {
-                var url = new Uri($"{router.Url}/route/v1/{router.Profile}/{coordinates}?overview=simplified&geometries=geojson");
+                var url = new Uri($"{router.Url}/route/v1/{router.Profile}/{coordinates}?overview=full&geometries=polyline6");
                 var (status, body) = await GetAsync(url, cancellation).ConfigureAwait(false);
                 if (status == HttpStatusCode.OK || IsNoRoute(body))
                 {
@@ -163,7 +163,7 @@ public sealed class MapClient : IDisposable
             }
         }
 
-        return Straight(from, to);
+        return Straight(from, to) with { IsOffline = true };
     }
 
     /// <summary>A great-circle leg, used when there is no road route.</summary>
@@ -186,7 +186,7 @@ public sealed class MapClient : IDisposable
                 ? new RouteLeg(from, to, route.Meters, route.Line, IsStraight: false)
                 : Straight(from, to);
         }
-        catch (Exception ex) when (ex is System.Text.Json.JsonException or KeyNotFoundException or InvalidOperationException or IndexOutOfRangeException)
+        catch (Exception ex) when (ex is System.Text.Json.JsonException or KeyNotFoundException or InvalidOperationException or IndexOutOfRangeException or FormatException)
         {
             Log.Warning($"Unreadable route response: {ex.Message}");
             return Straight(from, to);

@@ -6,8 +6,9 @@ public sealed record Place(string Name, string DisplayName, GeoPoint Point);
 /// <summary>
 /// One leg of the journey. <paramref name="Meters"/> is the road distance (or the great-circle distance when
 /// <paramref name="IsStraight"/>, e.g. across an ocean); <paramref name="Line"/> is the shape drawn on the map.
+/// <paramref name="IsOffline"/>: straight only because no routing service answered (retried next time).
 /// </summary>
-public sealed record RouteLeg(Place From, Place To, double Meters, IReadOnlyList<GeoPoint> Line, bool IsStraight);
+public sealed record RouteLeg(Place From, Place To, double Meters, IReadOnlyList<GeoPoint> Line, bool IsStraight, bool IsOffline = false);
 
 /// <summary>
 /// Where a distance takes you along the legs. <paramref name="Finished"/> when it reaches the last place;

@@ -36,11 +36,14 @@ public sealed record PlaceResult(Place Place)
     public string Name => Place.Name;
 
     public string Details => Place.DisplayName;
+
+    public override string ToString() => Details;
 }
 
 /// <summary>
-/// "Where would you get": the mouse distance of a period as a walk along real roads from the user's city through the
-/// cities they picked. Nothing here touches the network until the user allows it on this page.
+/// "Where would you get": the mouse distance of a period as a walk along real roads from the user's city, towards a
+/// well-known city in a random direction, or through the cities the user picked. Nothing here touches the network until
+/// the user allows it on this page.
 /// </summary>
 public sealed partial class MapViewModel(AppData data) : PageViewModel(data)
 {
@@ -48,6 +51,7 @@ public sealed partial class MapViewModel(AppData data) : PageViewModel(data)
 
     private MapClient? _client;
     private List<RouteLeg> _legs = [];
+    private List<Place> _route = [];
     private PeriodTotals? _periods;
     private int _generation;
     private DateTime _lastProgress;
@@ -76,6 +80,10 @@ public sealed partial class MapViewModel(AppData data) : PageViewModel(data)
 
     [ObservableProperty]
     public partial bool HasPlaces { get; set; }
+
+    /// <summary>The random destination used while the user has only picked a start.</summary>
+    [ObservableProperty]
+    public partial string? AutoTargetName { get; set; }
 
     public IReadOnlyList<MapPeriodOption> Periods { get; } =
         [new(MapPeriod.Today), new(MapPeriod.Week), new(MapPeriod.Month), new(MapPeriod.AllTime)];
@@ -226,6 +234,17 @@ public sealed partial class MapViewModel(AppData data) : PageViewModel(data)
         await PlacesChangedAsync();
     }
 
+    /// <summary>Another random well-known city as the destination.</summary>
+    [RelayCommand]
+    private async Task ShuffleAsync()
+    {
+        if (Places.Count == 1)
+        {
+            ResolveAutoTarget(Places[0], shuffle: true, []);
+            await RebuildAsync();
+        }
+    }
+
     [RelayCommand]
     private async Task RemoveLastAsync()
     {
@@ -262,7 +281,7 @@ public sealed partial class MapViewModel(AppData data) : PageViewModel(data)
     private void UpdateSearchHint() => SearchHint = Places.Count switch
     {
         0 => L["Map.SearchStart"],
-        1 => L["Map.SearchNext"],
+        1 => L["Map.SearchOptional"],
         _ => L["Map.SearchMore"],
     };
 
@@ -289,8 +308,27 @@ public sealed partial class MapViewModel(AppData data) : PageViewModel(data)
         {
             await Client.LoadServicesAsync(CancellationToken.None);
             var places = Places.ToList();
+            string? autoTarget = null;
             var legs = new List<RouteLeg>();
-            for (var i = 1; i < places.Count; i++)
+            if (places.Count == 1)
+            {
+                // Only a start so far: walk towards a well-known city in a random direction right away. A city with no
+                // walking route (across a sea or a closed border) is swapped for another, a few times at most.
+                var tried = new List<string>();
+                var target = ResolveAutoTarget(places[0], shuffle: false, tried);
+                var leg = await Client.RouteAsync(places[0], target, CancellationToken.None);
+                while (leg.IsStraight && !leg.IsOffline && tried.Count < 4 && generation == _generation)
+                {
+                    target = ResolveAutoTarget(places[0], shuffle: true, tried);
+                    leg = await Client.RouteAsync(places[0], target, CancellationToken.None);
+                }
+
+                autoTarget = target.Name;
+                places.Add(target);
+                legs.Add(leg);
+            }
+
+            for (var i = legs.Count + 1; i < places.Count; i++)
             {
                 legs.Add(await Client.RouteAsync(places[i - 1], places[i], CancellationToken.None));
                 if (generation != _generation)
@@ -300,7 +338,9 @@ public sealed partial class MapViewModel(AppData data) : PageViewModel(data)
             }
 
             _legs = legs;
-            RouteMessage = BuildRouteMessage(places, legs);
+            _route = places;
+            AutoTargetName = autoTarget;
+            RouteMessage = BuildRouteMessage(places, legs, autoTarget is not null);
             await UpdateProgressAsync(generation);
         }
         finally
@@ -310,6 +350,26 @@ public sealed partial class MapViewModel(AppData data) : PageViewModel(data)
                 IsBusy = false;
             }
         }
+    }
+
+    /// <summary>
+    /// The remembered random destination for this start, or a new one (on shuffle or for a new start).
+    /// Stored as "cityId|lat,lon of the start".
+    /// </summary>
+    private Place ResolveAutoTarget(Place start, bool shuffle, List<string> tried)
+    {
+        var startKey = string.Create(CultureInfo.InvariantCulture, $"{start.Point.Lat:0.####},{start.Point.Lon:0.####}");
+        var stored = (Data.Setting(SettingKeys.MapAutoTarget) ?? string.Empty).Split('|');
+        var city = stored.Length == 2 && stored[1] == startKey ? FamousCities.Find(stored[0]) : null;
+        if (city is null || shuffle)
+        {
+            city = FamousCities.Pick(start.Point, MetersFor(MapPeriod.AllTime), Random.Shared, except: city is null ? tried : [.. tried, city.Id]);
+            Data.Store.SetSetting(SettingKeys.MapAutoTarget, $"{city.Id}|{startKey}");
+        }
+
+        tried.Add(city.Id);
+        var name = L[$"City.{city.Id}"];
+        return new Place(name, name, city.Point);
     }
 
     private async Task UpdateProgressAsync(int generation)
@@ -343,14 +403,14 @@ public sealed partial class MapViewModel(AppData data) : PageViewModel(data)
             var name = await Client.PlaceNameAtAsync(position.Point, L.Code, CancellationToken.None);
             if (generation == _generation && name is not null && position == RoutePlan.Locate(_legs, MetersFor(Period)))
             {
-                if (string.Equals(name, Places[0].Name, StringComparison.OrdinalIgnoreCase))
+                if (string.Equals(name, _route[0].Name, StringComparison.OrdinalIgnoreCase))
                 {
                     CaptionLead = L["Map.StillInStart"];
-                    CaptionRoute = Places[0].Name;
+                    CaptionRoute = _route[0].Name;
                 }
                 else
                 {
-                    CaptionRoute = $"{Places[0].Name} → {name}";
+                    CaptionRoute = $"{_route[0].Name} → {name}";
                 }
             }
         }
@@ -362,7 +422,18 @@ public sealed partial class MapViewModel(AppData data) : PageViewModel(data)
 
     private void ShowCaption()
     {
-        Notice = _legs.Any(l => l.IsStraight) ? L["Map.Straight"] : null;
+        var notes = new List<string>();
+        if (AutoTargetName is not null)
+        {
+            notes.Add(L["Map.AutoHint"]);
+        }
+
+        if (_legs.Any(l => l.IsStraight))
+        {
+            notes.Add(L["Map.Straight"]);
+        }
+
+        Notice = notes.Count == 0 ? null : string.Join(Environment.NewLine, notes);
         CaptionLead = L[$"Map.Lead.{Period}"];
         if (Places.Count == 0)
         {
@@ -372,10 +443,9 @@ public sealed partial class MapViewModel(AppData data) : PageViewModel(data)
             return;
         }
 
-        if (Places.Count == 1 || _legs.Count == 0)
+        if (_legs.Count == 0)
         {
-            CaptionLead = L["Map.ChooseDestination"];
-            CaptionRoute = Places[0].Name;
+            CaptionRoute = Places[0].Name; // the route is still being built
             CaptionDetails = null;
             return;
         }
@@ -385,19 +455,19 @@ public sealed partial class MapViewModel(AppData data) : PageViewModel(data)
         var position = RoutePlan.Locate(_legs, meters)!;
         if (position.Finished)
         {
-            CaptionRoute = $"{Places[0].Name} → {Places[^1].Name}";
-            CaptionDetails = L.Format("Map.Reached", Format.Distance(position.ExtraMeters * 100));
+            CaptionRoute = $"{_route[0].Name} → {_route[^1].Name}";
+            CaptionDetails = L.Format(AutoTargetName is null ? "Map.Reached" : "Map.ReachedAuto", Format.Distance(position.ExtraMeters * 100));
         }
         else
         {
             // Until the reverse lookup answers: the leg being walked.
-            CaptionRoute = $"{Places[0].Name} → … → {_legs[position.LegIndex].To.Name}";
+            CaptionRoute = $"{_route[0].Name} → … → {_legs[position.LegIndex].To.Name}";
             var percent = (meters / total).ToString("P0", L.Culture);
             CaptionDetails = L.Format("Map.Progress", Format.Distance(meters * 100), Format.Distance(total * 100), Format.Distance((total - meters) * 100), percent);
         }
     }
 
-    private static string BuildRouteMessage(IReadOnlyList<Place> places, IReadOnlyList<RouteLeg> legs) => Json(w =>
+    private static string BuildRouteMessage(List<Place> places, List<RouteLeg> legs, bool lastIsAuto) => Json(w =>
     {
         w.WriteString("type", "route");
         w.WriteStartArray("legs");
@@ -411,10 +481,12 @@ public sealed partial class MapViewModel(AppData data) : PageViewModel(data)
 
         w.WriteEndArray();
         w.WriteStartArray("places");
-        foreach (var place in places)
+        for (var i = 0; i < places.Count; i++)
         {
+            var place = places[i];
             w.WriteStartObject();
             w.WriteString("name", place.Name);
+            w.WriteBoolean("auto", lastIsAuto && i == places.Count - 1);
             w.WriteNumber("lat", place.Point.Lat);
             w.WriteNumber("lon", place.Point.Lon);
             w.WriteEndObject();

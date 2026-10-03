@@ -14,6 +14,7 @@
     <EmbeddedResource Include="..\..\data\comparisons.json" LogicalName="AimOdometer.Data.comparisons.json" />
     <EmbeddedResource Include="..\..\data\achievements.json" LogicalName="AimOdometer.Data.achievements.json" />
     <EmbeddedResource Include="..\..\data\services.json" LogicalName="AimOdometer.Data.services.json" />
+    <EmbeddedResource Include="..\..\data\cities.json" LogicalName="AimOdometer.Data.cities.json" />
   </ItemGroup>
   <ItemGroup>
     <InternalsVisibleTo Include="AimOdometer.Core.Tests" />

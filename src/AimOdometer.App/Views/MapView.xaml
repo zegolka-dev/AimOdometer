@@ -94,6 +94,18 @@
               </DataTemplate>
             </ItemsControl.ItemTemplate>
           </ItemsControl>
+          <!-- Random destination while only the start is chosen -->
+          <StackPanel Orientation="Horizontal" Margin="0,2,6,2" Visibility="{Binding AutoTargetName, Converter={StaticResource NullToCollapsed}}">
+            <TextBlock Text="→" Margin="0,0,6,0" VerticalAlignment="Center" Foreground="{StaticResource TextMutedBrush}" />
+            <Border BorderBrush="{StaticResource AccentBrush}" BorderThickness="1" CornerRadius="8" Padding="10,3" ToolTip="{l:T Map.AutoTarget}">
+              <StackPanel Orientation="Horizontal">
+                <TextBlock Style="{StaticResource Icon}" Text="&#xE8B1;" FontSize="12" Margin="0,0,6,0" VerticalAlignment="Center" Foreground="{StaticResource AccentTextBrush}" />
+                <TextBlock Text="{Binding AutoTargetName}" FontSize="13" Foreground="{StaticResource AccentTextBrush}" />
+              </StackPanel>
+            </Border>
+          </StackPanel>
+          <Button Style="{StaticResource LinkButton}" Content="{l:T Map.Shuffle}" Command="{Binding ShuffleCommand}" Margin="6,0,0,0"
+                  AutomationProperties.AutomationId="MapShuffle" Visibility="{Binding AutoTargetName, Converter={StaticResource NullToCollapsed}}" />
           <Button Style="{StaticResource LinkButton}" Content="{l:T Map.RemoveLast}" Command="{Binding RemoveLastCommand}" Margin="6,0,0,0" />
           <Button Style="{StaticResource LinkButton}" Content="{l:T Map.Clear}" Command="{Binding ClearCommand}" Margin="6,0,0,0" />
         </WrapPanel>

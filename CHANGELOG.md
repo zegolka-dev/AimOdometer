@@ -7,7 +7,8 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), ver
 
 ### Added
 - Phase 6 world map ("Where would you get?"):
-  - Pick your city and where you walk to (then further cities); the distance of today, this week, this month or all
+  - Pick your city and the map walks towards a random well-known city right away ("Another direction" for a new
+    one); your own destination and further cities are optional. The distance of today, this week, this month or all
     time is shown as a walk along real roads, with the reached place named and markers for every period.
   - Loads nothing until allowed on the tab; WebView2 and its processes exist only while the tab is open.
   - OpenFreeMap dark map (MapLibre GL JS bundled), Nominatim search, FOSSGIS/OSRM walking routes; one request per
@@ -77,6 +78,8 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), ver
   opens; a window in test mode does not start the tracker.
 
 ### Fixed
+- The window could crash with a stack overflow when a search result was announced to accessibility tools (a map
+  point printed itself recursively).
 - The achievement share card printed the achievement name at number size, so it ran off the card.
 - The statistics chart crashed when the period switched to a shorter one while the mouse was over a bar.
 - A test window on another data folder activated the real window instead of opening.

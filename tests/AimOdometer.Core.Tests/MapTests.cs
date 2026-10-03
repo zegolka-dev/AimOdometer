@@ -14,6 +14,13 @@ public class GeoTests
         Assert.InRange(Geo.Distance(Chisinau, Odesa), 153_000, 153_700); // ~153 km as the crow flies (flat-earth estimate: 153.3 km)
 
     [Fact]
+    public void ToString_DoesNotRecurse() // WPF asks data items for ToString (accessibility)
+    {
+        Assert.Contains("Lat = 1", new GeoPoint(1, 2).ToString(), StringComparison.Ordinal);
+        Assert.Contains("Odesa", new Place("Odesa", "Odesa, UA", new GeoPoint(1, 2)).ToString(), StringComparison.Ordinal);
+    }
+
+    [Fact]
     public void Distance_OneDegreeOfLatitude() =>
         Assert.Equal(111_195, Geo.Distance(new GeoPoint(0, 0), new GeoPoint(1, 0)), tolerance: 5);
 
@@ -59,7 +66,7 @@ public class GeoTests
             Assert.True(Math.Abs(line[i].Lon - line[i - 1].Lon) < 10, $"jump at {i}");
         }
 
-        Assert.Equal(-118.24, line[^1].Normalized.Lon, precision: 6);
+        Assert.Equal(-118.24, line[^1].Normalize().Lon, precision: 6);
     }
 }
 
@@ -148,6 +155,27 @@ public class MapJsonTests
         var route = MapJson.ParseRoute(json)!.Value;
         Assert.Equal(232037.3, route.Meters);
         Assert.Equal(new GeoPoint(47.01, 28.86), route.Line[0]);
+    }
+
+    [Fact]
+    public void ParseRoute_ReadsPolyline6()
+    {
+        // 38.5,-120.2 → 40.7,-120.95 → 43.252,-126.453 (the reference example, at precision 6).
+        const string json = """{"code":"Ok","routes":[{"distance":1000,"geometry":"_izlhA~rlgdF_{geC~ywl@_kwzCn`{nI"}]}""";
+        var line = MapJson.ParseRoute(json)!.Value.Line;
+        Assert.Equal(3, line.Count);
+        Assert.Equal(38.5, line[0].Lat, precision: 6);
+        Assert.Equal(-120.95, line[1].Lon, precision: 6);
+        Assert.Equal(43.252, line[2].Lat, precision: 6);
+    }
+
+    [Fact]
+    public void DecodePolyline_ReferenceExample()
+    {
+        var line = MapJson.DecodePolyline("_p~iF~ps|U_ulLnnqC_mqNvxq`@", 5);
+        Assert.Equal(new GeoPoint(38.5, -120.2), line[0]);
+        Assert.Equal(-126.453, line[2].Lon, precision: 9);
+        Assert.Throws<FormatException>(() => MapJson.DecodePolyline("_p~iF~ps|U_", 5));
     }
 
     [Fact]
@@ -250,6 +278,7 @@ public sealed class MapClientTests : IDisposable
         Assert.Equal(200_000, leg.Meters);
         Assert.Equal(2, handler.Requests.Count);
         Assert.Contains("/route/v1/driving/28.86,47.01;30.72,46.48", handler.Requests[0].Url.AbsolutePath, StringComparison.Ordinal);
+        Assert.Contains("geometries=polyline6", handler.Requests[0].Url.Query, StringComparison.Ordinal);
 
         await client.RouteAsync(From, To, TestContext.Current.CancellationToken);
         Assert.Equal(2, handler.Requests.Count); // cached
@@ -262,6 +291,7 @@ public sealed class MapClientTests : IDisposable
         using var client = new MapClient(_store, handler);
         var leg = await client.RouteAsync(From, To, TestContext.Current.CancellationToken);
         Assert.True(leg.IsStraight);
+        Assert.False(leg.IsOffline);
         Assert.Equal(Geo.Distance(From.Point, To.Point), leg.Meters, precision: 6);
         await client.RouteAsync(From, To, TestContext.Current.CancellationToken);
         Assert.Single(handler.Requests);
@@ -272,8 +302,10 @@ public sealed class MapClientTests : IDisposable
     {
         var handler = new FakeHandler(_ => throw new HttpRequestException("offline"));
         using var client = new MapClient(_store, handler);
-        Assert.True((await client.RouteAsync(From, To, TestContext.Current.CancellationToken)).IsStraight);
-        Assert.Null(_store.GetGeoCache("route", "28.86,47.01;30.72,46.48"));
+        var leg = await client.RouteAsync(From, To, TestContext.Current.CancellationToken);
+        Assert.True(leg.IsStraight);
+        Assert.True(leg.IsOffline);
+        Assert.Null(_store.GetGeoCache("route-full", "28.86,47.01;30.72,46.48"));
     }
 
     [Fact]
@@ -305,4 +337,49 @@ public sealed class MapClientTests : IDisposable
             return Task.FromResult(new HttpResponseMessage(status) { Content = new StringContent(body) });
         }
     }
+}
+
+public class FamousCitiesTests
+{
+    private static readonly GeoPoint Chisinau = new(47.0105, 28.8638);
+
+    [Fact]
+    public void List_IsLargeAndUnique()
+    {
+        Assert.True(FamousCities.All.Count >= 80);
+        Assert.Equal(FamousCities.All.Count, FamousCities.All.Select(c => c.Id).Distinct().Count());
+        Assert.NotNull(FamousCities.Find("paris"));
+        Assert.Null(FamousCities.Find("atlantis"));
+    }
+
+    [Fact]
+    public void Pick_IsAJourneyButNotTooFar()
+    {
+        for (var seed = 0; seed < 50; seed++)
+        {
+            var city = FamousCities.Pick(Chisinau, 0, new Random(seed));
+            Assert.InRange(Geo.Distance(Chisinau, city.Point), FamousCities.MinimumMeters, 2_500_000);
+        }
+    }
+
+    [Fact]
+    public void Pick_IsNotReachedYet()
+    {
+        var city = FamousCities.Pick(Chisinau, 1_500_000, new Random(1));
+        Assert.True(Geo.Distance(Chisinau, city.Point) >= 1_650_000);
+    }
+
+    [Fact]
+    public void Pick_SkipsTheCurrentOne()
+    {
+        var first = FamousCities.Pick(Chisinau, 0, new Random(3));
+        for (var seed = 0; seed < 30; seed++)
+        {
+            Assert.NotEqual(first.Id, FamousCities.Pick(Chisinau, 0, new Random(seed), except: [first.Id]).Id);
+        }
+    }
+
+    [Fact]
+    public void Pick_FallsBackForHugeWalks() =>
+        Assert.NotNull(FamousCities.Pick(Chisinau, 30_000_000, new Random(1))); // longer than any city is far
 }

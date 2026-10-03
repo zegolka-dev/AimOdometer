@@ -140,6 +140,10 @@ phase that first needs them, so the repository never contains empty shells.
   great-circle line, remembered; when no router is reachable it is a straight line for now and retried next time.
 - Service addresses come from `data/services.json` built into the app, overridden by `services.json` on the project
   website when it is valid (checked at most once a day), so a provider can be replaced without a release.
+- With only a start chosen, the walk goes towards a random well-known city (`data/cities.json`, names in the language
+  files): 300 km to ~2500 km away as the crow flies and farther than the all-time distance, remembered per start;
+  a city with no walking route (sea, closed border) is replaced, up to four tries. "Another direction" picks again.
+- Routes use the full geometry (polyline6), so a position near the start stays on the road.
 - The journey is a chain of places (start, destination, next destinations). A period's distance is located along the
   legs proportionally within each leg (the drawn line is simplified, the road distance is exact); the reached point is
   named with a reverse lookup cached per ~1 km cell.

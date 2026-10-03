@@ -111,7 +111,7 @@ public static class MapJson
     }
 
     /// <summary>
-    /// OSRM /route with geometries=geojson → distance and line. Null when the server found no route (e.g. across an
+    /// OSRM /route with geometries=polyline6 (or geojson) → distance and line. Null when the server found no route (e.g. across an
     /// ocean); throws on a malformed response.
     /// </summary>
     public static (double Meters, IReadOnlyList<GeoPoint> Line)? ParseRoute(string json)
@@ -124,15 +124,55 @@ public static class MapJson
         }
 
         var route = root.GetProperty("routes")[0];
-        var line = route.GetProperty("geometry").GetProperty("coordinates").EnumerateArray()
-            .Select(c => new GeoPoint(c[1].GetDouble(), c[0].GetDouble()))
-            .ToList();
+        var geometry = route.GetProperty("geometry");
+        var line = geometry.ValueKind == JsonValueKind.String
+            ? DecodePolyline(geometry.GetString()!, 6)
+            : [.. geometry.GetProperty("coordinates").EnumerateArray().Select(c => new GeoPoint(c[1].GetDouble(), c[0].GetDouble()))];
         if (line.Count < 2)
         {
             return null;
         }
 
         return (route.GetProperty("distance").GetDouble(), line);
+    }
+
+    /// <summary>Decodes an encoded polyline (Google's algorithm; OSRM uses precision 6).</summary>
+    public static IReadOnlyList<GeoPoint> DecodePolyline(string encoded, int precision)
+    {
+        ArgumentNullException.ThrowIfNull(encoded);
+        var factor = Math.Pow(10, precision);
+        var points = new List<GeoPoint>();
+        var index = 0;
+        long lat = 0, lon = 0;
+        while (index < encoded.Length)
+        {
+            lat += Next(encoded, ref index);
+            lon += Next(encoded, ref index);
+            points.Add(new GeoPoint(lat / factor, lon / factor));
+        }
+
+        return points;
+
+        static long Next(string text, ref int index)
+        {
+            long result = 0;
+            var shift = 0;
+            int chunk;
+            do
+            {
+                if (index >= text.Length)
+                {
+                    throw new FormatException("Truncated polyline.");
+                }
+
+                chunk = text[index++] - 63;
+                result |= (long)(chunk & 0x1F) << shift;
+                shift += 5;
+            }
+            while (chunk >= 0x20);
+
+            return (result & 1) != 0 ? ~(result >> 1) : result >> 1;
+        }
     }
 
     // Nominatim sends coordinates as strings.

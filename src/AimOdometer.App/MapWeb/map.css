@@ -31,6 +31,16 @@ body {
   text-shadow: 0 0 3px var(--bg, #0F0F23), 0 0 6px var(--bg, #0F0F23);
 }
 
+/* The random destination: hollow, in the accent colour. */
+.place.auto {
+  background: var(--bg, #0F0F23);
+  box-shadow: 0 0 0 2px var(--accentText, #B9A4FC);
+}
+
+.place.auto span {
+  color: var(--accentText, #B9A4FC);
+}
+
 .period {
   width: 10px;
   height: 10px;
