@@ -48,7 +48,7 @@ public partial class MainWindow : Window
 
     private void OnViewModelChanged(object? sender, PropertyChangedEventArgs e)
     {
-        if (e.PropertyName == nameof(MainViewModel.HasOverlay))
+        if (e.PropertyName == nameof(MainViewModel.IsCalibrationVisible))
         {
             UpdateRawMouse();
         }
@@ -73,20 +73,21 @@ public partial class MainWindow : Window
             TranslateTransform.YProperty, new DoubleAnimation(8, 0, duration) { EasingFunction = ease });
     }
 
-    /// <summary>Raw mouse input is read only while onboarding or calibration is open (it costs CPU at high polling rates).</summary>
+    /// <summary>Raw mouse input is read only while the DPI calibration is open (it costs CPU at high polling rates).</summary>
     private void UpdateRawMouse()
     {
-        if (!IsLoaded && PresentationSource.FromVisual(this) is null)
+        // The native handle exists from SourceInitialized on; PresentationSource may not be attached yet at that point.
+        if (new WindowInteropHelper(this).Handle == 0)
         {
             return;
         }
 
-        if (ViewModel is { HasOverlay: true } vm && _rawMouse is null)
+        if (ViewModel is { IsCalibrationVisible: true } vm && _rawMouse is null)
         {
             _rawMouse = new RawMouseListener(this);
             _rawMouse.Report += vm.OnRawReport;
         }
-        else if (ViewModel is not { HasOverlay: true } && _rawMouse is not null)
+        else if (ViewModel is not { IsCalibrationVisible: true } && _rawMouse is not null)
         {
             _rawMouse.Dispose();
             _rawMouse = null;

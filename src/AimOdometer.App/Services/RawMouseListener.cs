@@ -25,7 +25,9 @@ public sealed unsafe class RawMouseListener : IDisposable
     public RawMouseListener(Window window)
     {
         ArgumentNullException.ThrowIfNull(window);
-        _source = (HwndSource)PresentationSource.FromVisual(window)!;
+        var handle = new WindowInteropHelper(window).Handle;
+        _source = HwndSource.FromHwnd(handle)
+            ?? throw new InvalidOperationException("The window has no native handle yet.");
         _source.AddHook(WndProc);
         var device = new User32.RawInputDevice { UsagePage = 0x01, Usage = 0x02, Flags = 0, HwndTarget = _source.Handle };
         User32.RegisterRawInputDevices(&device, 1, (uint)sizeof(User32.RawInputDevice));

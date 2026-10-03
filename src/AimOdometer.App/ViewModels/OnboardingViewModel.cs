@@ -18,15 +18,13 @@ public sealed partial class OnboardingViewModel : ObservableObject
     public const int StepCount = 5;
 
     private readonly AppData _data;
-    private readonly ICalibrationHost _calibration;
     private readonly Action _finished;
-    private readonly Dictionary<nint, DeviceRecord?> _deviceByHandle = [];
 
     public OnboardingViewModel(AppData data, ICalibrationHost calibration, Action finished)
     {
         _data = data;
-        _calibration = calibration;
         _finished = finished;
+        Mice = new GearViewModel(data, calibration);
         Languages = Loc.Available();
         Language = Languages.FirstOrDefault(l => l.Code == Loc.Instance.Code) ?? (Languages.Count > 0 ? Languages[0] : null);
         Metric = data.Units == UnitSystem.Metric;
@@ -68,21 +66,8 @@ public sealed partial class OnboardingViewModel : ObservableObject
     [ObservableProperty]
     public partial bool ShowTrayIcon { get; set; }
 
-    [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(HasMouse), nameof(MouseText))]
-    public partial DeviceRecord? Mouse { get; set; }
-
-    public string MouseText => Mouse?.Name ?? Loc.Instance["Onboarding.MoveYourMouse"];
-
-    [ObservableProperty]
-    public partial string DpiText { get; set; } = "800";
-
-    [ObservableProperty]
-    public partial string? DpiError { get; set; }
-
-    public bool HasMouse => Mouse is not null;
-
-    public static IReadOnlyList<string> DpiPresets => GearViewModel.DpiPresets;
+    /// <summary>The user's mice with editable DPI (same controls as Settings and Gear).</summary>
+    public GearViewModel Mice { get; }
 
     partial void OnLanguageChanged(LanguageInfo? value)
     {
@@ -90,50 +75,10 @@ public sealed partial class OnboardingViewModel : ObservableObject
         {
             Loc.Instance.SetLanguage(value.Code);
             OnPropertyChanged(nameof(StepText));
-            OnPropertyChanged(nameof(MouseText));
         }
     }
 
     partial void OnMetricChanged(bool value) => Format.Units = value ? UnitSystem.Metric : UnitSystem.Imperial;
-
-    /// <summary>On the mouse step, the mouse the user moves becomes the selected one.</summary>
-    public void OnReport(RawMouseReport report)
-    {
-        if (!IsMouse || report.Device == 0 || report.Absolute || (report.Dx | report.Dy) == 0)
-        {
-            return;
-        }
-
-        if (!_deviceByHandle.TryGetValue(report.Device, out var device))
-        {
-            device = RawMouseListener.FindDevice(_data.Store, report.Device);
-            _deviceByHandle[report.Device] = device;
-        }
-
-        if (device is not null && device.Id != Mouse?.Id)
-        {
-            Mouse = device;
-            DpiText = device.Dpi.ToString("0.##", CultureInfo.InvariantCulture);
-        }
-    }
-
-    [RelayCommand]
-    private void SetPreset(string preset) => DpiText = preset;
-
-    [RelayCommand]
-    private void Calibrate()
-    {
-        if (Mouse is { } mouse)
-        {
-            _calibration.ShowCalibration(mouse, dpi =>
-            {
-                if (dpi is { } measured)
-                {
-                    DpiText = measured.ToString("0", CultureInfo.InvariantCulture);
-                }
-            });
-        }
-    }
 
     [RelayCommand]
     private void Back()
@@ -155,6 +100,11 @@ public sealed partial class OnboardingViewModel : ObservableObject
         if (!IsLast)
         {
             Step++;
+            if (IsMouse)
+            {
+                Mice.Refresh();
+            }
+
             return;
         }
 
@@ -164,23 +114,18 @@ public sealed partial class OnboardingViewModel : ObservableObject
     [RelayCommand]
     private void Skip() => Finish();
 
+    /// <summary>Applies DPI values typed but not saved yet. Returns false when one of them is invalid.</summary>
     private bool SaveDpi()
     {
-        if (Mouse is null)
+        foreach (var row in Mice.Devices)
         {
-            return true; // no mouse moved: keep the default, it can be set later in Gear
+            if (row.DpiText != row.Device.Dpi.ToString("0.##", CultureInfo.InvariantCulture))
+            {
+                row.SaveDpiCommand.Execute(null);
+            }
         }
 
-        if (!double.TryParse(DpiText.Replace(',', '.'), NumberStyles.Float, CultureInfo.InvariantCulture, out var dpi) || dpi is < 50 or > 50_000)
-        {
-            DpiError = Loc.Instance["Gear.DpiInvalid"];
-            return false;
-        }
-
-        DpiError = null;
-        _data.Store.SetDeviceDpi(Mouse.Id, dpi);
-        _data.NotifyChanged(reloadTracker: true);
-        return true;
+        return Mice.Devices.All(r => r.DpiError is null);
     }
 
     private void Finish()

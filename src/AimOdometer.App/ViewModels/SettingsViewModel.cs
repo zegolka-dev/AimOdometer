@@ -13,11 +13,15 @@ public sealed partial class SettingsViewModel : PageViewModel
 {
     private bool _loading;
 
-    public SettingsViewModel(AppData data)
+    public SettingsViewModel(AppData data, ICalibrationHost calibration)
         : base(data)
     {
         Languages = [new LanguageInfo("auto", string.Empty), .. Loc.Available()];
+        Mice = new GearViewModel(data, calibration);
     }
+
+    /// <summary>The same mouse and DPI controls as on the Gear page.</summary>
+    public GearViewModel Mice { get; }
 
     public override string TitleKey => "Nav.Settings";
 
@@ -52,6 +56,7 @@ public sealed partial class SettingsViewModel : PageViewModel
     public override void Refresh()
     {
         _loading = true;
+        Mice.Refresh();
         var code = Data.Setting(SettingKeys.Language) ?? "auto";
         Language = Languages.FirstOrDefault(l => l.Code == code) ?? Languages[0];
         Metric = Data.Units == UnitSystem.Metric;

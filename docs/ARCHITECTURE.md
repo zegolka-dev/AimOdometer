@@ -143,6 +143,15 @@ dotnet publish src/AimOdometer.Tracker -c Release -o artifacts/tracker
 
 The NativeAOT publish requires the MSVC linker ("Desktop development with C++" / VS Build Tools). A normal `dotnet build`/`dotnet run` of the tracker works without it.
 
+### Developer pitfall: packaged terminals see a different %LOCALAPPDATA%
+
+If you run builds from a terminal that belongs to an MSIX-packaged app (for example a terminal inside a packaged IDE
+or AI assistant), Windows virtualizes `%LOCALAPPDATA%` for every process started from it: the tracker then writes to
+`%LOCALAPPDATA%\Packages\<package>\LocalCache\Local\AimOdometer` while the window you open from Explorer reads the
+real `%LOCALAPPDATA%\AimOdometer`. Two databases appear, and SQLite `-wal` files can get mixed between them.
+Start the tracker and the window through Explorer (`explorer.exe "path	o\AimOdometer.Tracker.exe"`), and use
+`AIMODOMETER_DATA_DIR` (outside AppData) for experiments. Installed copies are never affected.
+
 To regenerate the icon after editing `assets/logo.svg`:
 
 ```bash

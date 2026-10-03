@@ -11,6 +11,7 @@
       <ResourceDictionary.MergedDictionaries>
         <ResourceDictionary Source="Themes/Palette.xaml" />
         <ResourceDictionary Source="Themes/Controls.xaml" />
+        <ResourceDictionary Source="Themes/Templates.xaml" />
       </ResourceDictionary.MergedDictionaries>
 
       <BooleanToVisibilityConverter x:Key="BoolToVisibility" />

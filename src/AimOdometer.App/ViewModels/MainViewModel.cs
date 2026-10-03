@@ -20,7 +20,7 @@ public sealed partial class MainViewModel : ObservableObject, ICalibrationHost, 
             new GamesViewModel(data),
             new StatisticsViewModel(data),
             new GearViewModel(data, this),
-            new SettingsViewModel(data),
+            new SettingsViewModel(data, this),
         ];
         CurrentPage = Pages[0];
         foreach (var page in Pages)
@@ -71,20 +71,13 @@ public sealed partial class MainViewModel : ObservableObject, ICalibrationHost, 
     [ObservableProperty]
     public partial StatusKind Status { get; set; } = StatusKind.Unknown;
 
-    /// <summary>True while a modal overlay (onboarding, calibration) needs raw mouse input.</summary>
+    /// <summary>True while a modal overlay (onboarding, calibration) is shown.</summary>
     public bool HasOverlay => Onboarding is not null || Calibration is not null;
 
     /// <summary>Raw mouse reports from the window, routed to whichever overlay is open.</summary>
     public void OnRawReport(RawMouseReport report)
     {
-        if (Calibration is { } calibration)
-        {
-            calibration.OnReport(report);
-        }
-        else
-        {
-            Onboarding?.OnReport(report);
-        }
+        Calibration?.OnReport(report);
     }
 
     public void Start()

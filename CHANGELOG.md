@@ -17,6 +17,9 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), ver
   - First-run onboarding in 5 steps; single window instance; the window starts the tracker if needed.
   - English and Russian UI from JSON files; adding a language is one file.
   - `tools/Publish-Local.ps1` publishes window and tracker into one folder (installed layout).
+  - Settings › Mouse and DPI: the same per-mouse controls as Gear (manual DPI, presets, measure, include).
+  - Onboarding's mouse step lists the mice with manual DPI input instead of "move your mouse".
+  - `AIMODOMETER_DATA_DIR` environment variable to point the app at another data folder (tests, screenshots).
 - Phase 3 games:
   - Foreground app tracking with out-of-context WinEvent hooks; foreground time per app and hour (not counted while
     minimized, locked, asleep or paused); movement is attributed to the active app.
@@ -46,6 +49,10 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), ver
 ### Changed
 - Logo recolored to the chosen palette.
 - Autostart logic moved to Core (shared by tracker and window).
+
+### Fixed
+- Raw mouse input for DPI calibration was never enabled when the window opened with an overlay (the listener was
+  created before WPF attached the window's presentation source).
 
 ### Known issues
 - Windows 11 coalesces background mouse input; during intense aiming about 2 % of the path is not recorded.
