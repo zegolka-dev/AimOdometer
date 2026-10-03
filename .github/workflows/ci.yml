@@ -53,3 +53,40 @@ jobs:
             artifacts/tracker/AimOdometer.Tracker.exe
             artifacts/tracker/e_sqlite3.dll
           if-no-files-found: error
+
+  cloud:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install Supabase CLI and Deno (pinned in package.json)
+        run: npm ci
+
+      # The Steam Web API key and the service role key live only in Supabase secrets.
+      - name: No secrets in the repository
+        run: |
+          if git grep -nIE '(sb_secret_[A-Za-z0-9_-]{10,}|\b[0-9A-F]{32}\b|eyJhbGciOi[A-Za-z0-9_-]{20,})' -- ':!package-lock.json' ':!**/*.mjs'; then
+            echo "::error::Something that looks like a secret is committed."
+            exit 1
+          fi
+
+      - name: Type-check Edge Functions
+        run: npx deno check --config supabase/functions/deno.json supabase/functions/*/index.ts
+
+      - name: Edge Function unit tests
+        run: npx deno test --config supabase/functions/deno.json supabase/functions/tests
+
+      - name: Start a local Supabase (database and auth)
+        run: npx supabase start -x realtime,storage-api,imgproxy,kong,mailpit,postgres-meta,studio,edge-runtime,logflare,vector,supavisor,postgrest
+
+      - name: Row level security tests (pgTAP)
+        run: npx supabase test db --local
+
+      - name: Stop Supabase
+        if: always()
+        run: npx supabase stop --no-backup

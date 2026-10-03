@@ -57,6 +57,9 @@ public sealed record DayTotal(
 /// <summary>Distance moved in one hour-of-day on one weekday, summed over a period.</summary>
 public sealed record HourOfWeekTotal(DayOfWeek Day, int Hour, double Centimeters);
 
+/// <summary>One local date x app x mouse, for cloud sync. Peak speed in cm/s.</summary>
+public sealed record DailyBreakdown(DateOnly Date, long AppId, long DeviceId, double Centimeters, long Clicks, long MoveSeconds, double PeakSpeed);
+
 /// <summary>What a piece of gear is.</summary>
 public enum GearKind
 {
@@ -351,6 +354,31 @@ public sealed class StatsStore : IDisposable
                 DateOnly.ParseExact(select.GetString(0)!, "yyyy-MM-dd", CultureInfo.InvariantCulture),
                 select.GetDouble(1), select.GetDouble(2), select.GetDouble(3), select.GetInt64(4),
                 select.GetDouble(5), select.GetInt64(6), select.GetDouble(7)));
+        }
+
+        return result;
+    }
+
+    /// <summary>Totals per local date x app x device from <paramref name="from"/> on, devices that count only.</summary>
+    public IReadOnlyList<DailyBreakdown> GetDailyBreakdown(DateOnly? from = null)
+    {
+        using var select = _db.Prepare("""
+            SELECT h.local_date, h.app_id, h.device_id,
+                   sum(h.path_counts / h.dpi) * 2.54,
+                   sum(h.clicks_left + h.clicks_right + h.clicks_middle + h.clicks_x1 + h.clicks_x2),
+                   sum(h.move_seconds), max(h.peak_speed / h.dpi) * 2.54
+            FROM hourly h JOIN devices d ON d.id = h.device_id
+            WHERE d.excluded = 0 AND h.local_date >= ?1
+            GROUP BY h.local_date, h.app_id, h.device_id
+            ORDER BY h.local_date;
+            """);
+        select.Bind(1, from?.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture) ?? "0000-01-01");
+        var result = new List<DailyBreakdown>();
+        while (select.Step())
+        {
+            result.Add(new DailyBreakdown(
+                DateOnly.ParseExact(select.GetString(0)!, "yyyy-MM-dd", CultureInfo.InvariantCulture),
+                select.GetInt64(1), select.GetInt64(2), select.GetDouble(3), select.GetInt64(4), select.GetInt64(5), select.GetDouble(6)));
         }
 
         return result;
@@ -693,4 +721,8 @@ public static class SettingKeys
     public const string MapPlaces = "map_places";
     public const string MapPeriod = "map_period";
     public const string MapAutoTarget = "map_auto_target";
+    public const string CloudPcId = "cloud_pc_id";
+    public const string CloudSyncedUser = "cloud_synced_user";
+    public const string CloudSyncedThrough = "cloud_synced_through";
+    public const string CloudLastSync = "cloud_last_sync";
 }

@@ -32,7 +32,7 @@ Measured cost of the always-running pair: 4.2 MB private memory, 0 % CPU when th
                                                       └──────────────────────────────────────▶ App ──HTTPS──▶ Supabase / Steam / maps
 ```
 
-- The tracker never talks to the network. Only the App does: update checks, the Map tab, and cloud features after Steam sign-in.
+- The tracker never talks to the network. Only the App does: update checks, the Map tab (after allowing it), and the cloud after Steam sign-in.
 - The keyboard is never read.
 
 ## Tracker design rules
@@ -147,6 +147,26 @@ phase that first needs them, so the repository never contains empty shells.
 - The journey is a chain of places (start, destination, next destinations). A period's distance is located along the
   legs proportionally within each leg (the drawn line is simplified, the road distance is exact); the reached point is
   named with a reverse lookup cached per ~1 km cell.
+
+## Cloud (Supabase)
+
+- Project `tphrgryvyxgldozymqzk` (Frankfurt). Schema, functions and tests live in `supabase/`; the CLI is pinned in
+  `package.json` (`npm ci`, then `npx supabase …`). Deploy: `npx supabase db push`, `npx supabase functions deploy --use-api`.
+- **Sign in with Steam** (OpenID 2.0, not OIDC, so Supabase Auth cannot do it alone), RFC 8252 style:
+  1. The window opens a socket on `127.0.0.1:<random port>` and the browser at `auth-steam/start` with
+     `challenge = base64url(SHA-256(verifier))`, the port and a random `state`.
+  2. `start` stores the handshake (`auth_pending`, 5 minutes) and redirects to Steam.
+  3. `callback` checks the assertion (mode, endpoint, exact `return_to`, signed fields, SteamID64) and confirms it with
+     Steam (`check_authentication`), creates or finds the user (service email `steam_<id>@users.aimodometer.invalid`,
+     email sign-up is disabled) and redirects the browser to the loopback with a one-time code.
+  4. The window posts code + verifier to `exchange`; the function checks `S256(verifier)`, deletes the handshake, makes a
+     magic-link token for the user with the admin API and verifies it at once: the window gets an ordinary Supabase
+     session (access + refresh token), stored with DPAPI.
+- **Data**: `daily_stats` = PC x local date x game key x hashed mouse key, absolute daily values. Clients only read
+  their own rows (RLS) and write nothing directly; `sync` validates (no future days, ≤ 100 km and ≤ 2M clicks a day,
+  peak ≤ 50 m/s …), drops implausible rows and replaces whole days atomically. Rate limits per user and per IP hash.
+- **Only the window talks to the cloud**, and only when signed in: on open, every 15 minutes while open, on close.
+- Account deletion deletes the auth user; every table cascades from it.
 
 ## Named pipe
 

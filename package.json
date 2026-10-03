@@ -1,0 +1,9 @@
+{
+  "name": "aimodometer-cloud-tools",
+  "private": true,
+  "description": "Supabase CLI for the cloud part (supabase/). Run: npx supabase <command>",
+  "devDependencies": {
+    "deno": "2.9.6",
+    "supabase": "2.119.0"
+  }
+}

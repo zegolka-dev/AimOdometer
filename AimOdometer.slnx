@@ -1,12 +1,14 @@
 <Solution>
   <Folder Name="/src/">
     <Project Path="src/AimOdometer.App/AimOdometer.App.csproj" />
+    <Project Path="src/AimOdometer.Cloud/AimOdometer.Cloud.csproj" />
     <Project Path="src/AimOdometer.Core/AimOdometer.Core.csproj" />
     <Project Path="src/AimOdometer.Tracker/AimOdometer.Tracker.csproj" />
     <Project Path="src/AimOdometer.Win32/AimOdometer.Win32.csproj" />
   </Folder>
   <Folder Name="/tests/">
     <Project Path="tests/AimOdometer.App.Tests/AimOdometer.App.Tests.csproj" />
+    <Project Path="tests/AimOdometer.Cloud.Tests/AimOdometer.Cloud.Tests.csproj" />
     <Project Path="tests/AimOdometer.Core.Tests/AimOdometer.Core.Tests.csproj" />
     <Project Path="tests/AimOdometer.Tracker.Tests/AimOdometer.Tracker.Tests.csproj" />
   </Folder>

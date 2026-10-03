@@ -29,3 +29,5 @@ Releases/
 
 # UI smoke test data
 artifacts/
+
+node_modules/

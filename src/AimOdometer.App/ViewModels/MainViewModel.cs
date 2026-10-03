@@ -10,7 +10,7 @@ public sealed partial class MainViewModel : ObservableObject, ICalibrationHost, 
 {
     private readonly AppData _data;
 
-    public MainViewModel(AppData data)
+    public MainViewModel(AppData data, CloudService cloud)
     {
         _data = data;
         Tracker = new TrackerConnection();
@@ -22,7 +22,7 @@ public sealed partial class MainViewModel : ObservableObject, ICalibrationHost, 
             new AchievementsViewModel(data),
             new MapViewModel(data),
             new GearViewModel(data, this),
-            new SettingsViewModel(data, this),
+            new SettingsViewModel(data, this, cloud),
         ];
         CurrentPage = Pages[0];
         foreach (var page in Pages)

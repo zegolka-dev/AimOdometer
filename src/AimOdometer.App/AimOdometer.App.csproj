@@ -26,6 +26,7 @@
     <None Include="MapWeb\**" Link="map\%(RecursiveDir)%(Filename)%(Extension)" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\AimOdometer.Cloud\AimOdometer.Cloud.csproj" />
     <ProjectReference Include="..\AimOdometer.Core\AimOdometer.Core.csproj" />
     <ProjectReference Include="..\AimOdometer.Win32\AimOdometer.Win32.csproj" />
   </ItemGroup>

@@ -18,6 +18,7 @@ public partial class App : Application
     private SingleInstance? _instance;
     private AppData? _data;
     private MainViewModel? _main;
+    private CloudService? _cloud;
 
     protected override void OnStartup(StartupEventArgs e)
     {
@@ -49,7 +50,8 @@ public partial class App : Application
         Loc.Instance.SetLanguage(Loc.Resolve(_data.Setting(SettingKeys.Language)));
         Format.Units = _data.Units;
 
-        _main = new MainViewModel(_data);
+        _cloud = new CloudService(_data);
+        _main = new MainViewModel(_data, _cloud);
         var window = new MainWindow { DataContext = _main };
         window.ContentRendered += (_, _) =>
         {
@@ -59,10 +61,13 @@ public partial class App : Application
         MainWindow = window;
         window.Show();
         _main.Start();
+        _cloud.Start();
     }
 
     protected override void OnExit(ExitEventArgs e)
     {
+        _cloud?.SyncBeforeExit();
+        _cloud?.Dispose();
         _main?.Dispose();
         _data?.Dispose();
         _instance?.Dispose();

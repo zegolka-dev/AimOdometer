@@ -11,7 +11,12 @@ AimOdometer includes or uses the following third-party software and services.
 | [SQLite](https://sqlite.org) via SQLitePCLRaw | Public domain / Apache 2.0 | Local database |
 | [CommunityToolkit.Mvvm](https://github.com/CommunityToolkit/dotnet) | MIT | Window |
 
-## Online services (Map tab only, after you allow it)
+## Online services
+
+- [Supabase](https://supabase.com) hosts the AimOdometer cloud (only after you sign in with Steam).
+- [Steam](https://steamcommunity.com) OpenID sign-in and Web API (your public profile name and avatar).
+
+### Map tab only, after you allow it
 
 - Map tiles: [OpenFreeMap](https://openfreemap.org), © [OpenMapTiles](https://www.openmaptiles.org/), data ©
   [OpenStreetMap](https://www.openstreetmap.org/copyright) contributors (ODbL).

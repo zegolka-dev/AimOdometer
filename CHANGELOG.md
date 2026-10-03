@@ -6,6 +6,14 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), ver
 ## [Unreleased]
 
 ### Added
+- Phase 7 cloud:
+  - Sign in through Steam (Settings › Steam account and cloud): the browser signs in on Steam's own page, the window
+    gets a Supabase session through a loopback redirect with a PKCE-style verifier; the session is stored with DPAPI.
+  - Sync of daily totals (date x game x mouse) from the window: on open, every 15 minutes while open and on close;
+    totals of all your PCs and the list of PCs in Settings; sign out; delete the cloud account and its data.
+  - Supabase backend in `supabase/`: schema with row level security on every table, Edge Functions `auth-steam`,
+    `sync` (plausibility checks, rate limits), `profile`, `account-delete`; pgTAP, Deno and .NET tests; CI job with a
+    secret scan.
 - Phase 6 world map ("Where would you get?"):
   - Pick your city and the map walks towards a random well-known city right away ("Another direction" for a new
     one); your own destination and further cities are optional. The distance of today, this week, this month or all

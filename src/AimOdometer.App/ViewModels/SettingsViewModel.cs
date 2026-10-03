@@ -8,17 +8,21 @@ using CommunityToolkit.Mvvm.Input;
 
 namespace AimOdometer.App.ViewModels;
 
-/// <summary>Language, units, autostart, tray icon visibility, data folder.</summary>
+/// <summary>Steam account and cloud, language, units, mice, autostart, tray icon visibility, data folder.</summary>
 public sealed partial class SettingsViewModel : PageViewModel
 {
     private bool _loading;
 
-    public SettingsViewModel(AppData data, ICalibrationHost calibration)
+    public SettingsViewModel(AppData data, ICalibrationHost calibration, CloudService cloud)
         : base(data)
     {
         Languages = [new LanguageInfo("auto", string.Empty), .. Loc.Available()];
         Mice = new GearViewModel(data, calibration);
+        Account = new AccountViewModel(data, cloud);
     }
+
+    /// <summary>Sign in with Steam, sync status and the account's PCs.</summary>
+    public AccountViewModel Account { get; }
 
     /// <summary>The same mouse and DPI controls as on the Gear page.</summary>
     public GearViewModel Mice { get; }
@@ -60,6 +64,7 @@ public sealed partial class SettingsViewModel : PageViewModel
     {
         _loading = true;
         Mice.Refresh();
+        Account.Refresh();
         var code = Data.Setting(SettingKeys.Language) ?? "auto";
         Language = Languages.FirstOrDefault(l => l.Code == code) ?? Languages[0];
         Metric = Data.Units == UnitSystem.Metric;
