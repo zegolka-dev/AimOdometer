@@ -40,10 +40,19 @@ public static class TrackerClient
     }
 
     /// <summary>Process id of the tracker worker that serves the pipe, or null when none is running.</summary>
-    public static int? GetProcessId() =>
-        Send(TrackerCommand.Ping, timeoutMs: 500) is [TrackerProtocol.StatusOk, ..] response && response.Length >= 9
-            ? System.Buffers.Binary.BinaryPrimitives.ReadInt32LittleEndian(response.AsSpan(5))
-            : null;
+    public static int? GetProcessId() => GetInfo()?.ProcessId;
+
+    /// <summary>Who answers the pipe and which data folder it writes to; null when no tracker runs.</summary>
+    public static (int ProcessId, string? DataDirectory)? GetInfo()
+    {
+        if (Send(TrackerCommand.Ping, timeoutMs: 500) is not [TrackerProtocol.StatusOk, ..] response)
+        {
+            return null;
+        }
+
+        var (_, pid, folder) = TrackerProtocol.ReadPing(response);
+        return (pid, folder);
+    }
 
     public static bool IsRunning() => Send(TrackerCommand.Ping, timeoutMs: 300) is [TrackerProtocol.StatusOk, ..];
 

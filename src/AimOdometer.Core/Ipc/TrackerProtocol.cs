@@ -35,9 +35,9 @@ public sealed record TrackerStatus(
 /// </summary>
 public static class TrackerProtocol
 {
-    public const int Version = 1;
+    public const int Version = 2;
     public const int RequestSize = 9;
-    public const int MaxResponseSize = 128;
+    public const int MaxResponseSize = 1024;
 
     public const byte StatusOk = 0;
     public const byte StatusUnknownCommand = 1;
@@ -55,6 +55,40 @@ public static class TrackerProtocol
 
     public static (TrackerCommand Command, long Argument) ReadRequest(ReadOnlySpan<byte> buffer) =>
         ((TrackerCommand)buffer[0], BinaryPrimitives.ReadInt64LittleEndian(buffer[1..]));
+
+    /// <summary>Ping response: protocol version, process id and the folder the tracker writes to.</summary>
+    public static int WritePing(Span<byte> buffer, int processId, string dataDirectory)
+    {
+        ArgumentNullException.ThrowIfNull(dataDirectory);
+        buffer[0] = StatusOk;
+        BinaryPrimitives.WriteInt32LittleEndian(buffer[1..], Version);
+        BinaryPrimitives.WriteInt32LittleEndian(buffer[5..], processId);
+        var length = System.Text.Encoding.UTF8.GetBytes(dataDirectory, buffer[11..]);
+        BinaryPrimitives.WriteUInt16LittleEndian(buffer[9..], (ushort)length);
+        return 11 + length;
+    }
+
+    public static (int Version, int ProcessId, string? DataDirectory) ReadPing(ReadOnlySpan<byte> buffer)
+    {
+        if (buffer.Length < 9 || buffer[0] != StatusOk)
+        {
+            throw new InvalidDataException("Malformed tracker ping response.");
+        }
+
+        var version = BinaryPrimitives.ReadInt32LittleEndian(buffer[1..]);
+        var pid = BinaryPrimitives.ReadInt32LittleEndian(buffer[5..]);
+        string? folder = null;
+        if (buffer.Length >= 11)
+        {
+            var length = BinaryPrimitives.ReadUInt16LittleEndian(buffer[9..]);
+            if (buffer.Length >= 11 + length)
+            {
+                folder = System.Text.Encoding.UTF8.GetString(buffer.Slice(11, length));
+            }
+        }
+
+        return (version, pid, folder);
+    }
 
     /// <summary>Writes a status payload; returns the number of bytes written.</summary>
     public static int WriteStatus(Span<byte> buffer, TrackerStatus status)

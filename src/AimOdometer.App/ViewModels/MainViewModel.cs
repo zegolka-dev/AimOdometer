@@ -83,8 +83,14 @@ public sealed partial class MainViewModel : ObservableObject, ICalibrationHost, 
     public void Start()
     {
         CurrentPage.Refresh();
+        _ = StartTrackerLinkAsync();
+    }
+
+    /// <summary>Checks which folder the tracker writes to before showing any live numbers from it.</summary>
+    private async Task StartTrackerLinkAsync()
+    {
+        await EnsureTrackerAsync();
         Tracker.Start();
-        _ = EnsureTrackerAsync();
     }
 
     partial void OnCurrentPageChanged(PageViewModel oldValue, PageViewModel newValue)
@@ -118,11 +124,18 @@ public sealed partial class MainViewModel : ObservableObject, ICalibrationHost, 
         Calibration.Start();
     }
 
+    private string? _trackerFolder;
+
     private async Task EnsureTrackerAsync()
     {
         await TrackerConnection.EnsureRunningAsync();
+        _trackerFolder = (await Task.Run(Core.Ipc.TrackerClient.GetInfo))?.DataDirectory;
         await Tracker.PollAsync();
     }
+
+    /// <summary>The running tracker writes somewhere else than this window reads: say so instead of showing empty data.</summary>
+    private bool FolderMismatch =>
+        _trackerFolder is { } folder && !Core.AppIdentity.SameFolder(folder, Core.AppIdentity.DataDirectory);
 
     private void OnTrackerUpdated()
     {
@@ -131,6 +144,13 @@ public sealed partial class MainViewModel : ObservableObject, ICalibrationHost, 
         {
             Status = StatusKind.Stopped;
             StatusText = L["Status.NotRunning"];
+            return;
+        }
+
+        if (FolderMismatch)
+        {
+            Status = StatusKind.Stopped;
+            StatusText = L.Format("Status.OtherFolder", _trackerFolder);
             return;
         }
 

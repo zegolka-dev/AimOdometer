@@ -466,6 +466,13 @@ public sealed class StatsStore : IDisposable
         upsert.Bind(1, gameKey).Bind(2, displayName.Trim()).Run();
     }
 
+    /// <summary>Writes a consistent copy of the whole database to <paramref name="path"/> (must not exist).</summary>
+    public void BackupTo(string path)
+    {
+        ArgumentException.ThrowIfNullOrEmpty(path);
+        _db.Execute($"VACUUM INTO '{path.Replace("'", "''", StringComparison.Ordinal)}';");
+    }
+
     public string? GetSetting(string key)
     {
         using var select = _db.Prepare("SELECT value FROM settings WHERE key = ?1;");

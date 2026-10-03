@@ -96,6 +96,8 @@ internal sealed unsafe class TrackerHost : IDisposable
 
         _hour = HourKey.FromUtc(DateTime.UtcNow, TimeZoneInfo.Local);
         _storedTodayCm = _store.CentimetersOn(_hour.LocalDate);
+        Log.Warning($"Tracker writing to {_options.DataDirectory}");
+        BackupDaily();
 
         if (!RegisterRawInput(enable: true))
         {
@@ -379,6 +381,7 @@ internal sealed unsafe class TrackerHost : IDisposable
         if (dateChanged)
         {
             _storedTodayCm = SafeCentimetersToday();
+            BackupDaily();
         }
     }
 
@@ -427,6 +430,22 @@ internal sealed unsafe class TrackerHost : IDisposable
         }
 
         _failedWrites.Clear();
+    }
+
+    /// <summary>Keeps a copy of the database per day (last 7) so no bug or mistake can wipe more than a day.</summary>
+    private void BackupDaily()
+    {
+        try
+        {
+            if (Backups.CreateDaily(_store, Backups.FolderFor(_options.DataDirectory), _hour.LocalDate) is { } path)
+            {
+                Log.Info($"Backup written: {path}");
+            }
+        }
+        catch (Exception ex) when (ex is SqliteException or IOException or UnauthorizedAccessException)
+        {
+            Log.Error("Daily backup failed", ex);
+        }
     }
 
     private double SafeCentimetersToday()
@@ -580,7 +599,10 @@ internal sealed unsafe class TrackerHost : IDisposable
             return false;
         }
 
-        Process.Start(new ProcessStartInfo(app) { UseShellExecute = false })?.Dispose();
+        // The window must use the real data folder: never pass a test override from our own environment.
+        var start = new ProcessStartInfo(app) { UseShellExecute = false };
+        start.Environment.Remove(AppIdentity.DataDirectoryVariable);
+        Process.Start(start)?.Dispose();
         return true;
     }
 
@@ -712,9 +734,7 @@ internal sealed unsafe class TrackerHost : IDisposable
         switch (request->Command)
         {
             case TrackerCommand.Ping:
-                System.Buffers.Binary.BinaryPrimitives.WriteInt32LittleEndian(response[1..], TrackerProtocol.Version);
-                System.Buffers.Binary.BinaryPrimitives.WriteInt32LittleEndian(response[5..], Environment.ProcessId);
-                request->ResponseLength = 9;
+                request->ResponseLength = TrackerProtocol.WritePing(response, Environment.ProcessId, _options.DataDirectory);
                 break;
             case TrackerCommand.GetStatus:
                 request->ResponseLength = TrackerProtocol.WriteStatus(response, BuildStatus());

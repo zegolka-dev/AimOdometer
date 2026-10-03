@@ -10,6 +10,7 @@
   "Status.Tracking": "Tracking",
   "Status.Paused": "Paused",
   "Status.PausedUntil": "Paused until {0}",
+  "Status.OtherFolder": "The tracker writes to another folder: {0}",
   "Status.NotRunning": "The tracker isn't running",
 
   "Common.Today": "Today",

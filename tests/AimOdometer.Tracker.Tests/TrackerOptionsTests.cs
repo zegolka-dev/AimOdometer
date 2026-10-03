@@ -15,6 +15,22 @@ public class TrackerOptionsTests
     }
 
     [Fact]
+    public void IgnoresTheTestDataFolderVariable()
+    {
+        // The window and tools honour AIMODOMETER_DATA_DIR; the tracker must not, or a test could redirect real tracking.
+        var previous = Environment.GetEnvironmentVariable(Core.AppIdentity.DataDirectoryVariable);
+        try
+        {
+            Environment.SetEnvironmentVariable(Core.AppIdentity.DataDirectoryVariable, @"C:\Temp\test-data");
+            Assert.Equal(Core.AppIdentity.UserDataDirectory, TrackerOptions.Parse([]).DataDirectory);
+        }
+        finally
+        {
+            Environment.SetEnvironmentVariable(Core.AppIdentity.DataDirectoryVariable, previous);
+        }
+    }
+
+    [Fact]
     public void ParsesValues()
     {
         var options = TrackerOptions.Parse(["--data-dir", @"C:\Temp\x", "--batch-ms", "25", "--measure-latency", "--ecoqos"]);

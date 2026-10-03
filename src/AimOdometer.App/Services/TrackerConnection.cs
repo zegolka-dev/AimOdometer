@@ -46,6 +46,11 @@ public sealed partial class TrackerConnection : ObservableObject, IDisposable
             return true;
         }
 
+        if (AimOdometer.Core.AppIdentity.IsDataDirectoryOverridden)
+        {
+            return false; // test mode: never start the real tracker (it would serve the whole session)
+        }
+
         if (!File.Exists(TrackerExePath))
         {
             Log.Warning($"Tracker not running and not found at {TrackerExePath}");

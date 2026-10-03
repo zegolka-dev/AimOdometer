@@ -20,7 +20,7 @@ internal sealed record TrackerOptions(
 
     public static TrackerOptions Parse(string[] args)
     {
-        var dataDirectory = AppIdentity.DataDirectory;
+        var dataDirectory = AppIdentity.UserDataDirectory; // never the test override variable
         var batchInterval = DefaultBatchInterval;
         var crashAfter = 0;
         for (var i = 0; i < args.Length - 1; i++)
