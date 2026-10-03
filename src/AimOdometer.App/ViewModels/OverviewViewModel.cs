@@ -115,7 +115,10 @@ public sealed partial class OverviewViewModel(AppData data) : PageViewModel(data
         TopGames.Clear();
         var totals = GameStats.Summarize(Data.Catalog, Data.Store.GetApps(), Data.Store.GetAppUsage(today, today), Loc.Instance["Games.Other"]);
         var sum = totals.Sum(t => t.Centimeters);
-        var apps = Data.Store.GetApps().ToDictionary(a => a.ExeName, a => a.ExePath, StringComparer.OrdinalIgnoreCase);
+        // Several paths can share an exe name (e.g. two installs); any of them gives the icon.
+        var apps = Data.Store.GetApps()
+            .GroupBy(a => a.ExeName, StringComparer.OrdinalIgnoreCase)
+            .ToDictionary(g => g.Key, g => g.First().ExePath, StringComparer.OrdinalIgnoreCase);
         var index = 0;
         foreach (var total in totals.Where(t => t.Category == AppCategory.Game).Take(3))
         {

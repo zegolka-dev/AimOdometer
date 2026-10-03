@@ -87,10 +87,27 @@ public partial class App : Application
         window.Focus();
     }
 
-    private static void OnUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e)
+    private bool _showingError;
+
+    private void OnUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e)
     {
         Log.Error("Unhandled UI exception", e.Exception);
-        MessageBox.Show(e.Exception.Message, "AimOdometer", MessageBoxButton.OK, MessageBoxImage.Error);
         e.Handled = true;
+
+        // One dialog at a time: a broken template can throw on every layout pass, which must not flood the screen.
+        if (_showingError)
+        {
+            return;
+        }
+
+        _showingError = true;
+        try
+        {
+            MessageBox.Show(e.Exception.Message, "AimOdometer", MessageBoxButton.OK, MessageBoxImage.Error);
+        }
+        finally
+        {
+            _showingError = false;
+        }
     }
 }

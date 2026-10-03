@@ -1,0 +1,12 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:c="clr-namespace:AimOdometer.App.Controls">
+  <!-- Merged before Templates.xaml so shared templates can resolve these with StaticResource. -->
+  <BooleanToVisibilityConverter x:Key="BoolToVisibility" />
+  <c:InverseBoolToVisibilityConverter x:Key="InverseBoolToVisibility" />
+  <c:NullToCollapsedConverter x:Key="NullToCollapsed" />
+  <c:EnumEqualsConverter x:Key="EnumEquals" />
+  <c:InverseBoolConverter x:Key="InverseBool" />
+  <c:LanguageLabelConverter x:Key="LanguageLabel" />
+  <c:ShareToStarConverter x:Key="ShareToStar" />
+</ResourceDictionary>

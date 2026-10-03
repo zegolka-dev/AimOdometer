@@ -10,17 +10,11 @@
     <ResourceDictionary>
       <ResourceDictionary.MergedDictionaries>
         <ResourceDictionary Source="Themes/Palette.xaml" />
+        <ResourceDictionary Source="Themes/Converters.xaml" />
         <ResourceDictionary Source="Themes/Controls.xaml" />
         <ResourceDictionary Source="Themes/Templates.xaml" />
       </ResourceDictionary.MergedDictionaries>
 
-      <BooleanToVisibilityConverter x:Key="BoolToVisibility" />
-      <c:InverseBoolToVisibilityConverter x:Key="InverseBoolToVisibility" />
-      <c:NullToCollapsedConverter x:Key="NullToCollapsed" />
-      <c:EnumEqualsConverter x:Key="EnumEquals" />
-      <c:InverseBoolConverter x:Key="InverseBool" />
-      <c:LanguageLabelConverter x:Key="LanguageLabel" />
-      <c:ShareToStarConverter x:Key="ShareToStar" />
 
       <DataTemplate DataType="{x:Type vm:OverviewViewModel}"><v:OverviewView /></DataTemplate>
       <DataTemplate DataType="{x:Type vm:GamesViewModel}"><v:GamesView /></DataTemplate>

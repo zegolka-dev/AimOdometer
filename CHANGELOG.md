@@ -19,6 +19,8 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), ver
   - `tools/Publish-Local.ps1` publishes window and tracker into one folder (installed layout).
   - Settings › Mouse and DPI: the same per-mouse controls as Gear (manual DPI, presets, measure, include).
   - Onboarding's mouse step lists the mice with manual DPI input instead of "move your mouse".
+  - `tools/Test-UiSmoke.ps1`: opens the window on a throw-away data folder, walks onboarding, every page and every
+    period switch, and fails on any logged error.
   - `AIMODOMETER_DATA_DIR` environment variable to point the app at another data folder (tests, screenshots).
 - Phase 3 games:
   - Foreground app tracking with out-of-context WinEvent hooks; foreground time per app and hour (not counted while
@@ -51,6 +53,10 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), ver
 - Autostart logic moved to Core (shared by tracker and window).
 
 ### Fixed
+- Gear and Settings crashed when showing a mouse: the shared template could not find its converters (moved to
+  `Themes/Converters.xaml`, merged before the templates).
+- Overview failed when two apps had the same exe name in different folders.
+- A failing view no longer floods the screen with error dialogs (one at a time, the rest go to the log).
 - Raw mouse input for DPI calibration was never enabled when the window opened with an overlay (the listener was
   created before WPF attached the window's presentation source).
 
