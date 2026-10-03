@@ -59,7 +59,18 @@
     </Border>
 
     <!-- Page -->
-    <ScrollViewer Grid.Column="1" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Focusable="False">
+    <ScrollViewer Grid.Column="1" HorizontalScrollBarVisibility="Disabled" Focusable="False">
+      <ScrollViewer.Style>
+        <Style TargetType="ScrollViewer" BasedOn="{StaticResource {x:Type ScrollViewer}}">
+          <Setter Property="VerticalScrollBarVisibility" Value="Auto" />
+          <Style.Triggers>
+            <!-- The map page fills the window: its height is the viewport, the map scrolls inside itself. -->
+            <DataTrigger Binding="{Binding CurrentPage.FillsViewport}" Value="True">
+              <Setter Property="VerticalScrollBarVisibility" Value="Disabled" />
+            </DataTrigger>
+          </Style.Triggers>
+        </Style>
+      </ScrollViewer.Style>
       <ContentControl x:Name="PageHost" Content="{Binding CurrentPage}" Margin="36,28,36,32" Focusable="False">
         <ContentControl.RenderTransform>
           <TranslateTransform />

@@ -1,0 +1,10 @@
+{
+  "version": 1,
+  "mapStyle": "https://tiles.openfreemap.org/styles/dark",
+  "geocoder": "https://nominatim.openstreetmap.org",
+  "routers": [
+    { "url": "https://routing.openstreetmap.de/routed-foot", "profile": "driving" },
+    { "url": "https://router.project-osrm.org", "profile": "driving" }
+  ],
+  "attribution": "Routes: <a href=\"https://project-osrm.org/\">OSRM</a>, <a href=\"https://routing.openstreetmap.de/\">FOSSGIS</a> · Search: <a href=\"https://nominatim.org/\">Nominatim</a> · <a href=\"https://www.openstreetmap.org/fixthemap\">Fix the map</a>"
+}

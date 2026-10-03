@@ -105,6 +105,14 @@ try {
         foreach ($segment in $segments) { Invoke-Element $segment }
         "visited: $name ($($segments.Count) switches)"
     }
+
+    # Privacy: until the map is allowed on its tab, the window talks to nobody (pipes only, no sockets, no browser).
+    $remote = @(Get-NetTCPConnection -OwningProcess $process.Id -ErrorAction SilentlyContinue |
+        Where-Object { $_.RemoteAddress -notin @("0.0.0.0", "::", "127.0.0.1", "::1") })
+    if ($remote.Count -gt 0) { throw "The window opened network connections: $($remote.RemoteAddress -join ', ')" }
+    $browsers = @(Get-CimInstance Win32_Process -Filter "Name = 'msedgewebview2.exe'" | Where-Object { $_.CommandLine -like "*$data*" })
+    if ($browsers.Count -gt 0) { throw "WebView2 started although the map was not allowed." }
+    "network: none"
 }
 finally {
     if (-not $process.HasExited) { $process | Stop-Process -Force }

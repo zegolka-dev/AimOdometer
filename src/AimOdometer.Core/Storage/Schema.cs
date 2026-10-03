@@ -114,6 +114,17 @@ public static class Schema
             retired_on   TEXT
         );
         """,
+
+        // v4: responses of the map services (geocoding, routes, services.json). Their usage policies require caching.
+        """
+        CREATE TABLE geo_cache (
+            kind        TEXT    NOT NULL,               -- search, reverse, route, services
+            key         TEXT    NOT NULL,
+            value       TEXT    NOT NULL,
+            fetched_at  INTEGER NOT NULL,               -- Unix seconds, UTC
+            PRIMARY KEY (kind, key)
+        ) WITHOUT ROWID;
+        """,
     ];
 
     public static int LatestVersion => Migrations.Length;

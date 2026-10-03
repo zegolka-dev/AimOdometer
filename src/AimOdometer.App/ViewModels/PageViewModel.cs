@@ -24,6 +24,9 @@ public abstract partial class PageViewModel : ObservableObject
     /// <summary>Localization key of the navigation label.</summary>
     public abstract string TitleKey { get; }
 
+    /// <summary>True for a page that fills the window instead of scrolling (the map).</summary>
+    public virtual bool FillsViewport => false;
+
     /// <summary>Segoe Fluent Icons glyph.</summary>
     public abstract string Icon { get; }
 

@@ -20,6 +20,7 @@ public sealed partial class MainViewModel : ObservableObject, ICalibrationHost, 
             new GamesViewModel(data),
             new StatisticsViewModel(data),
             new AchievementsViewModel(data),
+            new MapViewModel(data),
             new GearViewModel(data, this),
             new SettingsViewModel(data, this),
         ];

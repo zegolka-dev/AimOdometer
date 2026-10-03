@@ -613,6 +613,24 @@ public sealed class StatsStore : IDisposable
         delete.Bind(1, id).Run();
     }
 
+    /// <summary>A cached map service response and when it was fetched, or null.</summary>
+    public (string Value, DateTimeOffset FetchedAt)? GetGeoCache(string kind, string key)
+    {
+        using var select = _db.Prepare("SELECT value, fetched_at FROM geo_cache WHERE kind = ?1 AND key = ?2;");
+        select.Bind(1, kind).Bind(2, key);
+        return select.Step() ? (select.GetString(0)!, DateTimeOffset.FromUnixTimeSeconds(select.GetInt64(1))) : null;
+    }
+
+    public void SetGeoCache(string kind, string key, string value, DateTimeOffset fetchedAt)
+    {
+        using var upsert = _db.Prepare(
+            """
+            INSERT INTO geo_cache (kind, key, value, fetched_at) VALUES (?1, ?2, ?3, ?4)
+            ON CONFLICT (kind, key) DO UPDATE SET value = excluded.value, fetched_at = excluded.fetched_at;
+            """);
+        upsert.Bind(1, kind).Bind(2, key).Bind(3, value).Bind(4, fetchedAt.ToUnixTimeSeconds()).Run();
+    }
+
     public string? GetSetting(string key)
     {
         using var select = _db.Prepare("SELECT value FROM settings WHERE key = ?1;");
@@ -671,4 +689,7 @@ public static class SettingKeys
     public const string LogLevel = "log_level";
     public const string EcoQos = "ecoqos";
     public const string Notifications = "notifications";
+    public const string MapEnabled = "map_enabled";
+    public const string MapPlaces = "map_places";
+    public const string MapPeriod = "map_period";
 }

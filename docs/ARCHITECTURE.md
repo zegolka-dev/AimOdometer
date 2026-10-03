@@ -125,6 +125,25 @@ phase that first needs them, so the repository never contains empty shells.
 - Game names and everything else are derived in the App from the stored executable ids.
 - Schema migrations are numbered SQL scripts (`PRAGMA user_version`); see `src/AimOdometer.Core/Storage/Schema.cs`.
 
+## Map tab
+
+- Nothing is loaded until the user allows the map on the tab (`map_enabled` setting). The UI smoke test checks that the
+  window has no network connections and no browser processes otherwise.
+- A WebView2 control is created when the tab is shown and disposed when it is left, which ends its `msedgewebview2`
+  processes (`tools/Test-Map.ps1` checks this). Its profile lives in `<data folder>\WebView2` with a 64 MB disk cache.
+- The page (`src/AimOdometer.App/MapWeb`, MapLibre GL JS bundled, no CDN) is served from the virtual host
+  `map.aimodometer.example`; navigation elsewhere is blocked and links open in the default browser. It only draws what
+  the window sends (`init`, `route`, `progress` messages) and reports `ready`, `loaded` and errors (no WebGL, tiles).
+- Geocoding and routing run in the window, not in the page (`Core/Map/MapClient.cs`): identifying User-Agent, at most one
+  request per second per host, every answer cached in the `geo_cache` table (search results and routes never expire).
+  Routes come from the FOSSGIS walking router with the OSRM demo server as fallback; with no road (an ocean) the leg is a
+  great-circle line, remembered; when no router is reachable it is a straight line for now and retried next time.
+- Service addresses come from `data/services.json` built into the app, overridden by `services.json` on the project
+  website when it is valid (checked at most once a day), so a provider can be replaced without a release.
+- The journey is a chain of places (start, destination, next destinations). A period's distance is located along the
+  legs proportionally within each leg (the drawn line is simplified, the road distance is exact); the reached point is
+  named with a reverse lookup cached per ~1 km cell.
+
 ## Named pipe
 
 `\\.\pipe\AimOdometer.Tracker.<session id>`, accessible only to the current user. Request: 1-byte command + 8-byte

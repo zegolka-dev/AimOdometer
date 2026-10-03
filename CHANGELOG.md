@@ -6,6 +6,13 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), ver
 ## [Unreleased]
 
 ### Added
+- Phase 6 world map ("Where would you get?"):
+  - Pick your city and where you walk to (then further cities); the distance of today, this week, this month or all
+    time is shown as a walk along real roads, with the reached place named and markers for every period.
+  - Loads nothing until allowed on the tab; WebView2 and its processes exist only while the tab is open.
+  - OpenFreeMap dark map (MapLibre GL JS bundled), Nominatim search, FOSSGIS/OSRM walking routes; one request per
+    second at most, every answer cached; straight line across oceans; service addresses replaceable via services.json.
+  - `tools/Test-Map.ps1` (live services) and a no-network check in the UI smoke test.
 - Phase 5 fun features:
   - Achievements: 39 in `data/achievements.json` (distance, day distance, streaks, flicks, games, night owl,
     clicks, wheel, per-mouse, active days) with progress bars on a new Achievements page. The tracker checks them

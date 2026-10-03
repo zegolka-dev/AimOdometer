@@ -22,7 +22,7 @@ centimeters = counts / DPI × 2.54
 
 - **Featherweight background process.** A tiny NativeAOT tracker, event-driven, no polling. Target: ≤ 15 MB RAM, ~0% CPU when idle.
 - **Anti-cheat friendly.** No hooks, no injection, no overlays, no game memory access. Only passive Raw Input and the name of the active app.
-- **Private.** The keyboard is never read. Without Steam sign-in, AimOdometer makes no network requests except an optional update check.
+- **Private.** The keyboard is never read. Without Steam sign-in, AimOdometer makes no network requests except an optional update check and the Map tab, which loads only after you allow it there (map tiles from OpenFreeMap, city search with Nominatim, walking routes with OSRM; they see your IP address and the cities you search, nothing else).
 
 ## Known limitations
 
