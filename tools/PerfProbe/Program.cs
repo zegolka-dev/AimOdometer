@@ -7,7 +7,7 @@ namespace AimOdometer.Tools.PerfProbe;
 
 /// <summary>
 /// Samples CPU and memory of the running tracker and reads its counters over the pipe.
-/// Usage: PerfProbe [--seconds 30] [--label "8000 Hz background"] | --flush | --db path	oimodometer.db
+/// Usage: PerfProbe [--seconds 30] [--label "8000 Hz background"] | --flush | --db path\to\aimodometer.db
 /// CPU is reported as percent of ONE core (100% = one core fully busy).
 /// </summary>
 internal static unsafe partial class Program

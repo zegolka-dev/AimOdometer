@@ -105,6 +105,9 @@ public sealed partial class GearViewModel(AppData data, ICalibrationHost calibra
 
     public ObservableCollection<DeviceRowViewModel> Devices { get; } = [];
 
+    /// <summary>Mouse pads, glides and mice with wear.</summary>
+    public GearItemsViewModel Gear { get; } = new(data);
+
     [ObservableProperty]
     public partial string? Saved { get; set; }
 
@@ -115,6 +118,8 @@ public sealed partial class GearViewModel(AppData data, ICalibrationHost calibra
         {
             Devices.Add(new DeviceRowViewModel(this, device, centimeters));
         }
+
+        Gear.Refresh();
     }
 
     internal void Rename(DeviceRowViewModel row, string name)

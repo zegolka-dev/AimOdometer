@@ -57,6 +57,17 @@ public sealed record DayTotal(
 /// <summary>Distance moved in one hour-of-day on one weekday, summed over a period.</summary>
 public sealed record HourOfWeekTotal(DayOfWeek Day, int Hour, double Centimeters);
 
+/// <summary>What a piece of gear is.</summary>
+public enum GearKind
+{
+    MousePad = 0,
+    Mouse = 1,
+    Glides = 2,
+}
+
+/// <summary>A mouse pad, mouse or set of glides with the distance it is expected to last.</summary>
+public sealed record GearItem(long Id, GearKind Kind, string Name, long? DeviceId, DateOnly StartedOn, double LifetimeKm, DateOnly? RetiredOn);
+
 /// <summary>Typed access to the local statistics database.</summary>
 public sealed class StatsStore : IDisposable
 {
@@ -473,6 +484,134 @@ public sealed class StatsStore : IDisposable
         _db.Execute($"VACUUM INTO '{path.Replace("'", "''", StringComparison.Ordinal)}';");
     }
 
+    /// <summary>Unlocked achievements: id -> (UTC time, whether the notification was shown).</summary>
+    public IReadOnlyDictionary<string, (DateTime UnlockedAtUtc, bool Notified)> GetAchievements()
+    {
+        using var select = _db.Prepare("SELECT id, unlocked_at, notified FROM achievements;");
+        var result = new Dictionary<string, (DateTime, bool)>(StringComparer.Ordinal);
+        while (select.Step())
+        {
+            result[select.GetString(0)!] = (
+                DateTime.Parse(select.GetString(1)!, CultureInfo.InvariantCulture, DateTimeStyles.AdjustToUniversal | DateTimeStyles.AssumeUniversal),
+                select.GetInt64(2) != 0);
+        }
+
+        return result;
+    }
+
+    public void UnlockAchievements(IEnumerable<string> ids, DateTime utcNow, bool notified)
+    {
+        ArgumentNullException.ThrowIfNull(ids);
+        using var insert = _db.Prepare("INSERT INTO achievements (id, unlocked_at, notified) VALUES (?1, ?2, ?3) ON CONFLICT (id) DO NOTHING;");
+        foreach (var id in ids)
+        {
+            insert.Reset();
+            insert.Bind(1, id).Bind(2, utcNow.ToString("O", CultureInfo.InvariantCulture)).Bind(3, notified ? 1L : 0L).Run();
+        }
+    }
+
+    public void MarkAchievementsNotified(IEnumerable<string> ids)
+    {
+        ArgumentNullException.ThrowIfNull(ids);
+        using var update = _db.Prepare("UPDATE achievements SET notified = 1 WHERE id = ?1;");
+        foreach (var id in ids)
+        {
+            update.Reset();
+            update.Bind(1, id).Run();
+        }
+    }
+
+    /// <summary>Distance per local date within local hours [fromHour, toHour] (for "night owl" achievements).</summary>
+    public IReadOnlyList<(DateOnly Date, double Centimeters)> GetHourRangeTotals(int fromHour, int toHour)
+    {
+        using var select = _db.Prepare("""
+            SELECT h.local_date, sum(h.path_counts / h.dpi) * 2.54
+            FROM hourly h JOIN devices d ON d.id = h.device_id
+            WHERE d.excluded = 0 AND h.local_hour BETWEEN ?1 AND ?2
+            GROUP BY h.local_date;
+            """);
+        select.Bind(1, fromHour).Bind(2, toHour);
+        var result = new List<(DateOnly, double)>();
+        while (select.Step())
+        {
+            result.Add((DateOnly.ParseExact(select.GetString(0)!, "yyyy-MM-dd", CultureInfo.InvariantCulture), select.GetDouble(1)));
+        }
+
+        return result;
+    }
+
+    /// <summary>Distance since a local date (inclusive), for one device or (null) all counted devices.</summary>
+    public double CentimetersSince(DateOnly from, long? deviceId)
+    {
+        using var select = _db.Prepare("""
+            SELECT coalesce(sum(h.path_counts / h.dpi), 0) * 2.54
+            FROM hourly h JOIN devices d ON d.id = h.device_id
+            WHERE h.local_date >= ?1 AND ((?2 IS NULL AND d.excluded = 0) OR h.device_id = ?2);
+            """);
+        select.Bind(1, from.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture));
+        if (deviceId is { } id)
+        {
+            select.Bind(2, id);
+        }
+        else
+        {
+            select.Bind(2, (string?)null);
+        }
+
+        return select.Step() ? select.GetDouble(0) : 0;
+    }
+
+    public IReadOnlyList<GearItem> GetGear()
+    {
+        using var select = _db.Prepare("SELECT id, kind, name, device_id, started_on, lifetime_km, retired_on FROM gear ORDER BY retired_on IS NOT NULL, id;");
+        var result = new List<GearItem>();
+        while (select.Step())
+        {
+            result.Add(new GearItem(
+                select.GetInt64(0), (GearKind)select.GetInt64(1), select.GetString(2)!,
+                select.IsNull(3) ? null : select.GetInt64(3),
+                DateOnly.ParseExact(select.GetString(4)!, "yyyy-MM-dd", CultureInfo.InvariantCulture),
+                select.GetDouble(5),
+                select.IsNull(6) ? null : DateOnly.ParseExact(select.GetString(6)!, "yyyy-MM-dd", CultureInfo.InvariantCulture)));
+        }
+
+        return result;
+    }
+
+    /// <summary>Adds (Id = 0) or updates a gear item; returns its id.</summary>
+    public long SaveGear(GearItem item)
+    {
+        ArgumentNullException.ThrowIfNull(item);
+        using var statement = _db.Prepare(item.Id == 0
+            ? "INSERT INTO gear (kind, name, device_id, started_on, lifetime_km, retired_on) VALUES (?1, ?2, ?3, ?4, ?5, ?6);"
+            : "UPDATE gear SET kind = ?1, name = ?2, device_id = ?3, started_on = ?4, lifetime_km = ?5, retired_on = ?6 WHERE id = ?7;");
+        statement.Bind(1, (long)item.Kind).Bind(2, item.Name);
+        if (item.DeviceId is { } device)
+        {
+            statement.Bind(3, device);
+        }
+        else
+        {
+            statement.Bind(3, (string?)null);
+        }
+
+        statement.Bind(4, item.StartedOn.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture)).Bind(5, item.LifetimeKm)
+            .Bind(6, item.RetiredOn?.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture));
+        if (item.Id != 0)
+        {
+            statement.Bind(7, item.Id);
+        }
+
+        statement.Run();
+        return item.Id == 0 ? _db.LastInsertRowId : item.Id;
+    }
+
+    public void DeleteGear(long id)
+    {
+        using var delete = _db.Prepare("DELETE FROM gear WHERE id = ?1;");
+        delete.Bind(1, id).Run();
+    }
+
     public string? GetSetting(string key)
     {
         using var select = _db.Prepare("SELECT value FROM settings WHERE key = ?1;");
@@ -530,4 +669,5 @@ public static class SettingKeys
     public const string Units = "units";
     public const string LogLevel = "log_level";
     public const string EcoQos = "ecoqos";
+    public const string Notifications = "notifications";
 }

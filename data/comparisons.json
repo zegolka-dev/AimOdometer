@@ -1,0 +1,16 @@
+{
+  "$comment": "Real-world distances for fun comparisons. 'meters' is the length or height; names and phrases live in data/i18n (Cmp.<id>). Ordered by size.",
+  "version": 1,
+  "comparisons": [
+    { "id": "football-field", "meters": 105 },
+    { "id": "eiffel-tower", "meters": 330 },
+    { "id": "burj-khalifa", "meters": 828 },
+    { "id": "golden-gate", "meters": 2737 },
+    { "id": "everest", "meters": 8849 },
+    { "id": "marathon", "meters": 42195 },
+    { "id": "channel-tunnel", "meters": 50450 },
+    { "id": "great-wall", "meters": 21196180 },
+    { "id": "equator", "meters": 40075017 },
+    { "id": "moon", "meters": 384400000 }
+  ]
+}

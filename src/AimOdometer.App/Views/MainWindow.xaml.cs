@@ -1,8 +1,10 @@
 using System.ComponentModel;
 using System.Windows;
 using System.Windows.Interop;
+using System.Windows.Markup;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
+using AimOdometer.App.Localization;
 using AimOdometer.App.Services;
 using AimOdometer.App.ViewModels;
 using AimOdometer.Win32;
@@ -17,6 +19,8 @@ public partial class MainWindow : Window
     public MainWindow()
     {
         InitializeComponent();
+        ApplyLanguage();
+        Loc.Instance.LanguageChanged += OnLanguageChanged;
         DataContextChanged += (_, e) =>
         {
             if (e.OldValue is MainViewModel old)
@@ -42,9 +46,15 @@ public partial class MainWindow : Window
 
     protected override void OnClosed(EventArgs e)
     {
+        Loc.Instance.LanguageChanged -= OnLanguageChanged;
         _rawMouse?.Dispose();
         base.OnClosed(e);
     }
+
+    private void OnLanguageChanged(object? sender, EventArgs e) => ApplyLanguage();
+
+    // Built-in controls (DatePicker, number formatting in bindings) read the inherited Language, which is en-US by default.
+    private void ApplyLanguage() => Language = XmlLanguage.GetLanguage(Loc.Instance.Culture.IetfLanguageTag);
 
     private void OnViewModelChanged(object? sender, PropertyChangedEventArgs e)
     {

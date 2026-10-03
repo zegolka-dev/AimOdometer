@@ -58,6 +58,21 @@ internal sealed unsafe class TrayIcon : IDisposable
         _ = Shell32.Shell_NotifyIconW(Shell32.NimModify, &data);
     }
 
+    /// <summary>A notification from the tray icon (shown by Windows as a regular toast on Windows 10/11).</summary>
+    public void ShowBalloon(string title, string text)
+    {
+        if (!_added)
+        {
+            return;
+        }
+
+        var data = NewData(Shell32.NifInfo);
+        Shell32.CopyText(data.SzInfoTitle, 64, title);
+        Shell32.CopyText(data.SzInfo, 256, text);
+        data.DwInfoFlags = Shell32.NiifInfo | Shell32.NiifRespectQuietTime;
+        _ = Shell32.Shell_NotifyIconW(Shell32.NimModify, &data);
+    }
+
     public void Dispose()
     {
         if (_added)

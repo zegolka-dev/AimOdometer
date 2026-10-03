@@ -94,6 +94,26 @@ public static class Schema
             display_name  TEXT NOT NULL
         ) WITHOUT ROWID;
         """,
+
+        // v3: unlocked achievements and gear (mouse pads, glides, mice) with their expected lifetime.
+        """
+        CREATE TABLE achievements (
+            id           TEXT    PRIMARY KEY,
+            unlocked_at  TEXT    NOT NULL,              -- UTC, ISO 8601
+            notified     INTEGER NOT NULL DEFAULT 0     -- 1 once the tray notification was shown (or skipped)
+        ) WITHOUT ROWID;
+
+        -- kind: 0 mouse pad, 1 mouse, 2 glides (mouse feet). device_id: the mouse it belongs to (null for pads).
+        CREATE TABLE gear (
+            id           INTEGER PRIMARY KEY,
+            kind         INTEGER NOT NULL,
+            name         TEXT    NOT NULL,
+            device_id    INTEGER,
+            started_on   TEXT    NOT NULL,              -- local date yyyy-MM-dd
+            lifetime_km  REAL    NOT NULL,
+            retired_on   TEXT
+        );
+        """,
     ];
 
     public static int LatestVersion => Migrations.Length;

@@ -22,6 +22,8 @@ internal sealed record TrayStrings(
     string OpenDataFolder,
     string Exit,
     string FatalStartTitle,
+    string AchievementTitle,
+    string MoreAchievementsFormat,
     UnitLabels Units)
 {
     public static readonly TrayStrings English = new(
@@ -39,6 +41,8 @@ internal sealed record TrayStrings(
         OpenDataFolder: "Open data folder",
         Exit: "Exit",
         FatalStartTitle: "AimOdometer could not start",
+        AchievementTitle: "New achievement!",
+        MoreAchievementsFormat: "{0} and {1} more",
         Units: UnitLabels.English);
 
     public static readonly TrayStrings Russian = new(
@@ -56,19 +60,23 @@ internal sealed record TrayStrings(
         OpenDataFolder: "Открыть папку с данными",
         Exit: "Выход",
         FatalStartTitle: "AimOdometer не смог запуститься",
+        AchievementTitle: "Новая ачивка!",
+        MoreAchievementsFormat: "{0} и ещё {1}",
         Units: new UnitLabels("см", "м", "км", "дюйм", "фут", "миль"));
 
     /// <summary>Picks strings by the language setting ("ru", "en") or, for "auto"/empty, by the Windows UI language.</summary>
-    public static TrayStrings For(string? language)
+    public static TrayStrings For(string? language) => Code(language) == "ru" ? Russian : English;
+
+    /// <summary>"ru" or "en" for a language setting ("auto"/empty follows the Windows UI language).</summary>
+    public static string Code(string? language)
     {
         const ushort LangRussian = 0x19;
-        var useRussian = language switch
+        return language switch
         {
-            "ru" => true,
-            "en" => false,
-            _ => (Kernel32.GetUserDefaultUILanguage() & 0x3FF) == LangRussian,
+            "ru" => "ru",
+            "en" => "en",
+            _ => (Kernel32.GetUserDefaultUILanguage() & 0x3FF) == LangRussian ? "ru" : "en",
         };
-        return useRussian ? Russian : English;
     }
 
     // The tracker is built with InvariantGlobalization to stay small; formats are culture-neutral.

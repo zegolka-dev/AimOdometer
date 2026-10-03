@@ -18,6 +18,13 @@ internal static unsafe partial class Shell32
 
     public const uint NotifyIconVersion4 = 4;
 
+    // Balloon (NIF_INFO) flags
+    public const uint NiifInfo = 0x01;
+    public const uint NiifRespectQuietTime = 0x80;
+
+    /// <summary>QUNS_ACCEPTS_NOTIFICATIONS: no full-screen app, presentation or quiet time.</summary>
+    public const int QunsAcceptsNotifications = 5;
+
     // Callback events (LOWORD of lParam with NOTIFYICON_VERSION_4)
     public const uint NinSelect = 0x0400;
     public const uint NinKeySelect = 0x0401;
@@ -45,6 +52,10 @@ internal static unsafe partial class Shell32
     [LibraryImport("shell32.dll")]
     [return: MarshalAs(UnmanagedType.Bool)]
     public static partial bool Shell_NotifyIconW(uint message, NotifyIconDataW* data);
+
+    /// <summary>Whether Windows would show a notification now (not during full-screen games, presentations, quiet time).</summary>
+    [LibraryImport("shell32.dll")]
+    public static partial int SHQueryUserNotificationState(int* state);
 
     /// <summary>Copies text into a fixed-size UTF-16 buffer, truncating and null-terminating.</summary>
     public static void CopyText(char* destination, int capacity, ReadOnlySpan<char> text)

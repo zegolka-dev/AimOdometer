@@ -1,0 +1,55 @@
+{
+  "$comment": "Achievement definitions. Names and descriptions are in data/i18n (Ach.<id>.Name / Ach.<id>.Desc). 'icon' is a Segoe Fluent Icons code point. Units by type: distances in meters, speed in m/s, the rest are counts/days. Add entries freely; ids must be unique.",
+  "version": 1,
+  "achievements": [
+    { "id": "distance-100m",   "type": "totalDistance", "target": 100,      "icon": "E7C1" },
+    { "id": "distance-1km",    "type": "totalDistance", "target": 1000,     "icon": "E7C1" },
+    { "id": "distance-5km",    "type": "totalDistance", "target": 5000,     "icon": "E7C1" },
+    { "id": "distance-10km",   "type": "totalDistance", "target": 10000,    "icon": "E7C1" },
+    { "id": "distance-marathon", "type": "totalDistance", "target": 42195,  "icon": "E805" },
+    { "id": "distance-100km",  "type": "totalDistance", "target": 100000,   "icon": "E7C1" },
+    { "id": "distance-250km",  "type": "totalDistance", "target": 250000,   "icon": "E7C1" },
+    { "id": "distance-500km",  "type": "totalDistance", "target": 500000,   "icon": "E7C1" },
+    { "id": "distance-1000km", "type": "totalDistance", "target": 1000000,  "icon": "E734" },
+
+    { "id": "day-500m", "type": "dayDistance", "target": 500,  "icon": "E787" },
+    { "id": "day-1km",  "type": "dayDistance", "target": 1000, "icon": "E787" },
+    { "id": "day-2km",  "type": "dayDistance", "target": 2000, "icon": "E787" },
+    { "id": "day-5km",  "type": "dayDistance", "target": 5000, "icon": "E787" },
+
+    { "id": "streak-3",   "type": "streak", "target": 3, "icon": "E81C" },
+    { "id": "streak-7",   "type": "streak", "target": 7, "icon": "E81C" },
+    { "id": "streak-14",  "type": "streak", "target": 14, "icon": "E81C" },
+    { "id": "streak-30",  "type": "streak", "target": 30, "icon": "E81C" },
+    { "id": "streak-100", "type": "streak", "target": 100, "icon": "E81C" },
+
+    { "id": "flick-2", "type": "peakSpeed", "target": 2, "icon": "E945" },
+    { "id": "flick-3", "type": "peakSpeed", "target": 3, "icon": "E945" },
+    { "id": "flick-5", "type": "peakSpeed", "target": 5, "icon": "E945" },
+    { "id": "flick-8", "type": "peakSpeed", "target": 8, "icon": "E945" },
+
+    { "id": "game-any-1km",  "type": "gameDistance", "target": 1000,  "icon": "E7FC" },
+    { "id": "game-any-10km", "type": "gameDistance", "target": 10000, "icon": "E7FC" },
+    { "id": "game-cs2-10km",      "type": "gameDistance", "target": 10000, "game": "steam:730",     "icon": "E7FC" },
+    { "id": "game-apex-10km",     "type": "gameDistance", "target": 10000, "game": "steam:1172470", "icon": "E7FC" },
+    { "id": "game-valorant-10km", "type": "gameDistance", "target": 10000, "game": "valorant",      "icon": "E7FC" },
+    { "id": "game-dota-10km",     "type": "gameDistance", "target": 10000, "game": "steam:570",     "icon": "E7FC" },
+
+    { "id": "games-3",  "type": "distinctGames", "target": 3,  "icon": "E8F1" },
+    { "id": "games-10", "type": "distinctGames", "target": 10, "icon": "E8F1" },
+
+    { "id": "night-500m", "type": "nightOneNight", "target": 500,  "icon": "E708" },
+    { "id": "night-2km",  "type": "nightDistance", "target": 2000, "icon": "E708" },
+
+    { "id": "clicks-10k",  "type": "totalClicks", "target": 10000,   "icon": "E8B0" },
+    { "id": "clicks-100k", "type": "totalClicks", "target": 100000,  "icon": "E8B0" },
+    { "id": "clicks-1m",   "type": "totalClicks", "target": 1000000, "icon": "E8B0" },
+
+    { "id": "wheel-10k", "type": "totalWheel", "target": 10000, "icon": "E96E" },
+
+    { "id": "mouse-100km", "type": "deviceDistance", "target": 100000, "icon": "E962" },
+    { "id": "mouse-500km", "type": "deviceDistance", "target": 500000, "icon": "E962" },
+
+    { "id": "active-30", "type": "activeDays", "target": 30, "icon": "E787" }
+  ]
+}

@@ -93,6 +93,9 @@ public sealed partial class StatisticsViewModel(AppData data) : PageViewModel(da
     [ObservableProperty]
     public partial IReadOnlyList<ChartBar> Bars { get; set; } = [];
 
+    [ObservableProperty]
+    public partial HeatMapData? Activity { get; set; }
+
     public bool IsCustom => Range == StatsRange.Custom;
 
     partial void OnRangeChanged(StatsRange value)
@@ -154,6 +157,14 @@ public sealed partial class StatisticsViewModel(AppData data) : PageViewModel(da
         WheelNotches = Format.Number(sum.WheelNotches);
 
         BuildChart(days, from, to, firstDay);
+
+        var cells = new double[7, 24];
+        foreach (var cell in Data.Store.GetHourOfWeekTotals(from, to))
+        {
+            cells[(int)cell.Day, cell.Hour] += cell.Centimeters;
+        }
+
+        Activity = new HeatMapData(cells, firstDay, Loc.Instance.Culture, cm => Format.Distance(cm));
     }
 
     private (DateOnly From, DateOnly To) Period(DateOnly today, DateOnly firstData) => Range switch

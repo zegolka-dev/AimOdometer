@@ -6,6 +6,17 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), ver
 ## [Unreleased]
 
 ### Added
+- Phase 5 fun features:
+  - Achievements: 39 in `data/achievements.json` (distance, day distance, streaks, flicks, games, night owl,
+    clicks, wheel, per-mouse, active days) with progress bars on a new Achievements page. The tracker checks them
+    after a flush and shows one tray notification, never during a full-screen game (it waits until you leave);
+    can be turned off in Settings.
+  - Comparisons ("That's 1.3 Burj Khalifas") and the share of the way to the Moon on the overview
+    (`data/comparisons.json`).
+  - Activity heat map (weekday × hour) on the statistics page.
+  - Gear wear: mouse pads, mice and glides with a lifetime, wear progress, "time to replace", retire and delete.
+  - Share cards 1080×1080 and 1080×1920 (day, week, month, all time, top games, latest achievement): copy to the
+    clipboard, save PNG to Pictures\AimOdometer, open the folder.
 - Phase 4 window (WPF, palette "Neon Violet", Fluent dark theme):
   - Overview with a live today counter, week/month/all time, 14-day chart, top games today, streak.
   - Statistics for any period: totals, averages per active and calendar day, records (best day/week, streak,
@@ -53,12 +64,13 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), ver
 - Autostart logic moved to Core (shared by tracker and window).
 
 ### Added (data safety)
-- Daily database backup in `<data folder>ackups` (newest 7 kept), made with SQLite `VACUUM INTO`.
+- Daily database backup in `<data folder>\backups` (newest 7 kept), made with SQLite `VACUUM INTO`.
 - The tracker reports its data folder over the pipe; the window warns when it differs from its own.
 - The tracker ignores `AIMODOMETER_DATA_DIR` (only `--data-dir` changes its folder) and never passes it to the window it
   opens; a window in test mode does not start the tracker.
 
 ### Fixed
+- Date pickers followed en-US formatting instead of the UI language.
 - Gear and Settings crashed when showing a mouse: the shared template could not find its converters (moved to
   `Themes/Converters.xaml`, merged before the templates).
 - Overview failed when two apps had the same exe name in different folders.

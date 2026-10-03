@@ -41,6 +41,8 @@
         <CheckBox IsChecked="{Binding Autostart}" Content="{l:T Settings.Autostart}" Margin="0,0,0,10" />
         <CheckBox IsChecked="{Binding ShowTrayIcon}" Content="{l:T Settings.ShowTrayIcon}" />
         <TextBlock Style="{StaticResource Hint}" Text="{l:T Settings.ShowTrayIconHint}" Margin="28,4,0,0" />
+        <CheckBox IsChecked="{Binding Notifications}" Content="{l:T Settings.Notifications}" Margin="0,10,0,0" />
+        <TextBlock Style="{StaticResource Hint}" Text="{l:T Settings.NotificationsHint}" Margin="28,4,0,0" />
       </StackPanel>
     </Border>
 

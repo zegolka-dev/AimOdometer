@@ -52,6 +52,14 @@
       </StackPanel>
     </Border>
 
+    <Border Style="{StaticResource Card}" Margin="0,16,0,0">
+      <StackPanel>
+        <TextBlock Style="{StaticResource SectionTitle}" Text="{l:T Stats.Heatmap}" Margin="0,0,0,4" />
+        <TextBlock Style="{StaticResource Hint}" Text="{l:T Stats.HeatmapHint}" Margin="0,0,0,12" />
+        <c:HeatMap Data="{Binding Activity}" />
+      </StackPanel>
+    </Border>
+
     <Grid Margin="0,16,0,0">
       <Grid.ColumnDefinitions>
         <ColumnDefinition Width="*" />

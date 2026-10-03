@@ -42,6 +42,9 @@ public sealed partial class SettingsViewModel : PageViewModel
     public partial bool ShowTrayIcon { get; set; }
 
     [ObservableProperty]
+    public partial bool Notifications { get; set; } = true;
+
+    [ObservableProperty]
     public partial string Version { get; set; } = string.Empty;
 
     [ObservableProperty]
@@ -62,6 +65,7 @@ public sealed partial class SettingsViewModel : PageViewModel
         Metric = Data.Units == UnitSystem.Metric;
         Autostart = Core.Autostart.IsEnabled();
         ShowTrayIcon = TrackerExe() is { } exe && TrayIconVisibility.IsPromoted(exe);
+        Notifications = Data.Setting(SettingKeys.Notifications) != "0";
         Version = typeof(SettingsViewModel).Assembly.GetName().Version?.ToString(3) ?? "?";
         StartupTime = MeasuredStartup is { } t ? Loc.Instance.Format("Settings.StartupTime", Format.Number(t.TotalMilliseconds)) : string.Empty;
         _loading = false;
@@ -99,6 +103,14 @@ public sealed partial class SettingsViewModel : PageViewModel
 
         Core.Autostart.Set(value, exe);
         Data.SetSetting(SettingKeys.Autostart, value ? "1" : "0");
+    }
+
+    partial void OnNotificationsChanged(bool value)
+    {
+        if (!_loading)
+        {
+            Data.SetSetting(SettingKeys.Notifications, value ? "1" : "0");
+        }
     }
 
     partial void OnShowTrayIconChanged(bool value)

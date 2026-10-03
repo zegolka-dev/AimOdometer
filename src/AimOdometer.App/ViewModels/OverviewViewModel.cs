@@ -52,6 +52,18 @@ public sealed partial class OverviewViewModel(AppData data) : PageViewModel(data
     public partial string StreakText { get; set; } = string.Empty;
 
     [ObservableProperty]
+    public partial string TodayComparison { get; set; } = string.Empty;
+
+    [ObservableProperty]
+    public partial string AllTimeComparison { get; set; } = string.Empty;
+
+    [ObservableProperty]
+    public partial string MoonText { get; set; } = string.Empty;
+
+    /// <summary>Data for the share card.</summary>
+    public PeriodTotals? Periods => _periods;
+
+    [ObservableProperty]
     public partial IReadOnlyList<ChartBar> Bars { get; set; } = [];
 
     [ObservableProperty]
@@ -108,7 +120,16 @@ public sealed partial class OverviewViewModel(AppData data) : PageViewModel(data
         Week = Format.Distance(_periods.Week.Centimeters + unsavedCm);
         Month = Format.Distance(_periods.Month.Centimeters + unsavedCm);
         AllTime = Format.Distance(_periods.AllTime.Centimeters + unsavedCm);
+        TodayComparison = ComparisonText(_periods.Today.Centimeters + unsavedCm);
+        AllTimeComparison = ComparisonText(_periods.AllTime.Centimeters + unsavedCm);
+        MoonText = Loc.Instance.Format("Overview.Moon",
+            (Core.Fun.Comparisons.MoonProgress(_periods.AllTime.Centimeters + unsavedCm) * 100).ToString("0.######", Loc.Instance.Culture) + "%");
     }
+
+    /// <summary>"That's 1.3 Burj Khalifas" style text, empty for no distance.</summary>
+    public static string ComparisonText(double centimeters) => Core.Fun.Comparisons.Best(centimeters) is { } c
+        ? Loc.Instance.Format($"Cmp.{c.Target.Id}", c.Ratio.ToString("0.0", Loc.Instance.Culture))
+        : string.Empty;
 
     private void LoadTopGames(DateOnly today)
     {

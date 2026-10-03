@@ -30,6 +30,7 @@ public static class SmokeWin {
 # Data folder outside %LOCALAPPDATA% on purpose (packaged terminals virtualize AppData, see docs/ARCHITECTURE.md).
 $data = Join-Path (Split-Path $PSScriptRoot -Parent) ("artifacts\uismoke-" + (Get-Date -Format "yyyyMMdd-HHmmss"))
 New-Item -ItemType Directory -Force $data | Out-Null
+if ($ScreenshotDir) { New-Item -ItemType Directory -Force $ScreenshotDir | Out-Null }
 if ($SeedDatabase) { Copy-Item $SeedDatabase (Join-Path $data "aimodometer.db") }
 
 $env:AIMODOMETER_DATA_DIR = $data
@@ -69,15 +70,38 @@ try {
         Invoke-Element $default
     }
 
-    # Pages: the first five radio buttons are the navigation.
-    $nav = (Find-All ([Windows.Automation.ControlType]::RadioButton)) | Select-Object -First 5
+    function Find-Id([string]$id, $type = [Windows.Automation.ControlType]::Button) {
+        Find-All $type | Where-Object { $_.Current.AutomationId -eq $id } | Select-Object -First 1
+    }
+
+    # Share overlay from the overview: open, save a square and a story card, check their pixel sizes, close.
+    if ($share = Find-Id "ShareButton") {
+        Invoke-Element $share
+        Start-Sleep -Milliseconds 800
+        Save-Shot "share"
+        $save = Find-Id "ShareSave"
+        if (-not $save) { throw "Share overlay did not open." }
+        Invoke-Element $save
+        Invoke-Element (Find-Id "ShareStory" ([Windows.Automation.ControlType]::RadioButton))
+        Invoke-Element $save
+        $sizes = Get-ChildItem (Join-Path $data "share") -Filter *.png | ForEach-Object {
+            $image = [Drawing.Image]::FromFile($_.FullName)
+            try { "{0}x{1}" -f $image.Width, $image.Height } finally { $image.Dispose() }
+        } | Sort-Object
+        if (($sizes -join ",") -ne "1080x1080,1080x1920") { throw "Unexpected share card sizes: $($sizes -join ', ')" }
+        Invoke-Element (Find-Id "ShareClose")
+        "visited: share overlay (cards $($sizes -join ', '))"
+    }
+
+    # Pages: navigation items carry their localization key as AutomationId ("Nav.*").
+    $nav = (Find-All ([Windows.Automation.ControlType]::RadioButton)) | Where-Object { $_.Current.AutomationId -like 'Nav.*' }
     $pageIndex = 0
     foreach ($item in $nav) {
         $name = $item.Current.Name
         Invoke-Element $item
         Save-Shot ("page-{0}" -f $pageIndex++)
         # Every period/segment switch on the page (radio buttons after the navigation).
-        $segments = (Find-All ([Windows.Automation.ControlType]::RadioButton)) | Select-Object -Skip 5
+        $segments = (Find-All ([Windows.Automation.ControlType]::RadioButton)) | Where-Object { $_.Current.AutomationId -notlike 'Nav.*' }
         foreach ($segment in $segments) { Invoke-Element $segment }
         "visited: $name ($($segments.Count) switches)"
     }

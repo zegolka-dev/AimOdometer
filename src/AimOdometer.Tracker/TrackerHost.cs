@@ -3,6 +3,8 @@ using System.Globalization;
 using System.Runtime.InteropServices;
 using AimOdometer.Core;
 using AimOdometer.Core.Diagnostics;
+using AimOdometer.Core.Fun;
+using AimOdometer.Core.Games;
 using AimOdometer.Core.Input;
 using AimOdometer.Core.Ipc;
 using AimOdometer.Core.Storage;
@@ -60,6 +62,11 @@ internal sealed unsafe class TrackerHost : IDisposable
     private UnitSystem _units;
     private long _lastTooltipUpdate;
     private long _lastBatchTimestamp;
+    private GameCatalog? _catalog;
+    private DateTime _catalogLoadedUtc;
+    private int _flushesSinceAchievementCheck = int.MaxValue;
+    private IReadOnlyDictionary<string, string> _texts = new Dictionary<string, string>();
+    private bool _notificationsEnabled = true;
     private long _wakeUps;
 
     public TrackerHost(TrackerOptions options, StatsStore store)
@@ -343,6 +350,7 @@ internal sealed unsafe class TrackerHost : IDisposable
             case FlushTimerId:
                 CheckHour();
                 Flush();
+                CheckAchievements();
                 break;
             case HourTimerId:
                 CheckHour();
@@ -723,6 +731,74 @@ internal sealed unsafe class TrackerHost : IDisposable
         }
     }
 
+    // ---------------------------------------------------------------- achievements
+
+    /// <summary>Every 5 minutes: record newly reached achievements, then notify (if allowed right now).</summary>
+    private void CheckAchievements()
+    {
+        const int EveryFlushes = 5;
+        if (++_flushesSinceAchievementCheck >= EveryFlushes)
+        {
+            _flushesSinceAchievementCheck = 0;
+            try
+            {
+                if (_catalog is null || DateTime.UtcNow - _catalogLoadedUtc > TimeSpan.FromHours(1))
+                {
+                    _catalog = GameCatalog.Create(_store); // Steam libraries and user rules change rarely
+                    _catalogLoadedUtc = DateTime.UtcNow;
+                }
+
+                var newly = AchievementService.UnlockNew(_store, _catalog, _hour.LocalDate, DateTime.UtcNow);
+                if (newly.Count > 0)
+                {
+                    Log.Info($"Achievements unlocked: {string.Join(", ", newly.Select(a => a.Id))}");
+                }
+            }
+            catch (Exception ex) when (ex is SqliteException or IOException or InvalidDataException or UnauthorizedAccessException)
+            {
+                Log.Error("Achievement check failed", ex);
+            }
+        }
+
+        NotifyPendingAchievements();
+    }
+
+    /// <summary>
+    /// Shows one notification for achievements not announced yet. Never while a full-screen game, a presentation or
+    /// quiet time is active (SHQueryUserNotificationState); they wait for the next minute after that.
+    /// </summary>
+    private void NotifyPendingAchievements()
+    {
+        try
+        {
+            var pending = _store.GetAchievements().Where(a => !a.Value.Notified).OrderBy(a => a.Value.UnlockedAtUtc).Select(a => a.Key).ToList();
+            if (pending.Count == 0)
+            {
+                return;
+            }
+
+            if (_notificationsEnabled)
+            {
+                int state;
+                if (Shell32.SHQueryUserNotificationState(&state) != 0 || state != Shell32.QunsAcceptsNotifications || _tray is null)
+                {
+                    return; // try again later
+                }
+
+                // Newest first is the most relevant; the rest are summarized.
+                var name = _texts.GetValueOrDefault($"Ach.{pending[^1]}.Name", pending[^1]);
+                var text = pending.Count == 1 ? name : string.Format(TrayStrings.Culture, _strings.MoreAchievementsFormat, name, pending.Count - 1);
+                _tray.ShowBalloon(_strings.AchievementTitle, text);
+            }
+
+            _store.MarkAchievementsNotified(pending);
+        }
+        catch (SqliteException ex)
+        {
+            Log.Error("Achievement notification failed", ex);
+        }
+    }
+
     // ---------------------------------------------------------------- pipe commands
 
     private void OnPipeRequest(PipeRequest* request)
@@ -784,7 +860,10 @@ internal sealed unsafe class TrackerHost : IDisposable
 
     private void LoadSettings()
     {
-        _strings = TrayStrings.For(_store.GetSetting(SettingKeys.Language));
+        var language = _store.GetSetting(SettingKeys.Language);
+        _strings = TrayStrings.For(language);
+        _texts = StringTable.Load(AppContext.BaseDirectory, TrayStrings.Code(language));
+        _notificationsEnabled = _store.GetSetting(SettingKeys.Notifications) != "0";
         _units = DistanceFormat.ParseUnits(_store.GetSetting(SettingKeys.Units));
         if (Log.TryParseLevel(_store.GetSetting(SettingKeys.LogLevel), out var level))
         {

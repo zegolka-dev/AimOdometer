@@ -5,6 +5,9 @@ public static class AppIdentity
 {
     public const string ProductName = "AimOdometer";
 
+    /// <summary>Project website (GitHub Pages), printed on share cards.</summary>
+    public const string Website = "https://zegolka-dev.github.io/AimOdometer";
+
     /// <summary>Per-session single-instance mutex of the background tracker.</summary>
     public const string TrackerMutexName = @"Local\AimOdometer.Tracker";
 

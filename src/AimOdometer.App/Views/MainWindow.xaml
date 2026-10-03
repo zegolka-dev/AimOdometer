@@ -50,6 +50,7 @@
               <RadioButton Style="{StaticResource NavItem}" GroupName="Nav" Tag="{Binding Icon}"
                            IsChecked="{Binding IsCurrent}"
                            AutomationProperties.Name="{Binding Title}"
+                           AutomationProperties.AutomationId="{Binding TitleKey}"
                            Content="{Binding Title}" />
             </DataTemplate>
           </ItemsControl.ItemTemplate>
@@ -69,6 +70,7 @@
     <!-- Overlays -->
     <Grid Grid.ColumnSpan="2" Background="#CC07071A" Visibility="{Binding HasOverlay, Converter={StaticResource BoolToVisibility}}">
       <v:OnboardingView DataContext="{Binding Onboarding}" Visibility="{Binding DataContext.IsOnboardingVisible, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource BoolToVisibility}}" />
+      <v:ShareView DataContext="{Binding Share}" Visibility="{Binding DataContext.IsShareVisible, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource BoolToVisibility}}" />
       <v:CalibrationView DataContext="{Binding Calibration}" Visibility="{Binding DataContext.IsCalibrationVisible, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource BoolToVisibility}}" />
     </Grid>
   </Grid>

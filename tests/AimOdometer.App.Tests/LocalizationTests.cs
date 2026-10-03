@@ -85,6 +85,44 @@ public partial class LocalizationTests
     }
 
     [Fact]
+    public void DataDrivenKeysExist()
+    {
+        // Keys built at run time: achievements, comparisons, gear kinds and share card kinds.
+        var english = Language("en");
+        var expected = new List<string>();
+        using (var achievements = JsonDocument.Parse(File.ReadAllText(Path.Combine(RepoRoot, "data", "achievements.json"))))
+        {
+            foreach (var a in achievements.RootElement.GetProperty("achievements").EnumerateArray())
+            {
+                var id = a.GetProperty("id").GetString();
+                expected.Add($"Ach.{id}.Name");
+                expected.Add($"Ach.{id}.Desc");
+            }
+        }
+
+        using (var comparisons = JsonDocument.Parse(File.ReadAllText(Path.Combine(RepoRoot, "data", "comparisons.json"))))
+        {
+            expected.AddRange(comparisons.RootElement.GetProperty("comparisons").EnumerateArray().Select(c => $"Cmp.{c.GetProperty("id").GetString()}"));
+        }
+
+        expected.AddRange(EnumMembers(Path.Combine(RepoRoot, "src", "AimOdometer.Core", "Storage", "StatsStore.cs"), "GearKind").Select(m => $"Gear.Kind.{m}"));
+        expected.AddRange(EnumMembers(Path.Combine(AppSource, "ViewModels", "ShareViewModel.cs"), "ShareKind").Select(m => $"Share.Kind.{m}"));
+        expected.AddRange(["Share.Card.Day", "Share.Card.Week", "Share.Card.Month", "Share.Card.AllTime"]);
+
+        Assert.True(expected.Count > 90);
+        var missing = expected.Where(k => !english.ContainsKey(k)).ToList();
+        Assert.True(missing.Count == 0, "Missing in en.json: " + string.Join(", ", missing));
+    }
+
+    private static IEnumerable<string> EnumMembers(string file, string name)
+    {
+        var text = File.ReadAllText(file);
+        var start = text.IndexOf("enum " + name, StringComparison.Ordinal);
+        var body = text[(text.IndexOf('{', start) + 1)..text.IndexOf('}', start)];
+        return body.Split(',').Select(m => m.Split('=')[0].Trim()).Where(m => m.Length > 0 && char.IsLetter(m[0]));
+    }
+
+    [Fact]
     public void FindsKeysInSources()
     {
         Assert.True(UsedKeys().Distinct().Count() > 100);

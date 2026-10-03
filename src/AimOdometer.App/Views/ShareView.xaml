@@ -1,0 +1,46 @@
+<UserControl x:Class="AimOdometer.App.Views.ShareView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:l="clr-namespace:AimOdometer.App.Localization">
+  <Border Style="{StaticResource AccentCard}" Width="860" Height="620" VerticalAlignment="Center" HorizontalAlignment="Center" Padding="28,24"
+          Background="{StaticResource SurfaceBrush}">
+    <Grid>
+      <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="300" />
+        <ColumnDefinition Width="24" />
+        <ColumnDefinition Width="*" />
+      </Grid.ColumnDefinitions>
+
+      <StackPanel>
+        <TextBlock Style="{StaticResource PageTitle}" Text="{l:T Share.Title}" />
+        <TextBlock Style="{StaticResource PageSubtitle}" Text="{l:T Share.Subtitle}" Margin="0,0,0,16" FontSize="13" />
+
+        <TextBlock Style="{StaticResource CardLabel}" Text="{l:T Share.What}" Margin="0,0,0,6" />
+        <ComboBox ItemsSource="{Binding Kinds}" SelectedItem="{Binding Kind}" DisplayMemberPath="Name" AutomationProperties.Name="{l:T Share.What}" />
+
+        <TextBlock Style="{StaticResource CardLabel}" Text="{l:T Share.Size}" Margin="0,16,0,6" />
+        <StackPanel Orientation="Horizontal">
+          <RadioButton Style="{StaticResource Segment}" GroupName="ShareSize" Content="{l:T Share.Square}" IsChecked="{Binding IsStory, Converter={StaticResource InverseBool}}" />
+          <RadioButton Style="{StaticResource Segment}" GroupName="ShareSize" AutomationProperties.AutomationId="ShareStory" Content="{l:T Share.Story}" IsChecked="{Binding IsStory}" />
+        </StackPanel>
+
+        <StackPanel Margin="0,24,0,0">
+          <Button Style="{StaticResource PrimaryButton}" Content="{l:T Share.Copy}" Command="{Binding CopyCommand}" Margin="0,0,0,8" />
+          <Button Style="{StaticResource SecondaryButton}" Content="{l:T Share.Save}" Command="{Binding SaveCommand}" AutomationProperties.AutomationId="ShareSave" Margin="0,0,0,8" />
+          <Button Style="{StaticResource SecondaryButton}" Content="{l:T Share.OpenFolder}" Command="{Binding OpenFolderCommand}" />
+        </StackPanel>
+        <TextBlock Text="{Binding Message}" Foreground="{StaticResource SuccessBrush}" FontSize="12" TextWrapping="Wrap" Margin="0,12,0,0"
+                   Visibility="{Binding Message, Converter={StaticResource NullToCollapsed}}" />
+      </StackPanel>
+
+      <Border Grid.Column="2" Background="{StaticResource SurfaceElevatedBrush}" CornerRadius="12" Padding="12">
+        <Image Source="{Binding Image}" Stretch="Uniform" RenderOptions.BitmapScalingMode="HighQuality" />
+      </Border>
+
+      <Button Grid.Column="2" Style="{StaticResource LinkButton}" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,-14,-10,0"
+              Command="{Binding CloseCommand}" AutomationProperties.AutomationId="ShareClose" AutomationProperties.Name="{l:T Common.Close}" ToolTip="{l:T Common.Close}">
+        <TextBlock Style="{StaticResource Icon}" Text="&#xE711;" FontSize="16" />
+      </Button>
+    </Grid>
+  </Border>
+</UserControl>

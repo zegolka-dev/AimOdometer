@@ -19,6 +19,7 @@ public sealed partial class MainViewModel : ObservableObject, ICalibrationHost, 
             new OverviewViewModel(data),
             new GamesViewModel(data),
             new StatisticsViewModel(data),
+            new AchievementsViewModel(data),
             new GearViewModel(data, this),
             new SettingsViewModel(data, this),
         ];
@@ -60,6 +61,12 @@ public sealed partial class MainViewModel : ObservableObject, ICalibrationHost, 
     [NotifyPropertyChangedFor(nameof(HasOverlay), nameof(IsOnboardingVisible), nameof(IsCalibrationVisible))]
     public partial CalibrationViewModel? Calibration { get; set; }
 
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(HasOverlay), nameof(IsShareVisible))]
+    public partial ShareViewModel? Share { get; set; }
+
+    public bool IsShareVisible => Share is not null;
+
     /// <summary>Calibration can open on top of onboarding; then only calibration is shown.</summary>
     public bool IsOnboardingVisible => Onboarding is not null && Calibration is null;
 
@@ -72,7 +79,7 @@ public sealed partial class MainViewModel : ObservableObject, ICalibrationHost, 
     public partial StatusKind Status { get; set; } = StatusKind.Unknown;
 
     /// <summary>True while a modal overlay (onboarding, calibration) is shown.</summary>
-    public bool HasOverlay => Onboarding is not null || Calibration is not null;
+    public bool HasOverlay => Onboarding is not null || Calibration is not null || Share is not null;
 
     /// <summary>Raw mouse reports from the window, routed to whichever overlay is open.</summary>
     public void OnRawReport(RawMouseReport report)
@@ -113,6 +120,11 @@ public sealed partial class MainViewModel : ObservableObject, ICalibrationHost, 
             CurrentPage.Refresh(); // onboarding may have changed units, language or DPI
         }
     }
+
+    /// <summary>Opens the share overlay with a card kind (name of a <see cref="ShareKind"/>).</summary>
+    [CommunityToolkit.Mvvm.Input.RelayCommand]
+    private void OpenShare(string kind) =>
+        Share = new ShareViewModel(_data, Enum.TryParse<ShareKind>(kind, out var k) ? k : ShareKind.Day, () => Share = null);
 
     public void ShowCalibration(DeviceRecord device, Action<double?> onClosed)
     {

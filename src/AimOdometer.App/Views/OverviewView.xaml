@@ -4,8 +4,19 @@
              xmlns:l="clr-namespace:AimOdometer.App.Localization"
              xmlns:c="clr-namespace:AimOdometer.App.Controls">
   <StackPanel>
-    <TextBlock Style="{StaticResource PageTitle}" Text="{l:T Overview.Title}" />
-    <TextBlock Style="{StaticResource PageSubtitle}" Text="{l:T Overview.Subtitle}" Margin="0,0,0,24" />
+    <DockPanel Margin="0,0,0,24">
+      <Button DockPanel.Dock="Right" Style="{StaticResource SecondaryButton}" VerticalAlignment="Top"
+              Command="{Binding DataContext.OpenShareCommand, RelativeSource={RelativeSource AncestorType=Window}}" CommandParameter="Day" AutomationProperties.AutomationId="ShareButton">
+        <StackPanel Orientation="Horizontal">
+          <TextBlock Style="{StaticResource Icon}" Text="&#xE72D;" Margin="0,0,8,0" />
+          <TextBlock Text="{l:T Share.Button}" />
+        </StackPanel>
+      </Button>
+      <StackPanel>
+        <TextBlock Style="{StaticResource PageTitle}" Text="{l:T Overview.Title}" />
+        <TextBlock Style="{StaticResource PageSubtitle}" Text="{l:T Overview.Subtitle}" />
+      </StackPanel>
+    </DockPanel>
 
     <!-- Today, live -->
     <Border Style="{StaticResource AccentCard}" Padding="28,22">
@@ -21,6 +32,8 @@
             <TextBlock Text="{Binding TodayUnit}" FontFamily="{StaticResource NumberFont}" FontSize="26"
                        Foreground="{StaticResource AccentTextBrush}" VerticalAlignment="Bottom" Margin="10,0,0,12" />
           </StackPanel>
+          <TextBlock Text="{Binding TodayComparison}" FontSize="15" Foreground="{StaticResource AccentTextBrush}" Margin="0,0,0,6"
+                     Visibility="{Binding TodayComparison, Converter={StaticResource NullToCollapsed}}" />
           <TextBlock Style="{StaticResource Hint}" Text="{Binding StreakText}" FontSize="13" />
         </StackPanel>
         <StackPanel Grid.Column="1" VerticalAlignment="Center" MinWidth="200">
@@ -52,6 +65,8 @@
         <StackPanel>
           <TextBlock Style="{StaticResource CardLabel}" Text="{l:T Common.AllTime}" />
           <TextBlock Style="{StaticResource BigNumber}" Text="{Binding AllTime}" />
+          <TextBlock Style="{StaticResource Hint}" Text="{Binding AllTimeComparison}" Margin="0,4,0,0" />
+          <TextBlock Style="{StaticResource Hint}" Text="{Binding MoonText}" />
         </StackPanel>
       </Border>
     </UniformGrid>
