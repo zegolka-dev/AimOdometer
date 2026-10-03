@@ -61,7 +61,25 @@ public sealed partial class CloudService : ObservableObject, IDisposable
     public void Start()
     {
         _timer.Start();
-        _ = SyncAsync();
+        _ = RefreshProfileThenSyncAsync();
+    }
+
+    /// <summary>Name and avatar from Steam (the server asks Steam at most every six hours), then a sync.</summary>
+    private async Task RefreshProfileThenSyncAsync()
+    {
+        if (Client.IsSignedIn)
+        {
+            try
+            {
+                await Client.RefreshProfileAsync(CancellationToken.None);
+            }
+            catch (CloudException ex)
+            {
+                Log.Info($"Profile refresh failed: {ex.Error} {ex.Message}");
+            }
+        }
+
+        await SyncAsync();
     }
 
     public async Task SignInAsync()
@@ -80,7 +98,7 @@ public sealed partial class CloudService : ObservableObject, IDisposable
             var pages = new SignInPages(L["Cloud.PageSuccessTitle"], L["Cloud.PageSuccessText"], L["Cloud.PageFailureTitle"], L["Cloud.PageFailureText"]);
             await SteamSignIn.SignInAsync(Client, OpenBrowser, pages, _signIn.Token);
             UpdateState();
-            await SyncAsync();
+            await RefreshProfileThenSyncAsync();
         }
         catch (OperationCanceledException)
         {
@@ -187,10 +205,14 @@ public sealed partial class CloudService : ObservableObject, IDisposable
 
     public static string Describe(CloudError error) => Loc.Instance[$"Cloud.Error.{error}"];
 
-    private void UpdateState() => State = _signIn is not null ? CloudState.SigningIn
-        : !Client.IsSignedIn ? CloudState.SignedOut
-        : _syncing ? CloudState.Syncing
-        : CloudState.Ready;
+    private void UpdateState()
+    {
+        State = _signIn is not null ? CloudState.SigningIn
+            : !Client.IsSignedIn ? CloudState.SignedOut
+            : _syncing ? CloudState.Syncing
+            : CloudState.Ready;
+        OnPropertyChanged(nameof(Client)); // the session (name, avatar) may have changed without a state change
+    }
 
     private static bool OpenBrowser(Uri url)
     {

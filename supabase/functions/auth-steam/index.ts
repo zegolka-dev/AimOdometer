@@ -156,7 +156,7 @@ async function userFor(steamId: string): Promise<string> {
 }
 
 async function summary(steamId: string) {
-  const key = Deno.env.get("STEAM_WEB_API_KEY");
+  const key = Deno.env.get("STEAM_WEB_API_KEY")?.trim();
   if (!key) {
     console.error("STEAM_WEB_API_KEY is not set");
     return null;

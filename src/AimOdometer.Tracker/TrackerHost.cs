@@ -242,6 +242,7 @@ internal sealed unsafe class TrackerHost : IDisposable
             case User32.WmEndSession:
                 if (wParam != 0)
                 {
+                    Log.Warning("Tracker stopped: Windows is signing out or shutting down");
                     Flush();
                 }
 
@@ -716,6 +717,8 @@ internal sealed unsafe class TrackerHost : IDisposable
                 _store.SetSetting(SettingKeys.Autostart, enable ? "1" : "0");
                 break;
             case CmdExit:
+                // Logged at the default level: "where did the tray icon go?" must be answerable from the log.
+                Log.Warning("Tracker stopped: Exit was chosen in the tray menu");
                 User32.PostMessageW(_hwnd, User32.WmClose, 0, 0);
                 break;
             case >= CmdDpiBase:
@@ -843,6 +846,7 @@ internal sealed unsafe class TrackerHost : IDisposable
                 UpdateTooltip(force: true);
                 break;
             case TrackerCommand.Shutdown:
+                Log.Warning("Tracker stopped: shutdown requested over the pipe (update or reinstall)");
                 User32.PostMessageW(_hwnd, User32.WmClose, 0, 0);
                 break;
             default:

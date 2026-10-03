@@ -86,6 +86,9 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), ver
   opens; a window in test mode does not start the tracker.
 
 ### Fixed
+- Steam name and avatar stayed empty when the Steam Web API key secret had a trailing newline (the server trims it
+  now); the window asks for the profile on start and after signing in, and logs why Steam could not be asked.
+- The tracker logs why it stopped (tray menu Exit, update, Windows shutdown), so a missing tray icon can be explained.
 - The window could crash with a stack overflow when a search result was announced to accessibility tools (a map
   point printed itself recursively).
 - The achievement share card printed the achievement name at number size, so it ran off the card.

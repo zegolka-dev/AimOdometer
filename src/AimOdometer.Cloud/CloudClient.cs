@@ -77,6 +77,11 @@ public sealed class CloudClient : IDisposable
         var token = await AccessTokenAsync(cancellation).ConfigureAwait(false);
         using var response = await SendAsync(HttpMethod.Get, CloudConfig.Functions("profile"), null, token, cancellation).ConfigureAwait(false);
         var root = await ReadAsync(response, cancellation).ConfigureAwait(false);
+        if (Text(root, "steam_status") is { Length: > 0 } steam and not ("ok" or "fresh"))
+        {
+            Log.Warning($"Steam profile could not be refreshed on the server: {steam}");
+        }
+
         var session = Session! with
         {
             SteamId = Text(root, "steam_id"),

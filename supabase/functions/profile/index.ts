@@ -16,10 +16,13 @@ Deno.serve(async (req) => {
     if (e) return error(404, "No profile.");
 
     const age = profile.steam_refreshed_at ? Date.now() - Date.parse(profile.steam_refreshed_at) : Infinity;
-    const key = Deno.env.get("STEAM_WEB_API_KEY");
+    const key = Deno.env.get("STEAM_WEB_API_KEY")?.trim();
+    // Why name and avatar may be missing, for the window's log (never contains the key).
+    let steamStatus = age > REFRESH_HOURS * 3600 * 1000 ? (key ? "pending" : "no_key") : "fresh";
     if (key && age > REFRESH_HOURS * 3600 * 1000) {
       try {
         const player = await playerSummary(profile.steam_id, key);
+        steamStatus = player ? "ok" : "not_found";
         if (player) {
           const fields = {
             persona_name: player.personaName,
@@ -32,11 +35,12 @@ Deno.serve(async (req) => {
           Object.assign(profile, fields);
         }
       } catch (steamError) {
-        console.error("profile refresh", steamError instanceof Error ? steamError.message : steamError);
+        steamStatus = steamError instanceof Error ? steamError.message.replace(/key=[^&\s]*/g, "key=***").slice(0, 120) : "error";
+        console.error("profile refresh", steamStatus);
       }
     }
 
-    return json(profile);
+    return json({ ...profile, steam_status: steamStatus });
   } catch (e) {
     console.error("profile", e instanceof Error ? e.message : e);
     return error(500, "Could not load the profile.");
