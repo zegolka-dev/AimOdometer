@@ -52,6 +52,12 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), ver
 - Logo recolored to the chosen palette.
 - Autostart logic moved to Core (shared by tracker and window).
 
+### Added (data safety)
+- Daily database backup in `<data folder>ackups` (newest 7 kept), made with SQLite `VACUUM INTO`.
+- The tracker reports its data folder over the pipe; the window warns when it differs from its own.
+- The tracker ignores `AIMODOMETER_DATA_DIR` (only `--data-dir` changes its folder) and never passes it to the window it
+  opens; a window in test mode does not start the tracker.
+
 ### Fixed
 - Gear and Settings crashed when showing a mouse: the shared template could not find its converters (moved to
   `Themes/Converters.xaml`, merged before the templates).
