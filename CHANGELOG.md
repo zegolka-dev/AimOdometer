@@ -14,7 +14,7 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), ver
   - Comparisons ("That's 1.3 Burj Khalifas") and the share of the way to the Moon on the overview
     (`data/comparisons.json`).
   - Activity heat map (weekday × hour) on the statistics page.
-  - Gear wear: mouse pads, mice and glides with a lifetime, wear progress, "time to replace", retire and delete.
+  - Gear wear: mouse pads, arm sleeves, mice and glides with a lifetime, wear progress, "time to replace", retire and delete.
   - Share cards 1080×1080 and 1080×1920 (day, week, month, all time, top games, latest achievement): copy to the
     clipboard, save PNG to Pictures\AimOdometer, open the folder.
 - Phase 4 window (WPF, palette "Neon Violet", Fluent dark theme):
@@ -70,6 +70,9 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), ver
   opens; a window in test mode does not start the tracker.
 
 ### Fixed
+- The achievement share card printed the achievement name at number size, so it ran off the card.
+- The statistics chart crashed when the period switched to a shorter one while the mouse was over a bar.
+- A test window on another data folder activated the real window instead of opening.
 - Date pickers followed en-US formatting instead of the UI language.
 - Gear and Settings crashed when showing a mouse: the shared template could not find its converters (moved to
   `Themes/Converters.xaml`, merged before the templates).

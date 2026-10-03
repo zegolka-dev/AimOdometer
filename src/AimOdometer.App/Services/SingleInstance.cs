@@ -1,13 +1,19 @@
+using System.IO;
+using System.Security.Cryptography;
+using System.Text;
+using AimOdometer.Core;
+
 namespace AimOdometer.App.Services;
 
 /// <summary>
 /// One statistics window per session: a second launch (tray click, Start menu) asks the first one to come to the
-/// front and exits.
+/// front and exits. A window on an overridden data folder (tests) is its own instance, so it never activates or
+/// blocks the real one.
 /// </summary>
 public sealed class SingleInstance : IDisposable
 {
-    private const string MutexName = @"Local\AimOdometer.App";
-    private const string ActivateEventName = @"Local\AimOdometer.App.Activate";
+    private static readonly string MutexName = @"Local\AimOdometer.App" + Suffix();
+    private static readonly string ActivateEventName = MutexName + ".Activate";
 
     private readonly Mutex _mutex;
     private readonly EventWaitHandle _activate;
@@ -35,6 +41,10 @@ public sealed class SingleInstance : IDisposable
         mutex.Dispose();
         return null;
     }
+
+    private static string Suffix() => AppIdentity.IsDataDirectoryOverridden
+        ? "." + Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(Path.GetFullPath(AppIdentity.DataDirectory).ToUpperInvariant())))[..16]
+        : string.Empty;
 
     public void Dispose()
     {

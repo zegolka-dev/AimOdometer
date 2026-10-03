@@ -16,7 +16,7 @@ public sealed class BarChart : FrameworkElement
 {
     public static readonly DependencyProperty BarsProperty = DependencyProperty.Register(
         nameof(Bars), typeof(IReadOnlyList<ChartBar>), typeof(BarChart),
-        new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.AffectsRender));
+        new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.AffectsRender, (d, _) => ((BarChart)d)._hover = -1));
 
     private const double LabelHeight = 20;
     private const double TooltipHeight = 26;
@@ -108,7 +108,7 @@ public sealed class BarChart : FrameworkElement
             drawingContext.DrawText(text, new Point(x, chartTop + chartHeight + 4));
         }
 
-        if (_hover >= 0)
+        if (_hover >= 0 && _hover < bars.Count)
         {
             var tip = Text(bars[_hover].Tooltip, 12, Resource("TextPrimaryBrush"), dpi);
             var width = tip.Width + 16;

@@ -63,9 +63,10 @@ public enum GearKind
     MousePad = 0,
     Mouse = 1,
     Glides = 2,
+    Sleeve = 3,
 }
 
-/// <summary>A mouse pad, mouse or set of glides with the distance it is expected to last.</summary>
+/// <summary>A mouse pad, mouse, set of glides or arm sleeve with the distance it is expected to last.</summary>
 public sealed record GearItem(long Id, GearKind Kind, string Name, long? DeviceId, DateOnly StartedOn, double LifetimeKm, DateOnly? RetiredOn);
 
 /// <summary>Typed access to the local statistics database.</summary>

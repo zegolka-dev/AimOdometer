@@ -169,6 +169,9 @@ public sealed class AchievementServiceAndGearTests : IDisposable
             Assert.False(pad.TimeToReplace);
             Assert.Equal(0, GearWear.Status(store, glides).KilometersUsed);
 
+            var sleeve = new GearItem(0, GearKind.Sleeve, "Рукав", mouse + 99, Today, 1500, null); // device is ignored
+            Assert.Equal(0.6, GearWear.Status(store, sleeve).KilometersUsed, precision: 6);
+
             var retired = GearWear.Status(store, new GearItem(1, GearKind.MousePad, "Old", null, Today.AddDays(-1), 1, Today.AddDays(-1)));
             Assert.Equal(1.0, retired.KilometersUsed, precision: 6); // yesterday only
             Assert.False(retired.TimeToReplace); // retired items never nag
@@ -180,9 +183,9 @@ public sealed class AchievementServiceAndGearTests : IDisposable
     {
         using var store = StatsStore.Open(_path);
         var id = store.SaveGear(new GearItem(0, GearKind.MousePad, "Artisan", null, Today, 800, null));
-        store.SaveGear(new GearItem(id, GearKind.MousePad, "Artisan Zero", null, Today, 900, Today));
+        store.SaveGear(new GearItem(id, GearKind.MousePad, "Artisan Zero Мягкий", null, Today, 900, Today));
         var item = Assert.Single(store.GetGear());
-        Assert.Equal("Artisan Zero", item.Name);
+        Assert.Equal("Artisan Zero Мягкий", item.Name);
         Assert.Equal(Today, item.RetiredOn);
         store.DeleteGear(id);
         Assert.Empty(store.GetGear());

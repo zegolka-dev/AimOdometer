@@ -67,6 +67,7 @@ internal sealed unsafe class TrackerHost : IDisposable
     private int _flushesSinceAchievementCheck = int.MaxValue;
     private IReadOnlyDictionary<string, string> _texts = new Dictionary<string, string>();
     private bool _notificationsEnabled = true;
+    private bool _notificationDeferLogged;
     private long _wakeUps;
 
     public TrackerHost(TrackerOptions options, StatsStore store)
@@ -782,6 +783,12 @@ internal sealed unsafe class TrackerHost : IDisposable
                 int state;
                 if (Shell32.SHQueryUserNotificationState(&state) != 0 || state != Shell32.QunsAcceptsNotifications || _tray is null)
                 {
+                    if (!_notificationDeferLogged)
+                    {
+                        Log.Warning($"Achievement notification deferred (notification state {state}): {string.Join(", ", pending)}");
+                        _notificationDeferLogged = true;
+                    }
+
                     return; // try again later
                 }
 
@@ -790,6 +797,10 @@ internal sealed unsafe class TrackerHost : IDisposable
                 var text = pending.Count == 1 ? name : string.Format(TrayStrings.Culture, _strings.MoreAchievementsFormat, name, pending.Count - 1);
                 _tray.ShowBalloon(_strings.AchievementTitle, text);
             }
+
+            // Rare event, logged at the default level so "did the notification come?" can be answered from the log.
+            Log.Warning($"Achievements unlocked ({(_notificationsEnabled ? "notification shown" : "notifications off")}): {string.Join(", ", pending)}");
+            _notificationDeferLogged = false;
 
             _store.MarkAchievementsNotified(pending);
         }

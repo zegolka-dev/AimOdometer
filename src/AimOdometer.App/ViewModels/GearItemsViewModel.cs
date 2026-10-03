@@ -43,6 +43,7 @@ public sealed partial class GearItemRowViewModel(GearItemsViewModel owner, GearS
     {
         GearKind.MousePad => "",
         GearKind.Mouse => "",
+        GearKind.Sleeve => "",
         _ => "",
     };
 
@@ -59,7 +60,7 @@ public sealed partial class GearItemsViewModel(AppData data) : ObservableObject
     public ObservableCollection<GearItemRowViewModel> Items { get; } = [];
 
     public IReadOnlyList<GearKindOption> Kinds { get; } =
-        [new(GearKind.MousePad), new(GearKind.Glides), new(GearKind.Mouse)];
+        [new(GearKind.MousePad), new(GearKind.Sleeve), new(GearKind.Glides), new(GearKind.Mouse)];
 
     public ObservableCollection<DeviceRecord> Mice { get; } = [];
 
@@ -85,7 +86,7 @@ public sealed partial class GearItemsViewModel(AppData data) : ObservableObject
     [ObservableProperty]
     public partial bool HasItems { get; set; }
 
-    public bool NeedsMouse => NewKind?.Kind is GearKind.Mouse or GearKind.Glides;
+    public bool NeedsMouse => NewKind is { } kind && !Core.Fun.GearWear.UsesAllMice(kind.Kind);
 
     partial void OnNewKindChanged(GearKindOption? value)
     {

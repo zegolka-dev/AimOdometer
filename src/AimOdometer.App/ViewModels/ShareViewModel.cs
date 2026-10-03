@@ -185,6 +185,8 @@ public sealed partial class ShareViewModel : ObservableObject
 public sealed record ShareKindOption(ShareKind Kind)
 {
     public string Name => Loc.Instance[$"Share.Kind.{Kind}"];
+
+    public override string ToString() => Name;
 }
 
 /// <summary>Renders a card view into a bitmap of an exact pixel size.</summary>

@@ -30,10 +30,13 @@
                    Visibility="{Binding Glyph, Converter={StaticResource NullToCollapsed}}" Margin="0,0,0,24" />
 
         <StackPanel Orientation="Horizontal">
-          <TextBlock Text="{Binding Number}" FontFamily="{StaticResource NumberFont}" FontSize="230" FontWeight="SemiBold"
-                     TextWrapping="Wrap" MaxWidth="900" LineHeight="230" LineStackingStrategy="BlockLineHeight">
+          <!-- Size lives in the style: a local value would override the trigger. -->
+          <TextBlock Text="{Binding Number}" FontFamily="{StaticResource NumberFont}" FontWeight="SemiBold"
+                     TextWrapping="Wrap" MaxWidth="900" LineStackingStrategy="BlockLineHeight">
             <TextBlock.Style>
               <Style TargetType="TextBlock">
+                <Setter Property="FontSize" Value="230" />
+                <Setter Property="LineHeight" Value="230" />
                 <Style.Triggers>
                   <!-- Achievement names are words, not numbers: smaller. -->
                   <DataTrigger Binding="{Binding Unit}" Value="">
