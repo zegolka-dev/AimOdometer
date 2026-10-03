@@ -149,7 +149,7 @@ If you run builds from a terminal that belongs to an MSIX-packaged app (for exam
 or AI assistant), Windows virtualizes `%LOCALAPPDATA%` for every process started from it: the tracker then writes to
 `%LOCALAPPDATA%\Packages\<package>\LocalCache\Local\AimOdometer` while the window you open from Explorer reads the
 real `%LOCALAPPDATA%\AimOdometer`. Two databases appear, and SQLite `-wal` files can get mixed between them.
-Start the tracker and the window through Explorer (`explorer.exe "path	o\AimOdometer.Tracker.exe"`), and use
+Start the tracker and the window through Explorer (`explorer.exe "C:\path\AimOdometer.Tracker.exe"`), and use
 `AIMODOMETER_DATA_DIR` (outside AppData) for experiments. Installed copies are never affected.
 
 To regenerate the icon after editing `assets/logo.svg`:
