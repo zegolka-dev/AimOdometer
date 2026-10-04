@@ -11,9 +11,11 @@ public class PipeSecurityTests
     public async Task PipeWithTheTrackerSecurityAcceptsTheSameUser()
     {
         var security = PipeServer.CreateSecurity();
-        var sddl = security.GetSecurityDescriptorSddlForm(AccessControlSections.Access);
-        Assert.StartsWith("D:", sddl, StringComparison.Ordinal);
-        Assert.Contains(System.Security.Principal.WindowsIdentity.GetCurrent().User!.Value, sddl, StringComparison.Ordinal);
+        // Exactly one rule: full control for the current user (compared as SIDs; SDDL may print well-known aliases).
+        var rules = security.GetAccessRules(true, false, typeof(System.Security.Principal.SecurityIdentifier)).Cast<PipeAccessRule>().ToList();
+        var rule = Assert.Single(rules);
+        Assert.Equal(System.Security.Principal.WindowsIdentity.GetCurrent().User, rule.IdentityReference);
+        Assert.Equal(AccessControlType.Allow, rule.AccessControlType);
 
         var name = $"AimOdometer.Test.{Guid.NewGuid():N}";
         using var server = PipeServer.CreatePipe(name, security, elevated: false);
