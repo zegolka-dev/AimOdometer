@@ -28,7 +28,7 @@ ICONS = {
 }
 
 # Search engine ownership checks (the content value of the meta tag the console shows). Empty = not added.
-GOOGLE_VERIFICATION = ""
+GOOGLE_VERIFICATION = "Kj0CfCkvA-06Pz4pwEgqz77r_XV53aLWFht5Sv82sV0"
 YANDEX_VERIFICATION = ""
 
 # English pages only: a browser set to Russian goes to the Russian page, unless a language was chosen before
