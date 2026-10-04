@@ -120,7 +120,7 @@ public sealed partial class FriendsViewModel : PageViewModel
 
     public override void Refresh()
     {
-        IsSignedIn = _cloud.Client.IsSignedIn;
+        IsSignedIn = _cloud.Client.IsSignedIn || DemoSocial.Boards is not null;
         if (!IsSignedIn)
         {
             Rows.Clear();
@@ -193,7 +193,7 @@ public sealed partial class FriendsViewModel : PageViewModel
 
     private async Task LoadAsync()
     {
-        if (!_cloud.Client.IsSignedIn || Game is null)
+        if ((!_cloud.Client.IsSignedIn && DemoSocial.Boards is null) || Game is null)
         {
             return;
         }
@@ -204,6 +204,13 @@ public sealed partial class FriendsViewModel : PageViewModel
         Message = null;
         MyPlace = null;
         CanJoinWorld = CanInvite = false;
+        if (DemoSocial.Boards is { } demo)
+        {
+            ShowDemo(demo, period);
+            IsLoading = false;
+            return;
+        }
+
         try
         {
             if (Board == BoardKind.Friends)
@@ -268,6 +275,18 @@ public sealed partial class FriendsViewModel : PageViewModel
         }
     }
 
+    /// <summary>Promo recordings: canned boards (see <see cref="DemoSocial"/>), scaled by the period.</summary>
+    private void ShowDemo(DemoBoards demo, string period)
+    {
+        var factor = DemoSocial.PeriodFactor(period);
+        var rows = Board == BoardKind.Friends ? demo.Friends : demo.World;
+        Show([.. rows.Select(r => r with { Centimeters = r.Centimeters * factor })]);
+        if (Board == BoardKind.World && demo.Me is { } me && rows.All(r => !r.IsMe))
+        {
+            MyPlace = L.Format("Friends.MyPlace", Format.Number(me.Rank), Format.Number(me.Players), Format.Distance(me.Centimeters * factor));
+        }
+    }
+
     private static readonly HashSet<string> KnownBadges = new(StringComparer.Ordinal) { "clown", "blockhead", "fool", "booster" };
 
     /// <summary>Titles first (creator, then beta tester), then shame badges; unknown ids from a newer server are skipped.</summary>
@@ -314,7 +333,8 @@ public sealed partial class FriendsViewModel : PageViewModel
         Rows.Clear();
         foreach (var row in rows)
         {
-            var avatar = Uri.TryCreate(row.AvatarUrl, UriKind.Absolute, out var url) && url.Scheme == Uri.UriSchemeHttps ? url : null;
+            var avatar = Uri.TryCreate(row.AvatarUrl, UriKind.Absolute, out var url)
+                && (url.Scheme == Uri.UriSchemeHttps || (url.IsFile && DemoSocial.Boards is not null)) ? url : null;
             var name = row.Name.Length > 0 ? row.Name : L["Friends.NoName"];
             Rows.Add(new BoardItem(Format.Number(row.Rank), row.IsMe ? L.Format("Friends.Me", name) : name, avatar, Format.Distance(row.Centimeters), row.IsMe,
                 Measured(row), Tags(row)));
