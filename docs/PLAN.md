@@ -268,9 +268,10 @@ AimOdometer/
 
 ### Фаза 9 — Релиз
 - [x] (сделано раньше фазы 8, по просьбе автора, 2026-10-04) Velopack: `vpk pack` в CI по тегу `v*` (`.github/workflows/release.yml`), публикация в GitHub Releases, дельты; окно самодостаточное (.NET внутри); хук удаления (Run-ключ, остановка трекера через pipe `Shutdown`); автообновление в App при открытии и раз в час (отключаемое): скачать → остановить трекер → применить → перезапуск. Setup.exe и portable zip.
-- [ ] Лендинг `site/` EN/RU, страницы privacy и anticheat, кнопка Download → `releases/latest/download/AimOdometerApp-win-Setup.exe`, деплой через Actions.
-- [ ] README (EN) + README.ru.md (про SmartScreen для неподписанной сборки), PRIVACY (EN+RU), `docs/ANTICHEAT.md`, `docs/RELEASE_CHECKLIST.md`.
-- [ ] **Ручное античит-тестирование** (чек-лист ниже) — делаешь ты, я готовлю чек-лист и сборку.
+- [x] Лендинг `site/` EN/RU (генератор `tools/build_site.py`, тексты privacy/anticheat в `site/content/`), скриншоты на демо-данных (без личных программ), кнопка «Скачать» берёт новейший релиз (бета тоже) через GitHub API, деплой через Actions (`pages.yml`) вместе с `services.json`.
+- [x] README (EN) + README.ru.md (про SmartScreen), PRIVACY (EN+RU), `docs/ANTICHEAT.md` (чек-лист и таблица результатов), `docs/RELEASE_CHECKLIST.md`.
+- [x] Настройки › Твои данные: экспорт в CSV и «Удалить статистику на этом ПК» (останавливает трекер, удаляет всё, кроме логов, перезапускает окно).
+- [ ] **Ручное античит-тестирование** VALORANT / Fortnite и повтор CS2/Apex/FACEIT на финальной версии — делаешь ты по `docs/ANTICHEAT.md`.
 - **Критерии приёмки:** установка начисто → онбординг → трекер в автозапуске; обновление v0.x → v0.y через дельту без потери данных; удаление оставляет данные (или удаляет по кнопке в настройках).
 
 ### Фаза 10 — Полировка

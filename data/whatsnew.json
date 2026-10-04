@@ -1,6 +1,17 @@
 {
   "releases": [
     {
+      "version": "0.1.0-beta.5",
+      "en": [
+        "Settings › Your data: export your statistics to CSV (opens in Excel) or delete everything AimOdometer keeps on this PC.",
+        "AimOdometer has a website now: zegolka-dev.github.io/AimOdometer, with the privacy policy and anti-cheat test results."
+      ],
+      "ru": [
+        "Настройки › Твои данные: экспорт статистики в CSV (открывается в Excel) или удаление всего, что AimOdometer хранит на этом ПК.",
+        "У AimOdometer появился сайт: zegolka-dev.github.io/AimOdometer — с политикой приватности и результатами проверок с античитами."
+      ]
+    },
+    {
       "version": "0.1.0-beta.4",
       "en": [
         "New \"Friends\" tab: leaderboards with your Steam friends who use AimOdometer, by week, month or all time, overall or per game.",

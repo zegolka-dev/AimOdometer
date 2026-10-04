@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Безопасность для античитов · AimOdometer</title>
+<meta name="description" content="Бесплатная программа для геймеров под Windows: реальный пробег мыши по коврику по играм, мышам и дням. Ачивки, карта мира и рейтинги с друзьями из Steam.">
+<link rel="canonical" href="https://zegolka-dev.github.io/AimOdometer/ru/anticheat.html">
+<link rel="alternate" hreflang="en" href="https://zegolka-dev.github.io/AimOdometer/anticheat.html">
+<link rel="alternate" hreflang="ru" href="https://zegolka-dev.github.io/AimOdometer/ru/anticheat.html">
+<meta property="og:title" content="Безопасность для античитов · AimOdometer">
+<meta property="og:description" content="Бесплатная программа для геймеров под Windows: реальный пробег мыши по коврику по играм, мышам и дням. Ачивки, карта мира и рейтинги с друзьями из Steam.">
+<meta property="og:image" content="https://zegolka-dev.github.io/AimOdometer/assets/og.png">
+<meta property="og:type" content="website">
+<meta name="theme-color" content="#0F0F23">
+<link rel="icon" type="image/png" href="../assets/favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Russo+One&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../style.css">
+</head>
+<body>
+<a class="skip" href="#main">Перейти к содержимому</a>
+<header class="top">
+  <div class="wrap">
+    <a class="brand" href="../ru/index.html"><img src="../assets/logo.png" alt="" width="32" height="32">AimOdometer</a>
+    <nav aria-label="Main">
+      <a href="../ru/index.html#features">Возможности</a>
+      <a href="anticheat.html">Античиты</a>
+      <a href="privacy.html">Приватность</a>
+      <a class="lang" href="../anticheat.html" hreflang="en" lang="en">English</a>
+    </nav>
+  </div>
+</header>
+<main id="main">
+<div class="wrap doc">
+<h1>Безопасность для античитов</h1>
+<p>Античиты ищут программы, которые меняют игру, читают её память или рисуют поверх неё. AimOdometer не делает ничего из этого. Он работает так же, как фирменные программы для игровых мышей.</p>
+
+<h2>Как устроен AimOdometer</h2>
+<ul>
+  <li><strong>Мышь:</strong> Windows Raw Input в фоновом режиме (<code>RIDEV_INPUTSINK</code>) — тот же открытый интерфейс, которым пользуются игры и программы для мышей. Он лишь получает копию того, что шлёт мышь; изменить или заблокировать ввод он не может.</li>
+  <li><strong>Какая игра:</strong> спрашивает у Windows, какое окно на переднем плане, и читает путь к .exe этой программы. Больше ничего об игре.</li>
+  <li><strong>Уведомления:</strong> ачивки ждут, пока ты выйдешь из полноэкранной игры.</li>
+</ul>
+
+<h2>Чего он никогда не делает</h2>
+<ul>
+  <li>Никаких хуков (без <code>SetWindowsHookEx</code>), инъекций DLL и драйверов.</li>
+  <li>Не открывает процессы игр, не читает и не пишет их память.</li>
+  <li>Никаких оверлеев, рисования поверх игр и имитации ввода.</li>
+  <li>Не читает клавиатуру.</li>
+</ul>
+
+<h2>Результаты проверок</h2>
+<p>Для каждой игры: трекер запущен заранее, не меньше 30 минут игры (для FACEIT / Vanguard — два матча), затем проверка: нет предупреждений и киков античита, пробег записан на игру, FPS не изменился сверх погрешности.</p>
+<table>
+  <thead><tr><th>Игра</th><th>Античит</th><th>Результат</th><th>Версия, дата</th></tr></thead>
+  <tbody>
+    <tr><td>Counter-Strike 2</td><td>VAC</td><td><span class="pill ok">Без проблем</span></td><td>0.0.1, 2026-10-02</td></tr>
+    <tr><td>Counter-Strike 2 на FACEIT</td><td>FACEIT AC</td><td><span class="pill ok">Без проблем</span></td><td>0.0.1, 2026-10-02</td></tr>
+    <tr><td>Apex Legends</td><td>Easy Anti-Cheat</td><td><span class="pill ok">Без проблем</span></td><td>0.0.1, 2026-10-03</td></tr>
+    <tr><td>VALORANT</td><td>Vanguard</td><td><span class="pill wait">ещё не проверено</span></td><td>—</td></tr>
+    <tr><td>Fortnite</td><td>EAC / BattlEye</td><td><span class="pill wait">ещё не проверено</span></td><td>—</td></tr>
+  </tbody>
+</table>
+<p>Разработчики античитов не сертифицируют сторонние программы, поэтому никто не может обещать что-то навсегда. Если с запущенным AimOdometer появится предупреждение — напиши, пожалуйста, issue на <a href="https://github.com/zegolka-dev/AimOdometer/issues">GitHub</a>.</p>
+
+</div>
+</main>
+<footer>
+  <div class="wrap">
+    <span>© 2026 AimOdometer · Лицензия MIT</span>
+    <nav aria-label="Footer">
+      <a href="https://github.com/zegolka-dev/AimOdometer">Код на GitHub</a>
+      <a href="privacy.html">Приватность</a>
+      <a href="anticheat.html">Античиты</a>
+      <a href="https://github.com/zegolka-dev/AimOdometer/releases">Releases</a>
+    </nav>
+  </div>
+</footer>
+<script src="../download.js" defer></script>
+</body>
+</html>

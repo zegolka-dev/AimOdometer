@@ -1,0 +1,45 @@
+<p>Last updated: 4 October 2026. AimOdometer is a free, open-source Windows app; this page says exactly what it does with data. The source code is on <a href="https://github.com/zegolka-dev/AimOdometer">GitHub</a>, so every statement here can be checked.</p>
+
+<h2>On your PC</h2>
+<p>AimOdometer stores in <code>%LOCALAPPDATA%\AimOdometer</code>, per hour:</p>
+<ul>
+  <li>how far your mouse moved (raw counts and the mouse's DPI), clicks, wheel notches, time in motion and the fastest flick;</li>
+  <li>which mouse it was (its Windows device id and the name you give it);</li>
+  <li>which program was in front (the path of its .exe) and for how long, to sort distance by game;</li>
+  <li>your settings, achievements and gear.</li>
+</ul>
+<p><strong>Never</strong> read or stored: the keyboard, the screen, window titles, what you type or do in games, game memory, files.</p>
+<p>The background tracker never uses the internet.</p>
+
+<h2>What goes over the internet</h2>
+<table>
+  <thead><tr><th>When</th><th>To whom</th><th>What</th></tr></thead>
+  <tbody>
+    <tr><td>The window opens (updates; can be switched off in Settings)</td><td>GitHub</td><td>A request for the list of releases; downloading an update. GitHub sees your IP address.</td></tr>
+    <tr><td>You allow the Map tab</td><td>OpenFreeMap, Nominatim (OpenStreetMap), FOSSGIS / OSRM routing</td><td>Map tiles, the cities you search, routes between them. They see your IP address and these queries. Answers are cached on your PC.</td></tr>
+    <tr><td>You sign in through Steam</td><td>Steam (sign-in page in your browser), AimOdometer cloud (Supabase, EU – Frankfurt)</td><td>See below.</td></tr>
+  </tbody>
+</table>
+
+<h2>If you sign in through Steam</h2>
+<p>Signing in is optional. Steam tells AimOdometer your SteamID; AimOdometer never sees your Steam password. The cloud then stores:</p>
+<ul>
+  <li>your SteamID, Steam name, avatar link, profile link and country (public Steam profile data);</li>
+  <li>daily totals per game and per mouse: distance, clicks, time in motion, fastest flick. Mice are identified by a one-way hash, not their hardware id;</li>
+  <li>for each PC: a random id, the PC's name and the last sync time;</li>
+  <li>your Steam friend list (SteamIDs only), cached for an hour, to find friends who use AimOdometer.</li>
+</ul>
+<p>Who sees you: Steam friends who use AimOdometer see your name, avatar and distance (on by default, can be switched off). The world leaderboard shows the same to everyone, only if you turn it on. Nobody else can read your data: every table is protected by row level security and tested.</p>
+<p>Only the window syncs: when it opens, every 15 minutes while it is open, and when it closes.</p>
+
+<h2>Deleting your data</h2>
+<ul>
+  <li><strong>Cloud:</strong> Settings › Steam account and cloud › “Delete cloud account” deletes the account and everything stored for it, at once.</li>
+  <li><strong>This PC:</strong> Settings › Your data › “Delete statistics on this PC”. Uninstalling AimOdometer keeps statistics unless you delete them.</li>
+</ul>
+
+<h2>No tracking, no ads</h2>
+<p>AimOdometer has no analytics, no telemetry, no advertising and sells nothing. This website uses no cookies and no analytics; it loads fonts from Google Fonts and asks GitHub for the newest version to show on the download button.</p>
+
+<h2>Contact</h2>
+<p>Questions or requests: open an issue on <a href="https://github.com/zegolka-dev/AimOdometer/issues">GitHub</a>.</p>

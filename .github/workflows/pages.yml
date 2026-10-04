@@ -1,0 +1,45 @@
+name: Website
+
+# Publishes site/ to GitHub Pages (https://zegolka-dev.github.io/AimOdometer/), together with services.json, which
+# installed copies read to learn the map service addresses. Pages must be enabled once in the repository settings
+# (Settings › Pages › Source: GitHub Actions).
+on:
+  push:
+    branches: [main]
+    paths: ["site/**", "data/services.json", ".github/workflows/pages.yml"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Assemble the site
+        run: |
+          mkdir _site
+          cp -r site/. _site/
+          rm -rf _site/content
+          cp data/services.json _site/services.json
+          touch _site/.nojekyll
+
+      - uses: actions/configure-pages@v5
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+      - id: deployment
+        uses: actions/deploy-pages@v4

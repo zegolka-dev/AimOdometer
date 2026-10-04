@@ -28,11 +28,19 @@ public partial class App : Application
         DispatcherUnhandledException += OnUnhandledException;
 
         _instance = SingleInstance.TryAcquire(() => Dispatcher.BeginInvoke(ActivateMainWindow));
+        for (var i = 0; _instance is null && e.Args.Contains(LocalData.RestartFlag) && i < 50; i++)
+        {
+            Thread.Sleep(100); // restarted after "delete my data": the old window is still closing
+            _instance = SingleInstance.TryAcquire(() => Dispatcher.BeginInvoke(ActivateMainWindow));
+        }
+
         if (_instance is null)
         {
             Shutdown(); // another window is already open; it has been brought to the front
             return;
         }
+
+        LocalData.ApplyIfRequested();
 
         StatsStore store;
         try

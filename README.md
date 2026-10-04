@@ -6,6 +6,9 @@
 
 <p align="center"><a href="README.ru.md">Русская версия</a></p>
 
+> **Website: [zegolka-dev.github.io/AimOdometer](https://zegolka-dev.github.io/AimOdometer/)** ·
+> [Privacy](PRIVACY.md) · [Anti-cheat](docs/ANTICHEAT.md)
+>
 > **Status: beta.** See [docs/PLAN.md](docs/PLAN.md) for the roadmap (in Russian) and [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for the design.
 
 ## Download

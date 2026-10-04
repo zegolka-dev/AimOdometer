@@ -141,7 +141,6 @@
   "Settings.Data": "Your data",
   "Settings.DataHint": "Statistics live in your user folder on this PC. Only if you sign in with Steam are daily totals synced to the AimOdometer cloud.",
   "Settings.OpenDataFolder": "Open data folder",
-  "Settings.ExportLater": "Export and delete buttons are coming in a later update.",
   "Settings.About": "About",
   "Settings.StartupTime": "Window opened in {0} ms",
   "Settings.Privacy": "AimOdometer never reads your keyboard and doesn't touch game memory. It only counts mouse movement and notes which app is active.",
@@ -508,5 +507,10 @@
   "Cloud.Privacy": "Who sees you",
   "Cloud.ShareWithFriends": "My Steam friends who use AimOdometer",
   "Cloud.ShowInWorld": "Everyone: take part in the world leaderboard",
-  "Cloud.PrivacyHint2": "Visible are your Steam name, avatar and distance. The world leaderboard is recalculated every 15 minutes."
+  "Cloud.PrivacyHint2": "Visible are your Steam name, avatar and distance. The world leaderboard is recalculated every 15 minutes.",
+  "Settings.ExportCsv": "Export to CSV",
+  "Settings.Exported": "Saved: {0}",
+  "Settings.DeleteLocal": "Delete statistics on this PC",
+  "Settings.DeleteTitle": "Delete statistics on this PC",
+  "Settings.DeleteConfirm": "Delete all AimOdometer statistics, settings and achievements on this PC and sign out here? The cloud account is not touched (delete it in the Steam account section). This cannot be undone. AimOdometer will restart."
 }

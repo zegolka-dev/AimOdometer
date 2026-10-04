@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Anti-cheat safety · AimOdometer</title>
+<meta name="description" content="Free Windows app for gamers: real mouse distance on the pad per game, per mouse and per day. Achievements, a world map and Steam friends leaderboards.">
+<link rel="canonical" href="https://zegolka-dev.github.io/AimOdometer/anticheat.html">
+<link rel="alternate" hreflang="en" href="https://zegolka-dev.github.io/AimOdometer/anticheat.html">
+<link rel="alternate" hreflang="ru" href="https://zegolka-dev.github.io/AimOdometer/ru/anticheat.html">
+<meta property="og:title" content="Anti-cheat safety · AimOdometer">
+<meta property="og:description" content="Free Windows app for gamers: real mouse distance on the pad per game, per mouse and per day. Achievements, a world map and Steam friends leaderboards.">
+<meta property="og:image" content="https://zegolka-dev.github.io/AimOdometer/assets/og.png">
+<meta property="og:type" content="website">
+<meta name="theme-color" content="#0F0F23">
+<link rel="icon" type="image/png" href="assets/favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Russo+One&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="top">
+  <div class="wrap">
+    <a class="brand" href="index.html"><img src="assets/logo.png" alt="" width="32" height="32">AimOdometer</a>
+    <nav aria-label="Main">
+      <a href="index.html#features">Features</a>
+      <a href="anticheat.html">Anti-cheat</a>
+      <a href="privacy.html">Privacy</a>
+      <a class="lang" href="ru/anticheat.html" hreflang="ru" lang="ru">Русский</a>
+    </nav>
+  </div>
+</header>
+<main id="main">
+<div class="wrap doc">
+<h1>Anti-cheat safety</h1>
+<p>Anti-cheat systems look for programs that change the game, read its memory or draw over it. AimOdometer does none of that. It works like the software that comes with gaming mice.</p>
+
+<h2>How AimOdometer works</h2>
+<ul>
+  <li><strong>Mouse:</strong> Windows Raw Input in background mode (<code>RIDEV_INPUTSINK</code>), the same public API games and mouse software use. It only receives a copy of what the mouse sends; it cannot change or block input.</li>
+  <li><strong>Which game:</strong> it asks Windows which window is in front and reads the path of that program's .exe. Nothing else about the game.</li>
+  <li><strong>Notifications:</strong> achievements wait until you leave a full-screen game.</li>
+</ul>
+
+<h2>What it never does</h2>
+<ul>
+  <li>No hooks (no <code>SetWindowsHookEx</code>), no DLL injection, no drivers.</li>
+  <li>Never opens game processes, never reads or writes their memory.</li>
+  <li>No overlay, no drawing over games, no input simulation.</li>
+  <li>Never reads the keyboard.</li>
+</ul>
+
+<h2>Test results</h2>
+<p>Each game: the tracker running before launch, at least 30 minutes (two matches for FACEIT / Vanguard), then: no anti-cheat warning or kick, distance recorded for the game, no FPS change beyond noise.</p>
+<table>
+  <thead><tr><th>Game</th><th>Anti-cheat</th><th>Result</th><th>Version, date</th></tr></thead>
+  <tbody>
+    <tr><td>Counter-Strike 2</td><td>VAC</td><td><span class="pill ok">OK</span></td><td>0.0.1, 2026-10-02</td></tr>
+    <tr><td>Counter-Strike 2 on FACEIT</td><td>FACEIT AC</td><td><span class="pill ok">OK</span></td><td>0.0.1, 2026-10-02</td></tr>
+    <tr><td>Apex Legends</td><td>Easy Anti-Cheat</td><td><span class="pill ok">OK</span></td><td>0.0.1, 2026-10-03</td></tr>
+    <tr><td>VALORANT</td><td>Vanguard</td><td><span class="pill wait">not tested yet</span></td><td>—</td></tr>
+    <tr><td>Fortnite</td><td>EAC / BattlEye</td><td><span class="pill wait">not tested yet</span></td><td>—</td></tr>
+  </tbody>
+</table>
+<p>No anti-cheat vendor certifies third-party apps, so nobody can promise anything forever. If you ever see a warning with AimOdometer running, please open an issue on <a href="https://github.com/zegolka-dev/AimOdometer/issues">GitHub</a>.</p>
+
+</div>
+</main>
+<footer>
+  <div class="wrap">
+    <span>© 2026 AimOdometer · MIT license</span>
+    <nav aria-label="Footer">
+      <a href="https://github.com/zegolka-dev/AimOdometer">Source on GitHub</a>
+      <a href="privacy.html">Privacy</a>
+      <a href="anticheat.html">Anti-cheat</a>
+      <a href="https://github.com/zegolka-dev/AimOdometer/releases">Releases</a>
+    </nav>
+  </div>
+</footer>
+<script src="download.js" defer></script>
+</body>
+</html>

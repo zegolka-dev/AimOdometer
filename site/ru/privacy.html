@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Политика приватности · AimOdometer</title>
+<meta name="description" content="Бесплатная программа для геймеров под Windows: реальный пробег мыши по коврику по играм, мышам и дням. Ачивки, карта мира и рейтинги с друзьями из Steam.">
+<link rel="canonical" href="https://zegolka-dev.github.io/AimOdometer/ru/privacy.html">
+<link rel="alternate" hreflang="en" href="https://zegolka-dev.github.io/AimOdometer/privacy.html">
+<link rel="alternate" hreflang="ru" href="https://zegolka-dev.github.io/AimOdometer/ru/privacy.html">
+<meta property="og:title" content="Политика приватности · AimOdometer">
+<meta property="og:description" content="Бесплатная программа для геймеров под Windows: реальный пробег мыши по коврику по играм, мышам и дням. Ачивки, карта мира и рейтинги с друзьями из Steam.">
+<meta property="og:image" content="https://zegolka-dev.github.io/AimOdometer/assets/og.png">
+<meta property="og:type" content="website">
+<meta name="theme-color" content="#0F0F23">
+<link rel="icon" type="image/png" href="../assets/favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Russo+One&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../style.css">
+</head>
+<body>
+<a class="skip" href="#main">Перейти к содержимому</a>
+<header class="top">
+  <div class="wrap">
+    <a class="brand" href="../ru/index.html"><img src="../assets/logo.png" alt="" width="32" height="32">AimOdometer</a>
+    <nav aria-label="Main">
+      <a href="../ru/index.html#features">Возможности</a>
+      <a href="anticheat.html">Античиты</a>
+      <a href="privacy.html">Приватность</a>
+      <a class="lang" href="../privacy.html" hreflang="en" lang="en">English</a>
+    </nav>
+  </div>
+</header>
+<main id="main">
+<div class="wrap doc">
+<h1>Политика приватности</h1>
+<p>Обновлено 4 октября 2026. AimOdometer — бесплатная программа с открытым кодом для Windows; здесь точно описано, что она делает с данными. Исходный код открыт на <a href="https://github.com/zegolka-dev/AimOdometer">GitHub</a>, поэтому любое утверждение отсюда можно проверить.</p>
+
+<h2>На твоём ПК</h2>
+<p>AimOdometer хранит в <code>%LOCALAPPDATA%\AimOdometer</code>, по часам:</p>
+<ul>
+  <li>сколько прошла мышь (сырые отсчёты и DPI мыши), клики, щелчки колеса, время в движении и самый быстрый флик;</li>
+  <li>какой это была мышь (её идентификатор устройства в Windows и имя, которое ты ей дал);</li>
+  <li>какая программа была на переднем плане (путь к её .exe) и сколько времени — чтобы разложить пробег по играм;</li>
+  <li>твои настройки, ачивки и снаряжение.</li>
+</ul>
+<p><strong>Никогда</strong> не читается и не хранится: клавиатура, экран, заголовки окон, что ты печатаешь и делаешь в играх, память игр, файлы.</p>
+<p>Фоновый трекер в интернет не ходит вообще.</p>
+
+<h2>Что уходит в интернет</h2>
+<table>
+  <thead><tr><th>Когда</th><th>Кому</th><th>Что</th></tr></thead>
+  <tbody>
+    <tr><td>Открывается окно (обновления; отключается в Настройках)</td><td>GitHub</td><td>Запрос списка версий; скачивание обновления. GitHub видит твой IP-адрес.</td></tr>
+    <tr><td>Ты разрешил вкладку «Карта»</td><td>OpenFreeMap, Nominatim (OpenStreetMap), маршрутизаторы FOSSGIS / OSRM</td><td>Фрагменты карты, города, которые ты ищешь, маршруты между ними. Они видят твой IP-адрес и эти запросы. Ответы сохраняются на ПК.</td></tr>
+    <tr><td>Ты вошёл через Steam</td><td>Steam (страница входа в браузере), облако AimOdometer (Supabase, ЕС — Франкфурт)</td><td>См. ниже.</td></tr>
+  </tbody>
+</table>
+
+<h2>Если ты вошёл через Steam</h2>
+<p>Вход необязателен. Steam сообщает AimOdometer твой SteamID; пароль от Steam AimOdometer никогда не видит. Затем в облаке хранятся:</p>
+<ul>
+  <li>твой SteamID, ник, ссылка на аватар, ссылка на профиль и страна (открытые данные профиля Steam);</li>
+  <li>итоги за день по каждой игре и мыши: пробег, клики, время в движении, самый быстрый флик. Мыши обозначаются необратимым хэшем, а не аппаратным идентификатором;</li>
+  <li>для каждого ПК: случайный идентификатор, имя компьютера и время последней синхронизации;</li>
+  <li>твой список друзей в Steam (только SteamID), сохраняется на час, чтобы найти друзей с AimOdometer.</li>
+</ul>
+<p>Кто тебя видит: друзья из Steam, у которых есть AimOdometer, видят твой ник, аватар и пробег (включено по умолчанию, можно выключить). Мировой рейтинг показывает то же всем — только если ты его включишь. Больше никто твои данные прочитать не может: каждая таблица защищена правилами доступа на уровне строк, и это проверяется тестами.</p>
+<p>Синхронизирует только окно программы: при открытии, раз в 15 минут, пока оно открыто, и при закрытии.</p>
+
+<h2>Удаление данных</h2>
+<ul>
+  <li><strong>Облако:</strong> Настройки › Аккаунт Steam и облако › «Удалить аккаунт в облаке» сразу удаляет аккаунт и всё, что для него хранилось.</li>
+  <li><strong>Этот ПК:</strong> Настройки › Твои данные › «Удалить статистику на этом ПК». Удаление программы статистику не трогает, пока ты не удалишь её сам.</li>
+</ul>
+
+<h2>Ни слежки, ни рекламы</h2>
+<p>В AimOdometer нет аналитики, телеметрии и рекламы, и он ничего не продаёт. Этот сайт не использует cookies и аналитику; он загружает шрифты с Google Fonts и спрашивает у GitHub номер новой версии для кнопки «Скачать».</p>
+
+<h2>Связь</h2>
+<p>Вопросы и просьбы — через issue на <a href="https://github.com/zegolka-dev/AimOdometer/issues">GitHub</a>.</p>
+
+</div>
+</main>
+<footer>
+  <div class="wrap">
+    <span>© 2026 AimOdometer · Лицензия MIT</span>
+    <nav aria-label="Footer">
+      <a href="https://github.com/zegolka-dev/AimOdometer">Код на GitHub</a>
+      <a href="privacy.html">Приватность</a>
+      <a href="anticheat.html">Античиты</a>
+      <a href="https://github.com/zegolka-dev/AimOdometer/releases">Releases</a>
+    </nav>
+  </div>
+</footer>
+<script src="../download.js" defer></script>
+</body>
+</html>

@@ -146,6 +146,46 @@ public sealed partial class SettingsViewModel : PageViewModel
     }
 
     [RelayCommand]
+    private void ExportCsv()
+    {
+        var dialog = new Microsoft.Win32.SaveFileDialog
+        {
+            FileName = $"AimOdometer-{DateTime.Now:yyyy-MM-dd}.csv",
+            Filter = "CSV (*.csv)|*.csv",
+            InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments),
+        };
+        if (dialog.ShowDialog() != true)
+        {
+            return;
+        }
+
+        try
+        {
+            LocalData.ExportCsv(Data, dialog.FileName);
+            DataMessage = Loc.Instance.Format("Settings.Exported", dialog.FileName);
+        }
+        catch (Exception ex) when (ex is System.IO.IOException or UnauthorizedAccessException)
+        {
+            DataMessage = ex.Message;
+        }
+    }
+
+    [RelayCommand]
+    private static async Task DeleteLocalDataAsync()
+    {
+        var L = Loc.Instance;
+        var answer = System.Windows.MessageBox.Show(System.Windows.Application.Current.MainWindow, L["Settings.DeleteConfirm"], L["Settings.DeleteTitle"],
+            System.Windows.MessageBoxButton.YesNo, System.Windows.MessageBoxImage.Warning, System.Windows.MessageBoxResult.No);
+        if (answer == System.Windows.MessageBoxResult.Yes)
+        {
+            await LocalData.DeleteAllAndRestartAsync();
+        }
+    }
+
+    [ObservableProperty]
+    public partial string? DataMessage { get; set; }
+
+    [RelayCommand]
     private static void OpenDataFolder() =>
         Process.Start(new ProcessStartInfo("explorer.exe", $"\"{AppIdentity.DataDirectory}\"") { UseShellExecute = false })?.Dispose();
 

@@ -8,6 +8,9 @@
 
 > **Статус: ранняя разработка.** Релизов пока нет. План — в [docs/PLAN.md](docs/PLAN.md), устройство — в [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
 
+**Сайт: [zegolka-dev.github.io/AimOdometer/ru](https://zegolka-dev.github.io/AimOdometer/ru/)** ·
+[Приватность](PRIVACY.md) · [Античиты](docs/ANTICHEAT.md)
+
 ## Скачать
 
 Windows 10 22H2+ / Windows 11, 64-бит. Последняя версия — в [Releases](https://github.com/zegolka-dev/AimOdometer/releases):
