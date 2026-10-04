@@ -303,8 +303,22 @@
           <Grid>
             <Border Background="{StaticResource SurfaceElevatedBrush}" CornerRadius="3" />
             <Border x:Name="PART_Track" />
-            <Border x:Name="PART_Indicator" Background="{TemplateBinding Foreground}" CornerRadius="3" HorizontalAlignment="Left" />
+            <Border x:Name="PART_Indicator" Background="{TemplateBinding Foreground}" CornerRadius="3" HorizontalAlignment="Left"
+                    RenderTransformOrigin="0,0.5">
+              <Border.RenderTransform><ScaleTransform x:Name="Fill" ScaleX="0" /></Border.RenderTransform>
+            </Border>
           </Grid>
+          <ControlTemplate.Triggers>
+            <!-- Fills from the left when the page appears. -->
+            <EventTrigger RoutedEvent="Loaded">
+              <BeginStoryboard>
+                <Storyboard>
+                  <DoubleAnimation Storyboard.TargetName="Fill" Storyboard.TargetProperty="ScaleX" From="0" To="1" BeginTime="0:0:0.08"
+                                   Duration="0:0:0.5" EasingFunction="{StaticResource EaseOut}" />
+                </Storyboard>
+              </BeginStoryboard>
+            </EventTrigger>
+          </ControlTemplate.Triggers>
         </ControlTemplate>
       </Setter.Value>
     </Setter>

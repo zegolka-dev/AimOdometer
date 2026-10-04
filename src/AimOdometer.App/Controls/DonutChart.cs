@@ -1,5 +1,6 @@
 using System.Windows;
 using System.Windows.Media;
+using System.Windows.Media.Animation;
 
 namespace AimOdometer.App.Controls;
 
@@ -11,7 +12,28 @@ public sealed class DonutChart : FrameworkElement
 {
     public static readonly DependencyProperty SlicesProperty = DependencyProperty.Register(
         nameof(Slices), typeof(IReadOnlyList<DonutSlice>), typeof(DonutChart),
-        new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.AffectsRender));
+        new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.AffectsRender, (d, _) => ((DonutChart)d).OnSlicesChanged()));
+
+    /// <summary>0..1 while the ring sweeps in clockwise.</summary>
+    public static readonly DependencyProperty GrowProperty = DependencyProperty.Register(
+        nameof(Grow), typeof(double), typeof(DonutChart),
+        new FrameworkPropertyMetadata(1.0, FrameworkPropertyMetadataOptions.AffectsRender));
+
+    private static readonly CubicEase GrowEase = new() { EasingMode = EasingMode.EaseOut };
+
+    public double Grow
+    {
+        get => (double)GetValue(GrowProperty);
+        set => SetValue(GrowProperty, value);
+    }
+
+    private void OnSlicesChanged()
+    {
+        if (SystemParameters.ClientAreaAnimation)
+        {
+            BeginAnimation(GrowProperty, new DoubleAnimation(0, 1, TimeSpan.FromMilliseconds(650)) { EasingFunction = GrowEase });
+        }
+    }
 
     public static readonly DependencyProperty ThicknessProperty = DependencyProperty.Register(
         nameof(Thickness), typeof(double), typeof(DonutChart),
@@ -58,14 +80,15 @@ public sealed class DonutChart : FrameworkElement
         var angle = -90.0;
         foreach (var slice in slices)
         {
-            var sweep = (slice.Value / total * 360) - gapDegrees;
+            var share = slice.Value / total * 360 * Grow;
+            var sweep = share - gapDegrees;
             if (sweep > 0.5)
             {
                 drawingContext.DrawGeometry(null, new Pen(slice.Brush, Thickness) { StartLineCap = PenLineCap.Flat, EndLineCap = PenLineCap.Flat },
                     Arc(center, radius, angle + (gapDegrees / 2), sweep));
             }
 
-            angle += slice.Value / total * 360;
+            angle += share;
         }
     }
 

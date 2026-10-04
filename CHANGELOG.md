@@ -5,6 +5,13 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), ver
 
 ## [Unreleased]
 
+## [0.1.0-beta.10] - 2026-10-04
+
+### Changed
+- Dialogs (What's new, feedback, share, onboarding, DPI measurement) fade and zoom in over a fading backdrop
+  (`Motion.Appear` attached property).
+- Progress bars fill from the left when a page appears; the share donut sweeps in.
+
 ## [0.1.0-beta.9] - 2026-10-04
 
 ### Changed
