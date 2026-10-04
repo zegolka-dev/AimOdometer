@@ -855,6 +855,17 @@ internal sealed unsafe class TrackerHost : IDisposable
                 _storedTodayCm = SafeCentimetersToday();
                 UpdateTooltip(force: true);
                 break;
+            case TrackerCommand.TestNotification:
+                if (_tray is null)
+                {
+                    response[0] = TrackerProtocol.StatusError;
+                }
+                else
+                {
+                    _tray.ShowBalloon(_strings.AchievementTitle, _strings.TestNotificationText);
+                }
+
+                break;
             case TrackerCommand.Shutdown:
                 Log.Warning("Tracker stopped: shutdown requested over the pipe (update or reinstall)");
                 User32.PostMessageW(_hwnd, User32.WmClose, 0, 0);

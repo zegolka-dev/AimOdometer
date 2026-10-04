@@ -1,6 +1,15 @@
 {
   "releases": [
     {
+      "version": "0.1.0-beta.13",
+      "en": [
+        "Achievement notifications pop up right away unless a full-screen game is in front. Settings › “Show an example” checks that they work on your PC; the checkbox above it turns them off."
+      ],
+      "ru": [
+        "Уведомления об ачивках приходят сразу, если на экране нет полноэкранной игры. Настройки › «Показать пример» проверяет, что они работают на твоём ПК, а галочка над ней их отключает."
+      ]
+    },
+    {
       "version": "0.1.0-beta.12",
       "en": [
         "Smoother: buttons and menus react to the mouse with soft animations; charts, the ring, bars and the heat map grow in; windows open smoothly; overview numbers roll like an odometer."

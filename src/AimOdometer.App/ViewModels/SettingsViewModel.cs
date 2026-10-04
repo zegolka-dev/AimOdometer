@@ -63,6 +63,25 @@ public sealed partial class SettingsViewModel : PageViewModel
     public partial string? ElevatedMessage { get; set; }
 
     [ObservableProperty]
+    public partial string? NotificationTestMessage { get; set; }
+
+    /// <summary>Asks the tracker for a sample notification, so "do notifications work on this PC?" has an answer.</summary>
+    [RelayCommand]
+    private async Task TestNotificationAsync()
+    {
+        var L = Loc.Instance;
+        if (AppIdentity.IsDataDirectoryOverridden)
+        {
+            NotificationTestMessage = L["Settings.NotificationTestFailed"]; // a test window never talks to the real tracker
+            return;
+        }
+
+        NotificationTestMessage = await TrackerConnection.SendAsync(Core.Ipc.TrackerCommand.TestNotification)
+            ? L["Settings.NotificationTestSent"]
+            : L["Settings.NotificationTestFailed"];
+    }
+
+    [ObservableProperty]
     public partial string Version { get; set; } = string.Empty;
 
     [ObservableProperty]

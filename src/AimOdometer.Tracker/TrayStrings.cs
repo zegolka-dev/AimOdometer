@@ -24,6 +24,7 @@ internal sealed record TrayStrings(
     string FatalStartTitle,
     string AchievementTitle,
     string MoreAchievementsFormat,
+    string TestNotificationText,
     UnitLabels Units)
 {
     public static readonly TrayStrings English = new(
@@ -43,6 +44,7 @@ internal sealed record TrayStrings(
         FatalStartTitle: "AimOdometer could not start",
         AchievementTitle: "New achievement!",
         MoreAchievementsFormat: "{0} and {1} more",
+        TestNotificationText: "This is how achievement notifications look.",
         Units: UnitLabels.English);
 
     public static readonly TrayStrings Russian = new(
@@ -62,6 +64,7 @@ internal sealed record TrayStrings(
         FatalStartTitle: "AimOdometer не смог запуститься",
         AchievementTitle: "Новая ачивка!",
         MoreAchievementsFormat: "{0} и ещё {1}",
+        TestNotificationText: "Так будут выглядеть уведомления об ачивках.",
         Units: new UnitLabels("см", "м", "км", "дюйм", "фут", "миль"));
 
     /// <summary>Picks strings by the language setting ("ru", "en") or, for "auto"/empty, by the Windows UI language.</summary>

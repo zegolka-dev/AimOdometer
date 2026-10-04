@@ -5,6 +5,16 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), ver
 
 ## [Unreleased]
 
+## [0.1.0-beta.13] - 2026-10-04
+
+### Added
+- Settings › "Show an example": the tracker shows a sample achievement notification (new pipe command
+  `TestNotification`), with a hint about Windows notification settings when nothing appears.
+
+### Fixed
+- The account card no longer says friends and leaderboards are coming: they are here.
+- The notifications hint says they appear right away unless a full-screen game is in front.
+
 ## [0.1.0-beta.12] - 2026-10-04
 
 ### Changed

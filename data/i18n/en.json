@@ -171,7 +171,7 @@
   "Stats.Heatmap": "When you move the most",
   "Stats.HeatmapHint": "Distance by weekday and hour for the chosen period. Hover a cell for details.",
   "Settings.Notifications": "Notify me about new achievements",
-  "Settings.NotificationsHint": "Never shown while a full-screen game is running: they wait until you leave the game.",
+  "Settings.NotificationsHint": "They pop up as soon as an achievement is unlocked, unless a full-screen game is in front: then they wait until you leave it.",
   "Gear.WearTitle": "Pads, sleeves and glides",
   "Gear.WearSubtitle": "Add your gear to see how worn it is. Pads and sleeves wear with every mouse; mice and glides only with their mouse.",
   "Gear.Kind.MousePad": "Mouse pad",
@@ -439,7 +439,7 @@
   "Map.AutoTarget": "Random direction",
   "Map.ReachedAuto": "Goal reached, with {0} to spare! Pick another direction or add your own city.",
   "Cloud.Title": "Steam account and cloud",
-  "Cloud.Pitch": "Sign in with Steam to see your statistics from all your PCs in one place. Friends and leaderboards come next. Without signing in, everything keeps working on this PC only.",
+  "Cloud.Pitch": "Sign in with Steam to see your statistics from all your PCs in one place. It also unlocks your Steam friends and the world leaderboard. Without signing in, everything keeps working on this PC only.",
   "Cloud.SignIn": "Sign in through Steam",
   "Cloud.PrivacyHint": "You sign in on Steam's own page in your browser: AimOdometer never sees your password. Synced are daily totals per game and mouse, never keystrokes or what you do in games.",
   "Cloud.ContinueInBrowser": "Continue in the browser window that just opened: sign in to Steam and confirm. Then come back here.",
@@ -536,5 +536,8 @@
   "Settings.ElevatedOff": "Done: the counter runs as a normal program again.",
   "Settings.ElevatedNotRunning": "The setting is saved, but the counter did not start. Restart AimOdometer.",
   "App.RecoveredFromBackup": "The statistics file was damaged (for example, the PC lost power while it was being written). AimOdometer restored the backup from {0}; distance since then is lost. The damaged file was kept next to it as aimodometer.db.broken-….",
-  "App.RecoveredEmpty": "The statistics file was damaged (for example, the PC lost power while it was being written) and there was no readable backup, so counting starts again. The damaged file was kept next to it as aimodometer.db.broken-…."
+  "App.RecoveredEmpty": "The statistics file was damaged (for example, the PC lost power while it was being written) and there was no readable backup, so counting starts again. The damaged file was kept next to it as aimodometer.db.broken-….",
+  "Settings.NotificationTest": "Show an example",
+  "Settings.NotificationTestSent": "Sent. Nothing appeared? Check Windows Settings › System › Notifications and Do not disturb.",
+  "Settings.NotificationTestFailed": "The counter is not running, so there is nothing to show the notification."
 }

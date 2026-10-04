@@ -15,6 +15,9 @@ public enum TrackerCommand : byte
     Resume = 5,
     ReloadSettings = 6,
     Shutdown = 7,
+
+    /// <summary>Shows a sample achievement notification (Settings › "Show an example"). Older trackers answer "unknown".</summary>
+    TestNotification = 8,
 }
 
 /// <summary>Live state reported by <see cref="TrackerCommand.GetStatus"/>.</summary>
