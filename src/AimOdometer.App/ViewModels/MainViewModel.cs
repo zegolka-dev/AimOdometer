@@ -23,7 +23,7 @@ public sealed partial class MainViewModel : ObservableObject, ICalibrationHost, 
             new AchievementsViewModel(data),
             new MapViewModel(data),
             new GearViewModel(data, this),
-            new SettingsViewModel(data, this, cloud),
+            new SettingsViewModel(data, this, cloud, updates),
         ];
         CurrentPage = Pages[0];
         foreach (var page in Pages)

@@ -474,5 +474,10 @@
   "Settings.AutoUpdate": "Install updates automatically",
   "Settings.AutoUpdateHint": "When the window opens (and every hour while it is open) AimOdometer looks for a new version on GitHub, installs it and restarts. Statistics are never touched.",
   "Update.Downloading": "Downloading AimOdometer {0}… {1}%",
-  "Update.Restarting": "Installing AimOdometer {0}: restarting in a few seconds"
+  "Update.Restarting": "Installing AimOdometer {0}: restarting in a few seconds",
+  "Update.CheckNow": "Check for updates",
+  "Update.Checking": "Checking…",
+  "Update.UpToDate": "You have the latest version ({0}).",
+  "Update.DevBuild": "This is a developer build: updates come only to installed copies.",
+  "Update.Failed": "Could not check for updates. Check the internet connection."
 }

@@ -5,6 +5,11 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), ver
 
 ## [Unreleased]
 
+## [0.1.0-beta.2] - 2026-10-04
+
+### Added
+- Settings › About: "Check for updates" button with the answer (latest version, found, failed).
+
 ## [0.1.0-beta.1] - 2026-10-04
 
 First beta for friends: everything from phases 1–7 plus automatic updates.

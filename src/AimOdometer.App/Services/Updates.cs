@@ -41,6 +41,10 @@ public sealed partial class Updates : ObservableObject, IDisposable
     [ObservableProperty]
     public partial string? Banner { get; set; }
 
+    /// <summary>Answer to the last check started from Settings.</summary>
+    [ObservableProperty]
+    public partial string? LastResult { get; set; }
+
     public bool IsEnabled => _data.Setting(SettingKeys.AutoUpdate) != "0";
 
     public void Start()
@@ -49,11 +53,20 @@ public sealed partial class Updates : ObservableObject, IDisposable
         _ = CheckAsync();
     }
 
-    public async Task CheckAsync()
+    /// <summary>"Check for updates" in Settings: works even with automatic updates switched off.</summary>
+    public Task CheckNowAsync() => CheckAsync(manual: true);
+
+    public async Task CheckAsync(bool manual = false)
     {
-        if (_busy || !IsEnabled)
+        if (_busy || (!manual && !IsEnabled))
         {
             return;
+        }
+
+        var L = Loc.Instance;
+        if (manual)
+        {
+            LastResult = L["Update.Checking"];
         }
 
         _busy = true;
@@ -62,17 +75,19 @@ public sealed partial class Updates : ObservableObject, IDisposable
             var manager = new UpdateManager(new GithubSource(AppIdentity.Repository, accessToken: null, prerelease: true));
             if (!manager.IsInstalled)
             {
+                LastResult = manual ? L["Update.DevBuild"] : null;
                 return; // a developer build
             }
 
             var update = await manager.CheckForUpdatesAsync();
             if (update is null)
             {
+                LastResult = manual ? L.Format("Update.UpToDate", AppIdentity.Version) : null;
                 return;
             }
 
             var version = update.TargetFullRelease.Version.ToString();
-            var L = Loc.Instance;
+            LastResult = null;
             Banner = L.Format("Update.Downloading", version, 0);
             await manager.DownloadUpdatesAsync(update, percent =>
                 _dispatcher.BeginInvoke(() => Banner = L.Format("Update.Downloading", version, percent)));
@@ -89,6 +104,7 @@ public sealed partial class Updates : ObservableObject, IDisposable
             // Offline, GitHub unreachable, a broken download: try again later, never bother the user.
             Log.Warning($"Update check failed: {ex.Message}");
             Banner = null;
+            LastResult = manual ? L["Update.Failed"] : null;
         }
         finally
         {

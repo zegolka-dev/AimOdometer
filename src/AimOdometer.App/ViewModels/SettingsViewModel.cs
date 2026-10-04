@@ -13,13 +13,17 @@ public sealed partial class SettingsViewModel : PageViewModel
 {
     private bool _loading;
 
-    public SettingsViewModel(AppData data, ICalibrationHost calibration, CloudService cloud)
+    public SettingsViewModel(AppData data, ICalibrationHost calibration, CloudService cloud, Updates updates)
         : base(data)
     {
+        Updates = updates;
         Languages = [new LanguageInfo("auto", string.Empty), .. Loc.Available()];
         Mice = new GearViewModel(data, calibration);
         Account = new AccountViewModel(data, cloud);
     }
+
+    /// <summary>Automatic updates; "Check for updates" and its answer.</summary>
+    public Updates Updates { get; }
 
     /// <summary>Sign in with Steam, sync status and the account's PCs.</summary>
     public AccountViewModel Account { get; }
@@ -121,6 +125,9 @@ public sealed partial class SettingsViewModel : PageViewModel
             Data.SetSetting(SettingKeys.Notifications, value ? "1" : "0");
         }
     }
+
+    [RelayCommand]
+    private Task CheckUpdatesAsync() => Updates.CheckNowAsync();
 
     partial void OnAutoUpdateChanged(bool value)
     {
