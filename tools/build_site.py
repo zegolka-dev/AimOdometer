@@ -4,8 +4,10 @@ Run after changing texts: python tools/build_site.py (and python tools/make_site
 The pages are static: site.js adds the motion (fade-ins, scroll marquee, magnetic hero, letter-by-letter text,
 stacking cards; all off with "reduce motion"), download.js points the download buttons at the newest release.
 """
+import datetime
 import hashlib
 import html
+import json
 import os
 
 ROOT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "site")
@@ -24,6 +26,10 @@ ICONS = {
     "arrow": '<path d="M5 12h14"/><path d="m13 6 6 6-6 6"/>',
     "globe": '<circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>',
 }
+
+# Search engine ownership checks (the content value of the meta tag the console shows). Empty = not added.
+GOOGLE_VERIFICATION = ""
+YANDEX_VERIFICATION = ""
 
 # English pages only: a browser set to Russian goes to the Russian page, unless a language was chosen before
 # (the language button remembers the choice).
@@ -56,8 +62,9 @@ ROW_TWO = ["stats-totals", "games-list", "achievements-progress", "map-top", "ov
 T = {
     "en": dict(
         lang="en", other="ru", other_short="RU", lang_title="Читать на русском", prefix="",
-        title="AimOdometer: how far does your mouse travel?",
-        description="Free Windows app for gamers: real mouse distance on the pad per game, per mouse and per day. Achievements, a world map and Steam friends leaderboards.",
+        title="AimOdometer: Mouse Odometer for Gamers, Free for Windows",
+        description="AimOdometer is a free mouse odometer for Windows gamers: how far your mouse really travels on the pad, per game and per mouse. Achievements, Steam leaderboards.",
+        og_locale="en_US",
         nav_features="Features", nav_inside="Inside", nav_safety="Anti-cheat", nav_privacy="Privacy", nav_download="Download",
         skip="Skip to content",
         hero_lead="Counts how far your mouse really travels on the pad, per game and per mouse",
@@ -69,7 +76,7 @@ T = {
         meta_fallback="Windows 10 22H2+ / 11, 64-bit",
         marquee_label="Screens of AimOdometer",
         about_title="What is it",
-        about_text="AimOdometer turns your aim into kilometers. A tiny counter in the tray reads your mouse the way mouse software does and converts every movement into real centimeters on the pad using your DPI, even in shooters where the cursor is locked to the center. See which game makes you run the most, beat your records and race your Steam friends.",
+        about_text="AimOdometer is an odometer for your mouse that turns your aim into kilometers. A tiny counter in the tray reads your mouse the way mouse software does and converts every movement into real centimeters on the pad using your DPI, even in shooters where the cursor is locked to the center. See which game makes you run the most, beat your records and race your Steam friends.",
         stats=[("± 1%", "accuracy with your mouse's real DPI"), ("< 10 MB", "of memory in the background"), ("≈ 0.1%", "of one CPU core while you play"), ("0", "hooks, injections or game memory reads")],
         features_title="Features",
         features=[
@@ -109,8 +116,9 @@ T = {
     ),
     "ru": dict(
         lang="ru", other="en", other_short="EN", lang_title="Read in English", prefix="../",
-        title="AimOdometer: сколько проходит твоя мышь?",
-        description="Бесплатная программа для геймеров под Windows: реальный пробег мыши по коврику по играм, мышам и дням. Ачивки, карта мира и рейтинги с друзьями из Steam.",
+        title="AimOdometer (Аим Одометр): одометр мыши для геймеров",
+        description="AimOdometer (Аим Одометр) - бесплатный одометр мыши для Windows: сколько мышь реально проходит по коврику в каждой игре. Ачивки и рейтинги друзей из Steam.",
+        og_locale="ru_RU",
         nav_features="Возможности", nav_inside="Внутри", nav_safety="Античиты", nav_privacy="Приватность", nav_download="Скачать",
         skip="Перейти к содержимому",
         hero_lead="Считает, сколько твоя мышь на самом деле проходит по коврику, по играм и по мышам",
@@ -122,7 +130,7 @@ T = {
         meta_fallback="Windows 10 22H2+ / 11, 64-бит",
         marquee_label="Экраны AimOdometer",
         about_title="Что это",
-        about_text="AimOdometer превращает твой аим в километры. Крошечный счётчик в трее читает мышь так же, как программы для мышей, и переводит каждое движение в настоящие сантиметры по коврику с учётом DPI, даже в шутерах, где курсор зажат в центре. Смотри, в какой игре ты бегаешь мышью больше всего, бей свои рекорды и соревнуйся с друзьями из Steam.",
+        about_text="AimOdometer (Аим Одометр) - это одометр для мыши, который превращает твой аим в километры. Крошечный счётчик в трее читает мышь так же, как программы для мышей, и переводит каждое движение в настоящие сантиметры по коврику с учётом DPI, даже в шутерах, где курсор зажат в центре. Смотри, в какой игре ты бегаешь мышью больше всего, бей свои рекорды и соревнуйся с друзьями из Steam.",
         stats=[("± 1%", "точность с реальным DPI твоей мыши"), ("< 10 МБ", "памяти в фоне"), ("≈ 0,1%", "одного ядра процессора во время игры"), ("0", "хуков, инъекций и чтения памяти игр")],
         features_title="Возможности",
         features=[
@@ -163,6 +171,36 @@ T = {
 }
 
 
+def structured_data(t):
+    """schema.org data for search engines: the app (name variants, free, Windows) and the site's name."""
+    url = SITE + ("/ru/" if t["lang"] == "ru" else "/")
+    app = {
+        "@context": "https://schema.org",
+        "@type": "SoftwareApplication",
+        "name": "AimOdometer",
+        "alternateName": ["Aim Odometer", "Аим Одометр", "АимОдометр"],
+        "description": t["description"],
+        "url": url,
+        "image": SITE + "/assets/og.png",
+        "applicationCategory": "GameApplication",
+        "operatingSystem": "Windows 10, Windows 11",
+        "offers": {"@type": "Offer", "price": "0", "priceCurrency": "USD"},
+        "downloadUrl": RELEASES,
+        "license": "https://opensource.org/licenses/MIT",
+        "isAccessibleForFree": True,
+        "inLanguage": ["en", "ru"],
+        "sameAs": [REPO],
+    }
+    site = {
+        "@context": "https://schema.org",
+        "@type": "WebSite",
+        "name": "AimOdometer",
+        "alternateName": ["Aim Odometer", "Аим Одометр"],
+        "url": SITE + "/",
+    }
+    return "".join(f'<script type="application/ld+json">{json.dumps(x, ensure_ascii=False)}</script>\n' for x in (app, site))
+
+
 def fade(delay=0.0, x=0, y=30, cls=""):
     """Class and style attributes for a fade-in (site.js); x/y are the start offset in px."""
     return f'class="{(cls + " fade").strip()}" style="--d:{delay}s;--x:{x}px;--y:{y}px"'
@@ -195,10 +233,21 @@ def page(t, file, title, description, body, landing=False):
 <link rel="canonical" href="{canonical}">
 <link rel="alternate" hreflang="en" href="{SITE}/{file.replace('index.html', '')}">
 <link rel="alternate" hreflang="ru" href="{SITE}/ru/{file.replace('index.html', '')}">
+<link rel="alternate" hreflang="x-default" href="{SITE}/{file.replace('index.html', '')}">
 <meta property="og:title" content="{html.escape(title)}">
 <meta property="og:description" content="{html.escape(description)}">
 <meta property="og:image" content="{SITE}/assets/og.png">
 <meta property="og:type" content="website">
+<meta property="og:url" content="{canonical}">
+<meta property="og:site_name" content="AimOdometer">
+<meta property="og:locale" content="{t['og_locale']}">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="{html.escape(title)}">
+<meta name="twitter:description" content="{html.escape(description)}">
+<meta name="twitter:image" content="{SITE}/assets/og.png">
+{f'<meta name="google-site-verification" content="{GOOGLE_VERIFICATION}">' if GOOGLE_VERIFICATION else ''}
+{f'<meta name="yandex-verification" content="{YANDEX_VERIFICATION}">' if YANDEX_VERIFICATION else ''}
+{structured_data(t) if landing else ''}
 <meta name="theme-color" content="#0F0F23">
 <link rel="icon" type="image/png" href="{p}assets/favicon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -375,6 +424,26 @@ def document(t, file, title, inner_html):
     return page(t, file, f"{title} · AimOdometer", t["description"], body)
 
 
+PAGES = ["", "privacy.html", "anticheat.html", "code-signing.html"]
+
+
+def sitemap():
+    """Every page in both languages with its alternates (hreflang) and today's date."""
+    today = datetime.date.today().isoformat()
+    entries = []
+    for page_name in PAGES:
+        for prefix in ("", "ru/"):
+            links = "".join(
+                f'\n    <xhtml:link rel="alternate" hreflang="{code}" href="{SITE}/{p}{page_name}"/>'
+                for code, p in (("en", ""), ("ru", "ru/"), ("x-default", "")))
+            priority = "1.0" if page_name == "" else "0.6"
+            entries.append(f"  <url>\n    <loc>{SITE}/{prefix}{page_name}</loc>\n    <lastmod>{today}</lastmod>\n"
+                           f"    <priority>{priority}</priority>{links}\n  </url>")
+    return ('<?xml version="1.0" encoding="UTF-8"?>\n'
+            '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">\n'
+            + "\n".join(entries) + "\n</urlset>\n")
+
+
 def write(path, text):
     os.makedirs(os.path.dirname(path), exist_ok=True)
     with open(path, "w", encoding="utf-8", newline="\n") as f:
@@ -390,4 +459,5 @@ if __name__ == "__main__":
             source = os.path.join(ROOT, "content", f"{file.replace('.html', '')}.{code}.html")
             with open(source, encoding="utf-8") as f:
                 write(os.path.join(folder, file), document(t, file, t[key], f.read()))
+    write(os.path.join(ROOT, "sitemap.xml"), sitemap())
     print("site built")
