@@ -5,6 +5,12 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), ver
 
 ## [Unreleased]
 
+## [0.1.0-beta.7] - 2026-10-04
+
+### Changed
+- Gear: own line icons for mouse pads, sleeves, glides and mice (the sleeve used a hand pointer); "Measure DPI" shows a
+  ruler instead of the hand pointer.
+
 ## [0.1.0-beta.6] - 2026-10-04
 
 ### Added

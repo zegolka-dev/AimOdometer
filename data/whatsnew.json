@@ -1,6 +1,15 @@
 {
   "releases": [
     {
+      "version": "0.1.0-beta.7",
+      "en": [
+        "New icons for mouse pads, sleeves, glides and mice on the Gear page."
+      ],
+      "ru": [
+        "Новые иконки для ковриков, рукавов, глайдов и мышей на странице «Снаряжение»."
+      ]
+    },
+    {
       "version": "0.1.0-beta.6",
       "en": [
         "“Complaints and suggestions” at the bottom left: write to the author directly from the app.",

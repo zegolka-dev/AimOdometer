@@ -32,7 +32,12 @@
                 <ColumnDefinition Width="Auto" />
               </Grid.ColumnDefinitions>
               <Border Width="44" Height="44" CornerRadius="10" Background="{StaticResource SurfaceElevatedBrush}" Margin="0,0,14,0" VerticalAlignment="Top">
-                <TextBlock Style="{StaticResource Icon}" Text="{Binding Glyph}" FontSize="20" HorizontalAlignment="Center" Foreground="{StaticResource AccentTextBrush}" />
+                <Path Data="{Binding Icon}" Width="24" Height="24" Stretch="None" HorizontalAlignment="Center" VerticalAlignment="Center"
+                      Stroke="{StaticResource AccentTextBrush}" StrokeThickness="1.35" StrokeLineJoin="Round" StrokeStartLineCap="Round" StrokeEndLineCap="Round">
+                  <Path.LayoutTransform>
+                    <ScaleTransform ScaleX="1.25" ScaleY="1.25" />
+                  </Path.LayoutTransform>
+                </Path>
               </Border>
               <StackPanel Grid.Column="1">
                 <TextBlock FontSize="15">
