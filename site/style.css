@@ -139,7 +139,20 @@ h2 .giant, h2.plain { font-size: clamp(3rem, 12vw, 160px); text-align: center; }
   transition: opacity 0.2s;
 }
 .hero-nav a:hover { opacity: 0.7; }
-.hero-nav .lang { color: var(--accent-text); }
+/* Language button: a globe and RU/EN in an outlined pill, in the hero and on document pages */
+.hero-nav .lang, .top nav .lang {
+  display: inline-flex; align-items: center; gap: 7px;
+  padding: 7px 14px 7px 11px;
+  border: 1.5px solid rgba(185, 164, 252, 0.7);
+  border-radius: 999px;
+  color: var(--accent-text);
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  background: rgba(139, 92, 246, 0.12);
+  transition: background-color 0.2s, border-color 0.2s;
+}
+.lang svg { width: 1.1em; height: 1.1em; flex: none; }
+.hero-nav .lang:hover, .top nav .lang:hover { background: rgba(139, 92, 246, 0.26); border-color: var(--accent-text); opacity: 1; }
 
 .hero-title { overflow: hidden; padding: 0 clamp(8px, 1.4vw, 24px); }
 .hero-title .giant {
@@ -436,7 +449,7 @@ details p { margin-top: 10px; color: var(--text-2); }
 .top nav { display: flex; gap: clamp(12px, 2vw, 24px); flex-wrap: wrap; }
 .top nav a { color: var(--text); text-decoration: none; text-transform: uppercase; letter-spacing: 0.06em; font-size: 0.85rem; font-weight: 500; }
 .top nav a:hover { opacity: 0.7; }
-.top nav .lang { color: var(--accent-text); }
+.top nav { align-items: center; }
 
 .doc { padding: 56px 0 80px; max-width: 860px; }
 .doc h1 {

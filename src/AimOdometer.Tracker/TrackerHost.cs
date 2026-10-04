@@ -68,6 +68,7 @@ internal sealed unsafe class TrackerHost : IDisposable
     private IReadOnlyDictionary<string, string> _texts = new Dictionary<string, string>();
     private bool _notificationsEnabled = true;
     private bool _notificationDeferLogged;
+    private IReadOnlyList<GearStatus> _wornGear = [];
     private long _wakeUps;
 
     public TrackerHost(TrackerOptions options, StatsStore store)
@@ -767,6 +768,8 @@ internal sealed unsafe class TrackerHost : IDisposable
                 {
                     Log.Info($"Achievements unlocked: {string.Join(", ", newly.Select(a => a.Id))}");
                 }
+
+                _wornGear = GearWear.DueForReplacement(_store);
             }
             catch (Exception ex) when (ex is SqliteException or IOException or InvalidDataException or UnauthorizedAccessException)
             {
@@ -775,6 +778,48 @@ internal sealed unsafe class TrackerHost : IDisposable
         }
 
         NotifyPendingAchievements();
+        NotifyWornGear();
+    }
+
+    /// <summary>
+    /// "Time to replace": a pad, sleeve, mouse or set of glides reached 90 % of its expected lifetime. Announced once
+    /// per item, under the same rules as achievements (setting, never during a full-screen game).
+    /// </summary>
+    private void NotifyWornGear()
+    {
+        if (_wornGear.Count == 0)
+        {
+            return;
+        }
+
+        try
+        {
+            if (_notificationsEnabled)
+            {
+                int state;
+                if (Shell32.SHQueryUserNotificationState(&state) != 0 || state != Shell32.QunsAcceptsNotifications || _tray is null)
+                {
+                    return; // try again next minute
+                }
+
+                var first = _wornGear[0];
+                var text = string.Format(TrayStrings.Culture, _strings.GearWornFormat, first.Item.Name, Math.Round(first.Fraction * 100));
+                if (_wornGear.Count > 1)
+                {
+                    text = string.Format(TrayStrings.Culture, _strings.MoreAchievementsFormat, text, _wornGear.Count - 1);
+                }
+
+                _tray.ShowBalloon(_strings.GearWornTitle, text);
+            }
+
+            Log.Warning($"Gear due for replacement ({(_notificationsEnabled ? "notification shown" : "notifications off")}): {string.Join(", ", _wornGear.Select(g => g.Item.Id))}");
+            GearWear.MarkAnnounced(_store, _wornGear.Select(g => g.Item.Id));
+            _wornGear = [];
+        }
+        catch (SqliteException ex)
+        {
+            Log.Error("Gear notification failed", ex);
+        }
     }
 
     /// <summary>

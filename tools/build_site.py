@@ -22,7 +22,13 @@ ICONS = {
     "shield": '<path d="M12 22s8-3.5 8-10V5l-8-3-8 3v7c0 6.5 8 10 8 10z"/><path d="m9 12 2 2 4-4"/>',
     "lock": '<rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/>',
     "arrow": '<path d="M5 12h14"/><path d="m13 6 6 6-6 6"/>',
+    "globe": '<circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>',
 }
+
+# English pages only: a browser set to Russian goes to the Russian page, unless a language was chosen before
+# (the language button remembers the choice).
+REDIRECT = ('<script>try{if(!localStorage.getItem("lang")&&/^ru\\b/i.test(navigator.language||""))'
+            'location.replace("ru/"+location.pathname.split("/").pop()+location.hash)}catch(e){}</script>')
 
 
 def asset(prefix, name):
@@ -35,13 +41,21 @@ def icon(name):
     return f'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">{ICONS[name]}</svg>'
 
 
+def lang_button(t, href):
+    """The language switch: a globe and RU/EN in a pill; clicking remembers the choice for the redirect above."""
+    remember = f"try{{localStorage.setItem('lang','{t['other']}')}}catch(e){{}}"
+    return (f'<a class="lang" href="{href}" hreflang="{t["other"]}" lang="{t["other"]}" '
+            f'aria-label="{html.escape(t["lang_title"])}" title="{html.escape(t["lang_title"])}" onclick="{remember}">'
+            f'{icon("globe")}<span>{t["other_short"]}</span></a>')
+
+
 # Marquee tiles (tools/make_site_tiles.py): row one moves right, row two left.
 ROW_ONE = ["overview-today", "games-share", "stats-days", "achievements-grid", "map-route", "overview-days"]
 ROW_TWO = ["stats-totals", "games-list", "achievements-progress", "map-top", "overview-totals"]
 
 T = {
     "en": dict(
-        lang="en", other="ru", other_label="Русский", prefix="",
+        lang="en", other="ru", other_short="RU", lang_title="Читать на русском", prefix="",
         title="AimOdometer: how far does your mouse travel?",
         description="Free Windows app for gamers: real mouse distance on the pad per game, per mouse and per day. Achievements, a world map and Steam friends leaderboards.",
         nav_features="Features", nav_inside="Inside", nav_safety="Anti-cheat", nav_privacy="Privacy", nav_download="Download",
@@ -64,6 +78,7 @@ T = {
             ("Achievements and fair play", "39 achievements for distance, streaks, flicks, night sessions and games. Inflating kilometers with a DPI set far too low earns shame badges instead: Clown, Fool, Blockhead and Booster."),
             ("World map", "Your distance as a walk along real roads, from your city towards a famous one or wherever you choose."),
             ("Friends and leaderboards", "Sign in with Steam to compare with your Steam friends and, if you want, the whole world. Every line shows the DPI behind the distance and the fastest flick."),
+            ("Gear wear", "Add your mouse pad, arm sleeve, glides and mouse: AimOdometer counts the kilometers each one has done and reminds you with a notification when one reaches 90% of its lifetime, so you know when to replace it."),
             ("Featherweight", "A native counter of a few megabytes runs in the background and never touches the game; the window with charts opens only when you need it. Updates install themselves."),
         ],
         inside_title="Inside",
@@ -93,7 +108,7 @@ T = {
         signing_page_title="Code signing policy", nav_signing="Code signing",
     ),
     "ru": dict(
-        lang="ru", other="en", other_label="English", prefix="../",
+        lang="ru", other="en", other_short="EN", lang_title="Read in English", prefix="../",
         title="AimOdometer: сколько проходит твоя мышь?",
         description="Бесплатная программа для геймеров под Windows: реальный пробег мыши по коврику по играм, мышам и дням. Ачивки, карта мира и рейтинги с друзьями из Steam.",
         nav_features="Возможности", nav_inside="Внутри", nav_safety="Античиты", nav_privacy="Приватность", nav_download="Скачать",
@@ -116,6 +131,7 @@ T = {
             ("Ачивки и честная игра", "39 ачивок за пробег, серии, флики, ночные сессии и игры. А за километры, накрученные слишком низким DPI, дают позорные значки: Клоун, Дурак, Балбес и Накрутчик."),
             ("Карта мира", "Твой пробег как прогулка по настоящим дорогам: от твоего города к известному или туда, куда выберешь."),
             ("Друзья и рейтинги", "Войди через Steam и сравнивай пробег с друзьями, а по желанию со всем миром. В каждой строке виден DPI, на котором набегано расстояние и поставлен рекорд флика."),
+            ("Износ снаряжения", "Добавь коврик, рукав, глайды и мышь: AimOdometer считает, сколько километров прошла каждая вещь, и напомнит уведомлением, когда одна из них израсходует 90% ресурса, чтобы ты знал, когда её менять."),
             ("Легче пёрышка", "Нативный счётчик в несколько мегабайт работает в фоне и никогда не трогает игру; окно с графиками открывается, только когда нужно. Обновления ставятся сами."),
         ],
         inside_title="Внутри",
@@ -163,7 +179,7 @@ def page(t, file, title, description, body, landing=False):
       <a href="index.html#features">{t['nav_features']}</a>
       <a href="anticheat.html">{t['nav_safety']}</a>
       <a href="privacy.html">{t['nav_privacy']}</a>
-      <a class="lang" href="{other_href}" hreflang="{t['other']}" lang="{t['other']}">{t['other_label']}</a>
+      {lang_button(t, other_href)}
     </nav>
   </div>
 </header>
@@ -172,6 +188,7 @@ def page(t, file, title, description, body, landing=False):
 <html lang="{t['lang']}">
 <head>
 <meta charset="utf-8">
+{REDIRECT if t['lang'] == 'en' else ''}
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>{html.escape(title)}</title>
 <meta name="description" content="{html.escape(description)}">
@@ -219,7 +236,7 @@ def glow_button(t, label):
 
 
 def tile(p, name, lang, alt=""):
-    return f'<img src="{p}assets/tiles/{name}-{lang}.webp" alt="{html.escape(alt)}" width="840" height="540" loading="lazy" decoding="async">'
+    return f'<img src="{asset(p, f'assets/tiles/{name}-{lang}.webp')}" alt="{html.escape(alt)}" width="840" height="540" loading="lazy" decoding="async">'
 
 
 def landing(t):
@@ -272,7 +289,7 @@ def landing(t):
       <a class="optional" href="#inside">{t['nav_inside']}</a>
       <a class="optional" href="anticheat.html">{t['nav_safety']}</a>
       <a href="#download">{t['nav_download']}</a>
-      <a class="lang" href="{other_href}" hreflang="{t['other']}" lang="{t['other']}">{t['other_label']}</a>
+      {lang_button(t, other_href)}
     </div>
   </nav>
   <div class="hero-title">

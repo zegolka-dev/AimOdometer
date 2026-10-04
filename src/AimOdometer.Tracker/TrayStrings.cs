@@ -26,6 +26,8 @@ internal sealed record TrayStrings(
     string MoreAchievementsFormat,
     string TestNotificationText,
     string ShameTitle,
+    string GearWornTitle,
+    string GearWornFormat,
     UnitLabels Units)
 {
     public static readonly TrayStrings English = new(
@@ -47,6 +49,8 @@ internal sealed record TrayStrings(
         MoreAchievementsFormat: "{0} and {1} more",
         TestNotificationText: "This is how achievement notifications look.",
         ShameTitle: "Shame achievement!",
+        GearWornTitle: "Time to replace your gear",
+        GearWornFormat: "{0} has used {1}% of its lifetime",
         Units: UnitLabels.English);
 
     public static readonly TrayStrings Russian = new(
@@ -68,6 +72,8 @@ internal sealed record TrayStrings(
         MoreAchievementsFormat: "{0} и ещё {1}",
         TestNotificationText: "Так будут выглядеть уведомления об ачивках.",
         ShameTitle: "Позорная ачивка!",
+        GearWornTitle: "Пора менять снаряжение",
+        GearWornFormat: "{0}: израсходовано {1}% ресурса",
         Units: new UnitLabels("см", "м", "км", "дюйм", "фут", "миль"));
 
     /// <summary>Picks strings by the language setting ("ru", "en") or, for "auto"/empty, by the Windows UI language.</summary>

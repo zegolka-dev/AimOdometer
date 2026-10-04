@@ -1,6 +1,15 @@
 {
   "releases": [
     {
+      "version": "0.1.0-beta.19",
+      "en": [
+        "AimOdometer now reminds you with a notification when your mouse pad, sleeve, glides or mouse reach 90% of their lifetime. Add them on the Gear page."
+      ],
+      "ru": [
+        "AimOdometer теперь напоминает уведомлением, когда коврик, рукав, глайды или мышь израсходуют 90% ресурса. Добавь их на странице «Снаряжение»."
+      ]
+    },
+    {
       "version": "0.1.0-beta.18",
       "en": [
         "The Steam page does not load when you sign in? After 20 seconds AimOdometer explains why and offers to open it again.",

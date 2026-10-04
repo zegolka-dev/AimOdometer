@@ -173,7 +173,7 @@
   "Settings.Notifications": "Notify me about new achievements",
   "Settings.NotificationsHint": "They pop up as soon as an achievement is unlocked, unless a full-screen game is in front: then they wait until you leave it.",
   "Gear.WearTitle": "Pads, sleeves and glides",
-  "Gear.WearSubtitle": "Add your gear to see how worn it is. Pads and sleeves wear with every mouse; mice and glides only with their mouse.",
+  "Gear.WearSubtitle": "Add your gear to see how worn it is. Pads and sleeves wear with every mouse; mice and glides only with their mouse. At 90% of the lifetime AimOdometer reminds you with a notification.",
   "Gear.Kind.MousePad": "Mouse pad",
   "Gear.Kind.Mouse": "Mouse",
   "Gear.Kind.Glides": "Glides",

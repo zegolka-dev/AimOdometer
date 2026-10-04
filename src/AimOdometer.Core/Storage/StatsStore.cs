@@ -771,4 +771,7 @@ public static class SettingKeys
 
     /// <summary>Row format of the last full cloud upload; older formats are uploaded again once (2 = rows carry DPI).</summary>
     public const string CloudRowFormat = "cloud_row_format";
+
+    /// <summary>Gear item ids already announced as "time to replace" (comma separated).</summary>
+    public const string GearAnnounced = "gear_announced";
 }

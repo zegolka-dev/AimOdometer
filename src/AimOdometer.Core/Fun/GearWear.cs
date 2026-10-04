@@ -45,4 +45,34 @@ public static class GearWear
 
     /// <summary>True for gear that is not tied to one mouse.</summary>
     public static bool UsesAllMice(GearKind kind) => kind is GearKind.MousePad or GearKind.Sleeve;
+
+    /// <summary>
+    /// Gear in use that reached <see cref="GearStatus.ReplaceThreshold"/> and has not been announced yet
+    /// (<see cref="SettingKeys.GearAnnounced"/>), for the "time to replace" notification.
+    /// </summary>
+    public static IReadOnlyList<GearStatus> DueForReplacement(StatsStore store)
+    {
+        ArgumentNullException.ThrowIfNull(store);
+        var announced = Announced(store);
+        return [.. store.GetGear()
+            .Where(item => item.RetiredOn is null && !announced.Contains(item.Id))
+            .Select(item => Status(store, item))
+            .Where(status => status.TimeToReplace)];
+    }
+
+    /// <summary>Remembers that these items were announced, so each one is announced once.</summary>
+    public static void MarkAnnounced(StatsStore store, IEnumerable<long> ids)
+    {
+        ArgumentNullException.ThrowIfNull(store);
+        ArgumentNullException.ThrowIfNull(ids);
+        var all = Announced(store);
+        all.UnionWith(ids);
+        store.SetSetting(SettingKeys.GearAnnounced, string.Join(',', all.Order()));
+    }
+
+    private static HashSet<long> Announced(StatsStore store) =>
+        [.. (store.GetSetting(SettingKeys.GearAnnounced) ?? string.Empty)
+            .Split(',', StringSplitOptions.RemoveEmptyEntries)
+            .Select(part => long.TryParse(part, System.Globalization.NumberStyles.None, System.Globalization.CultureInfo.InvariantCulture, out var id) ? id : -1)
+            .Where(id => id > 0)];
 }

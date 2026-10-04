@@ -5,7 +5,14 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), ver
 
 ## [Unreleased]
 
+## [0.1.0-beta.19] - 2026-10-05
+
 ### Added
+- Gear reminder: when a mouse pad, arm sleeve, set of glides or mouse reaches 90 % of its expected lifetime, the tray
+  shows "Time to replace your gear" once per item (same rules as achievement notifications: the setting, never during
+  a full-screen game). `GearWear.DueForReplacement`, `SettingKeys.GearAnnounced`.
+- Website: a language button (globe and RU/EN) in the hero and on document pages; a browser set to Russian opens the
+  Russian pages unless a language was chosen; the features list mentions the gear reminder; tile links are versioned.
 - New website design: huge gradient headings, a two-row marquee of app screens that moves with scrolling, a magnetic
   hero picture, text that lights up letter by letter, a light features section with large numbers, stacking cards
   with the app's pages, and the anti-cheat, privacy, FAQ and download sections. Same Neon Violet palette, type Exo 2
