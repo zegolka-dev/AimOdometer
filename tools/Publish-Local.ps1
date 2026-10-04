@@ -18,7 +18,9 @@ $installer = "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer"
 if ((Test-Path $installer) -and ($env:Path -notlike "*$installer*")) { $env:Path += ";$installer" } # vswhere for NativeAOT
 
 $tracker = Join-Path $Output "AimOdometer.Tracker.exe"
-if (Test-Path $tracker) {
+# Stop only a tracker running from this folder: an installed AimOdometer (the user's real one) must keep counting.
+$ownTracker = Get-Process AimOdometer.Tracker -ErrorAction SilentlyContinue | Where-Object { $_.Path -like "$Output*" }
+if ((Test-Path $tracker) -and $ownTracker) {
     & $tracker --stop | Out-Null
     Start-Sleep -Seconds 2
 }

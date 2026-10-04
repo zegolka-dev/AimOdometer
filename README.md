@@ -6,7 +6,22 @@
 
 <p align="center"><a href="README.ru.md">Русская версия</a></p>
 
-> **Status: early development.** Nothing is released yet. See [docs/PLAN.md](docs/PLAN.md) for the roadmap (in Russian) and [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for the design.
+> **Status: beta.** See [docs/PLAN.md](docs/PLAN.md) for the roadmap (in Russian) and [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for the design.
+
+## Download
+
+Windows 10 22H2+ / Windows 11, 64-bit. Get the latest version from
+[Releases](https://github.com/zegolka-dev/AimOdometer/releases):
+
+- **`AimOdometerApp-win-Setup.exe`**: installs for your user (no admin rights), adds Start menu and desktop shortcuts and
+  starts with Windows.
+- **`AimOdometerApp-win-Portable.zip`**: unzip anywhere and run `AimOdometer.exe`.
+
+Both update themselves: when the window opens (and every hour while it is open) AimOdometer looks for a new release,
+installs it and restarts. This can be switched off in Settings. .NET is included, nothing else to install.
+
+The builds are not code-signed yet, so Windows SmartScreen may say "Windows protected your PC": click
+**More info → Run anyway**.
 
 ## Why another mouse odometer?
 

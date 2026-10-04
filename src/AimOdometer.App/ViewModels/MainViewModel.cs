@@ -10,9 +10,10 @@ public sealed partial class MainViewModel : ObservableObject, ICalibrationHost, 
 {
     private readonly AppData _data;
 
-    public MainViewModel(AppData data, CloudService cloud)
+    public MainViewModel(AppData data, CloudService cloud, Updates updates)
     {
         _data = data;
+        Updates = updates;
         Tracker = new TrackerConnection();
         Pages =
         [
@@ -48,6 +49,9 @@ public sealed partial class MainViewModel : ObservableObject, ICalibrationHost, 
     }
 
     public IReadOnlyList<PageViewModel> Pages { get; }
+
+    /// <summary>Automatic updates (banner while one is installed).</summary>
+    public Updates Updates { get; }
 
     public TrackerConnection Tracker { get; }
 

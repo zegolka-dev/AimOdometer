@@ -267,7 +267,7 @@ AimOdometer/
 - **Критерии приёмки:** pgTAP-тесты на видимость с учётом настроек; накрученная запись отклоняется; место пользователя отображается вне топ-100.
 
 ### Фаза 9 — Релиз
-- [ ] Velopack: `vpk pack` в CI по тегу `v*`, публикация в GitHub Releases, дельты; хуки установки/удаления (Run-ключ, остановка трекера через pipe `Shutdown`); проверка обновлений в App (отключаемая).
+- [x] (сделано раньше фазы 8, по просьбе автора, 2026-10-04) Velopack: `vpk pack` в CI по тегу `v*` (`.github/workflows/release.yml`), публикация в GitHub Releases, дельты; окно самодостаточное (.NET внутри); хук удаления (Run-ключ, остановка трекера через pipe `Shutdown`); автообновление в App при открытии и раз в час (отключаемое): скачать → остановить трекер → применить → перезапуск. Setup.exe и portable zip.
 - [ ] Лендинг `site/` EN/RU, страницы privacy и anticheat, кнопка Download → `releases/latest/download/AimOdometerApp-win-Setup.exe`, деплой через Actions.
 - [ ] README (EN) + README.ru.md (про SmartScreen для неподписанной сборки), PRIVACY (EN+RU), `docs/ANTICHEAT.md`, `docs/RELEASE_CHECKLIST.md`.
 - [ ] **Ручное античит-тестирование** (чек-лист ниже) — делаешь ты, я готовлю чек-лист и сборку.

@@ -10,9 +10,27 @@ public static class Autostart
 
     public static string CommandFor(string trackerExePath) => $"\"{trackerExePath}\" --autostart";
 
-    /// <summary>True for the installed copy (not a developer build folder); autostart is on by default only there.</summary>
-    public static bool IsInstalledLocation(string? exePath) =>
-        exePath?.Contains(@"\AimOdometerApp\", StringComparison.OrdinalIgnoreCase) == true;
+    /// <summary>
+    /// True for an installed or portable copy (not a developer build folder); autostart is on by default only there.
+    /// Velopack layouts keep the app in "current" next to Update.exe.
+    /// </summary>
+    public static bool IsInstalledLocation(string? exePath)
+    {
+        if (exePath is null)
+        {
+            return false;
+        }
+
+        if (exePath.Contains(@"\AimOdometerApp\", StringComparison.OrdinalIgnoreCase))
+        {
+            return true;
+        }
+
+        var folder = Path.GetDirectoryName(exePath);
+        return folder is not null &&
+               string.Equals(Path.GetFileName(folder), "current", StringComparison.OrdinalIgnoreCase) &&
+               File.Exists(Path.Combine(Path.GetDirectoryName(folder) ?? folder, "Update.exe"));
+    }
 
     public static bool IsEnabled()
     {

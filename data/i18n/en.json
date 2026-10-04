@@ -470,5 +470,9 @@
   "Cloud.Error.SessionExpired": "You were signed out. Sign in again to keep syncing.",
   "Cloud.Error.TooManyRequests": "Too many requests to the cloud. It will try again later.",
   "Cloud.Error.Rejected": "The cloud refused the request. Try signing in again.",
-  "Cloud.Error.ServerError": "The AimOdometer cloud has a problem right now. It will try again later."
+  "Cloud.Error.ServerError": "The AimOdometer cloud has a problem right now. It will try again later.",
+  "Settings.AutoUpdate": "Install updates automatically",
+  "Settings.AutoUpdateHint": "When the window opens (and every hour while it is open) AimOdometer looks for a new version on GitHub, installs it and restarts. Statistics are never touched.",
+  "Update.Downloading": "Downloading AimOdometer {0}… {1}%",
+  "Update.Restarting": "Installing AimOdometer {0}: restarting in a few seconds"
 }

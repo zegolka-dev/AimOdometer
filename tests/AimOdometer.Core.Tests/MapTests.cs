@@ -239,7 +239,7 @@ public sealed class MapClientTests : IDisposable
 
     [Fact]
     public void UserAgent_IdentifiesTheApp() =>
-        Assert.Matches(@"^AimOdometer/\d+\.\d+\.\d+ \(\+https://github\.com/zegolka-dev/AimOdometer\)$", MapClient.UserAgent);
+        Assert.Matches(@"^AimOdometer/\d+\.\d+\.\d+(-[0-9A-Za-z.]+)? \(\+https://github\.com/zegolka-dev/AimOdometer\)$", MapClient.UserAgent);
 
     [Fact]
     public async Task Search_IsCachedAndSendsUserAgent()

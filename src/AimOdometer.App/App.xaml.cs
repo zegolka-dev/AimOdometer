@@ -19,6 +19,7 @@ public partial class App : Application
     private AppData? _data;
     private MainViewModel? _main;
     private CloudService? _cloud;
+    private Updates? _updates;
 
     protected override void OnStartup(StartupEventArgs e)
     {
@@ -51,7 +52,9 @@ public partial class App : Application
         Format.Units = _data.Units;
 
         _cloud = new CloudService(_data);
-        _main = new MainViewModel(_data, _cloud);
+        var cloud = _cloud;
+        _updates = new Updates(_data, () => cloud.SyncBeforeExit());
+        _main = new MainViewModel(_data, _cloud, _updates);
         var window = new MainWindow { DataContext = _main };
         window.ContentRendered += (_, _) =>
         {
@@ -62,10 +65,12 @@ public partial class App : Application
         window.Show();
         _main.Start();
         _cloud.Start();
+        _updates.Start();
     }
 
     protected override void OnExit(ExitEventArgs e)
     {
+        _updates?.Dispose();
         _cloud?.SyncBeforeExit();
         _cloud?.Dispose();
         _main?.Dispose();

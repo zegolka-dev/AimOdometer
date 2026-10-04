@@ -11,8 +11,10 @@ public static class AppIdentity
     /// <summary>Source code; sent in the User-Agent of map requests, as the services' usage policies ask.</summary>
     public const string Repository = "https://github.com/zegolka-dev/AimOdometer";
 
-    /// <summary>Product version (major.minor.patch).</summary>
-    public static string Version => typeof(AppIdentity).Assembly.GetName().Version?.ToString(3) ?? "0.0.0";
+    /// <summary>Product version as released (SemVer, e.g. "0.1.0-beta.1"), without build metadata.</summary>
+    public static string Version =>
+        (System.Reflection.CustomAttributeExtensions.GetCustomAttribute<System.Reflection.AssemblyInformationalVersionAttribute>(typeof(AppIdentity).Assembly)
+            ?.InformationalVersion ?? "0.0.0").Split('+')[0];
 
     /// <summary>Per-session single-instance mutex of the background tracker.</summary>
     public const string TrackerMutexName = @"Local\AimOdometer.Tracker";

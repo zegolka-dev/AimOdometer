@@ -1,0 +1,70 @@
+name: Release
+
+# Push a tag like v0.1.0-beta.2 to publish a version. Installed copies find it on their next check and update
+# themselves (Velopack, from this repository's GitHub Releases).
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+jobs:
+  release:
+    runs-on: windows-latest
+    env:
+      DOTNET_CLI_TELEMETRY_OPTOUT: 1
+      DOTNET_NOLOGO: 1
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: global.json
+
+      - name: Version from the tag
+        shell: pwsh
+        run: |
+          $version = "${{ github.ref_name }}".TrimStart("v")
+          if ($version -notmatch '^\d+\.\d+\.\d+(-[0-9A-Za-z.]+)?$') { throw "Tag must look like v1.2.3 or v1.2.3-beta.1" }
+          "VERSION=$version" >> $env:GITHUB_ENV
+          "PRERELEASE=$(if ($version.Contains('-')) { 'true' } else { 'false' })" >> $env:GITHUB_ENV
+
+      - name: Test
+        run: dotnet test -c Release
+
+      - name: Publish window (self-contained) and tracker (NativeAOT)
+        shell: pwsh
+        run: |
+          dotnet publish src/AimOdometer.App -c Release -o publish -p:Version=$env:VERSION
+          dotnet publish src/AimOdometer.Tracker -c Release -o publish -p:Version=$env:VERSION
+          Get-ChildItem publish -Filter *.pdb | Remove-Item
+
+      - name: Install vpk
+        run: dotnet tool restore
+
+      - name: Previous release (for delta updates)
+        shell: pwsh
+        run: dotnet vpk download github --repoUrl "https://github.com/${{ github.repository }}" --token "${{ secrets.GITHUB_TOKEN }}" --pre -o releases
+        continue-on-error: true
+
+      - name: Pack (Setup.exe, portable zip, update packages)
+        shell: pwsh
+        run: |
+          "AimOdometer $env:VERSION. What changed: https://github.com/${{ github.repository }}/blob/main/CHANGELOG.md" | Set-Content notes.md
+          dotnet vpk pack --packId AimOdometerApp --packVersion $env:VERSION --packDir publish --mainExe AimOdometer.App.exe `
+            --packTitle AimOdometer --packAuthors zegolka-dev --icon assets/icon.ico --releaseNotes notes.md -o releases
+
+      - name: Upload to GitHub Releases
+        shell: pwsh
+        run: |
+          $arguments = @("vpk", "upload", "github", "--repoUrl", "https://github.com/${{ github.repository }}",
+            "--token", "${{ secrets.GITHUB_TOKEN }}", "--publish", "--releaseName", "AimOdometer $env:VERSION",
+            "--tag", "${{ github.ref_name }}", "-o", "releases")
+          if ($env:PRERELEASE -eq 'true') { $arguments += "--pre" }
+          dotnet @arguments
+          if ($LASTEXITCODE -ne 0) { throw "Upload failed" }

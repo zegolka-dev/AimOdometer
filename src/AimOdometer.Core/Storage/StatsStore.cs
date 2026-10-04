@@ -725,4 +725,5 @@ public static class SettingKeys
     public const string CloudSyncedUser = "cloud_synced_user";
     public const string CloudSyncedThrough = "cloud_synced_through";
     public const string CloudLastSync = "cloud_last_sync";
+    public const string AutoUpdate = "auto_update";
 }

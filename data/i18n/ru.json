@@ -470,5 +470,9 @@
   "Cloud.Error.SessionExpired": "Сессия закончилась. Войди снова, чтобы продолжить синхронизацию.",
   "Cloud.Error.TooManyRequests": "Слишком много запросов к облаку. Попробую позже.",
   "Cloud.Error.Rejected": "Облако отклонило запрос. Попробуй войти заново.",
-  "Cloud.Error.ServerError": "В облаке AimOdometer сейчас сбой. Попробую позже."
+  "Cloud.Error.ServerError": "В облаке AimOdometer сейчас сбой. Попробую позже.",
+  "Settings.AutoUpdate": "Устанавливать обновления автоматически",
+  "Settings.AutoUpdateHint": "Когда окно открывается (и раз в час, пока оно открыто), AimOdometer ищет новую версию на GitHub, устанавливает её и перезапускается. Статистика не затрагивается.",
+  "Update.Downloading": "Скачиваю AimOdometer {0}… {1}%",
+  "Update.Restarting": "Устанавливаю AimOdometer {0}: перезапуск через пару секунд"
 }

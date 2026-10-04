@@ -5,7 +5,15 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), ver
 
 ## [Unreleased]
 
+## [0.1.0-beta.1] - 2026-10-04
+
+First beta for friends: everything from phases 1–7 plus automatic updates.
+
 ### Added
+- Releases and automatic updates (Velopack): Setup.exe and a portable zip on GitHub Releases, built by CI from a
+  `v*` tag; the window looks for a new version when it opens and every hour, downloads only the changes, stops the
+  tracker, installs and restarts (Settings › Install updates automatically). The window is self-contained (.NET
+  included). Uninstalling stops the tracker and removes it from autostart; statistics stay.
 - Phase 7 cloud:
   - Sign in through Steam (Settings › Steam account and cloud): the browser signs in on Steam's own page, the window
     gets a Supabase session through a loopback redirect with a PKCE-style verifier; the session is stored with DPAPI.

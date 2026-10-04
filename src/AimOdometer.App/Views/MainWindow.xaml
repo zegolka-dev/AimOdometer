@@ -78,6 +78,16 @@
       </ContentControl>
     </ScrollViewer>
 
+    <!-- Update in progress -->
+    <Border Grid.Column="1" VerticalAlignment="Top" HorizontalAlignment="Center" Margin="0,12,0,0" Padding="16,8"
+            CornerRadius="10" Background="{StaticResource AccentBrush}" Panel.ZIndex="5"
+            Visibility="{Binding Updates.Banner, Converter={StaticResource NullToCollapsed}}">
+      <StackPanel Orientation="Horizontal">
+        <TextBlock Style="{StaticResource Icon}" Text="&#xE896;" Margin="0,0,8,0" VerticalAlignment="Center" Foreground="White" />
+        <TextBlock Text="{Binding Updates.Banner}" Foreground="White" FontSize="13" FontWeight="SemiBold" />
+      </StackPanel>
+    </Border>
+
     <!-- Overlays -->
     <Grid Grid.ColumnSpan="2" Background="#CC07071A" Visibility="{Binding HasOverlay, Converter={StaticResource BoolToVisibility}}">
       <v:OnboardingView DataContext="{Binding Onboarding}" Visibility="{Binding DataContext.IsOnboardingVisible, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource BoolToVisibility}}" />

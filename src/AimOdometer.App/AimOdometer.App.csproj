@@ -8,7 +8,10 @@
     <ApplicationIcon>..\..\assets\icon.ico</ApplicationIcon>
     <!-- Precompiled code for a faster first frame (target: < 1.5 s). -->
     <PublishReadyToRun>true</PublishReadyToRun>
-    <SelfContained>false</SelfContained>
+    <!-- Self-contained: friends can unzip and run without installing .NET. -->
+    <SelfContained>true</SelfContained>
+    <!-- Program.Main runs Velopack's install/update hooks before WPF starts. -->
+    <StartupObject>AimOdometer.App.Program</StartupObject>
     <TieredPGO>true</TieredPGO>
     <!-- WPF Fluent theme (ThemeMode) is marked experimental; we rely on it for native Windows 11 control styles. -->
     <NoWarn>$(NoWarn);WPF0001</NoWarn>
@@ -16,6 +19,7 @@
   <ItemGroup>
     <PackageReference Include="CommunityToolkit.Mvvm" />
     <PackageReference Include="Microsoft.Web.WebView2" />
+    <PackageReference Include="Velopack" />
   </ItemGroup>
   <ItemGroup>
     <Resource Include="..\..\assets\icon.ico" Link="Assets\icon.ico" />
