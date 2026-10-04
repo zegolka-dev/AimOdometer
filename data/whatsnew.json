@@ -1,6 +1,15 @@
 {
   "releases": [
     {
+      "version": "0.1.0-beta.16",
+      "en": [
+        "“Check for updates” bottom left: installs a new version in one click."
+      ],
+      "ru": [
+        "«Проверить обновления» внизу слева: новая версия ставится в один клик."
+      ]
+    },
+    {
       "version": "0.1.0-beta.15",
       "en": [
         "Everyone who signed in during the beta now wears the “Beta tester” tag on the leaderboards. Thank you!"

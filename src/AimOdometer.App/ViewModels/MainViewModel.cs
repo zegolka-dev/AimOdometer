@@ -91,6 +91,10 @@ public sealed partial class MainViewModel : ObservableObject, ICalibrationHost, 
     [CommunityToolkit.Mvvm.Input.RelayCommand]
     private void OpenFeedback() => Feedback = new FeedbackViewModel(_cloud, () => Feedback = null);
 
+    /// <summary>Sidebar "Check for updates": downloads and installs a newer version right away (even with auto-update off).</summary>
+    [CommunityToolkit.Mvvm.Input.RelayCommand]
+    private Task CheckUpdatesAsync() => Updates.CheckNowAsync();
+
     /// <summary>Calibration can open on top of onboarding; then only calibration is shown.</summary>
     public bool IsOnboardingVisible => Onboarding is not null && Calibration is null;
 

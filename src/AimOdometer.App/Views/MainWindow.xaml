@@ -26,17 +26,28 @@
           <TextBlock Text="AimOdometer" FontSize="17" FontWeight="SemiBold" Margin="10,0,0,0" VerticalAlignment="Center" />
         </StackPanel>
 
-        <!-- Complaints and suggestions -->
-        <Button DockPanel.Dock="Bottom" Style="{StaticResource LinkButton}" Command="{Binding OpenFeedbackCommand}" HorizontalAlignment="Left"
-                Margin="4,0,0,10" AutomationProperties.AutomationId="OpenFeedback">
-          <StackPanel Orientation="Horizontal">
-            <TextBlock Style="{StaticResource Icon}" Text="&#xED15;" Margin="0,0,8,0" VerticalAlignment="Center" />
-            <TextBlock Text="{l:T Feedback.Button}" />
-          </StackPanel>
-        </Button>
+        <!-- Updates and complaints: links under the status, with room to the window edge -->
+        <StackPanel DockPanel.Dock="Bottom" Margin="4,0,0,6">
+          <Button Style="{StaticResource LinkButton}" Command="{Binding CheckUpdatesCommand}" HorizontalAlignment="Left"
+                  AutomationProperties.AutomationId="SidebarCheckUpdates">
+            <StackPanel Orientation="Horizontal">
+              <TextBlock Style="{StaticResource Icon}" Text="&#xE895;" Margin="0,0,8,0" VerticalAlignment="Center" />
+              <TextBlock Text="{l:T Update.CheckNow}" />
+            </StackPanel>
+          </Button>
+          <TextBlock Text="{Binding Updates.LastResult}" Style="{StaticResource Hint}" FontSize="12" TextWrapping="Wrap" Margin="24,2,0,0"
+                     Visibility="{Binding Updates.LastResult, Converter={StaticResource NullToCollapsed}}" />
+          <Button Style="{StaticResource LinkButton}" Command="{Binding OpenFeedbackCommand}" HorizontalAlignment="Left" Margin="0,10,0,0"
+                  AutomationProperties.AutomationId="OpenFeedback">
+            <StackPanel Orientation="Horizontal">
+              <TextBlock Style="{StaticResource Icon}" Text="&#xED15;" Margin="0,0,8,0" VerticalAlignment="Center" />
+              <TextBlock Text="{l:T Feedback.Button}" />
+            </StackPanel>
+          </Button>
+        </StackPanel>
 
         <!-- Live tracker status -->
-        <Border DockPanel.Dock="Bottom" Background="{StaticResource SurfaceElevatedBrush}" CornerRadius="10" Padding="12,10">
+        <Border DockPanel.Dock="Bottom" Background="{StaticResource SurfaceElevatedBrush}" CornerRadius="10" Padding="12,10" Margin="0,12,0,14">
           <StackPanel Orientation="Horizontal">
             <Ellipse x:Name="StatusDot" Width="8" Height="8" Margin="0,0,10,0" VerticalAlignment="Center">
               <Ellipse.Style>

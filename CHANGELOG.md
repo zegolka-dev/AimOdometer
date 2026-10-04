@@ -5,6 +5,15 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), ver
 
 ## [Unreleased]
 
+## [0.1.0-beta.16] - 2026-10-05
+
+### Added
+- "Check for updates" in the sidebar, under the counter status: finds, downloads and installs a newer version right
+  away (also with automatic updates off); the answer shows under the link.
+
+### Fixed
+- The sidebar's bottom links had no room: more space between the status, the links and the window edge.
+
 ## [0.1.0-beta.15] - 2026-10-05
 
 ### Added
