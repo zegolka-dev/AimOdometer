@@ -151,6 +151,7 @@ internal static unsafe partial class Program
 
         static string F(double v) => v.ToString("0.00", CultureInfo.InvariantCulture);
         Console.WriteLine($"Label:                {label}");
+        Console.WriteLine($"Data folder:          {TrackerClient.GetInfo()?.DataDirectory}");
         Console.WriteLine($"Duration:             {seconds} s");
         Console.WriteLine($"CPU cycles (% core):  {cyclePercent:0.000} (precise; {cpuHz / 1e9:0.0} GHz nominal)");
         Console.WriteLine($"CPU time (% core):    avg {F(cpuSamples.Average())}, max {F(cpuSamples.Max())} (coarse, 15.6 ms ticks)");

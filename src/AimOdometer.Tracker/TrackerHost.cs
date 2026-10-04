@@ -953,9 +953,18 @@ internal sealed unsafe class TrackerHost : IDisposable
     }
 
     /// <summary>Asks a tracker running in this session to exit. Returns false if none is running.</summary>
+    /// <summary>
+    /// "--stop": asks the running tracker to exit. Windows drops window messages from a normal process to an elevated
+    /// one (UIPI), so a tracker running as administrator is asked over its pipe, which has a medium integrity label.
+    /// </summary>
     public static bool RequestStopOfRunningInstance()
     {
         var hwnd = User32.FindWindowW(AppIdentity.TrackerWindowClass, null);
-        return hwnd != 0 && User32.PostMessageW(hwnd, User32.WmClose, 0, 0);
+        if (hwnd != 0 && User32.PostMessageW(hwnd, User32.WmClose, 0, 0))
+        {
+            return true;
+        }
+
+        return TrackerClient.Send(TrackerCommand.Shutdown) is [TrackerProtocol.StatusOk, ..];
     }
 }

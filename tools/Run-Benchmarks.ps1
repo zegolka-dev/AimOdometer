@@ -6,7 +6,9 @@
   Publishes nothing: run `dotnet build -c Release` and
   `dotnet publish src/AimOdometer.Tracker -c Release -o artifacts/tracker` first.
   Uses a throw-away data folder, so your real statistics are not touched.
-  Stops any running tracker first. The mouse cursor jitters while the input simulator runs.
+  Stops any running tracker first (also one running as administrator) and refuses to run if another tracker still
+  answers. The mouse cursor jitters while the input simulator runs. Afterwards start the real tracker again (tray
+  shortcut, or `schtasks /run /tn "AimOdometer\Tracker"` in the administrator mode).
 
 .EXAMPLE
   pwsh tools/Run-Benchmarks.ps1 -Seconds 20
@@ -28,9 +30,14 @@ foreach ($exe in $probe, $sim, $tracker) {
 
 function Restart-Tracker([string]$Extra) {
     & $tracker --stop | Out-Null
-    Start-Sleep -Seconds 1
+    Start-Sleep -Seconds 2
     Start-Process $tracker -ArgumentList "--data-dir `"$DataDir`" --measure-latency $TrackerArgs $Extra" | Out-Null
     Start-Sleep -Seconds 2
+    # Never measure (or feed synthetic input to) another tracker: the one answering must write to $DataDir.
+    $folder = (& $probe --seconds 1 | Select-String "^Data folder:\s+(.*)$").Matches.Groups[1].Value.Trim()
+    if (-not $folder -or [IO.Path]::GetFullPath($folder).TrimEnd('\') -ne [IO.Path]::GetFullPath($DataDir).TrimEnd('\')) {
+        throw "The running tracker writes to '$folder', not to the benchmark folder: stop it first (tray menu > Exit)."
+    }
 }
 
 function Invoke-Scenario([string]$Label, [int]$Rate) {

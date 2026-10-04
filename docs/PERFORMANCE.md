@@ -143,9 +143,21 @@ query-limited access, which also works on an elevated process):
 |---|---|---|---|
 | idle, real installed tracker | 0.001 | 1.46 | 0 |
 
-The tracker has grown since phase 2 (achievements, notifications, gear, fair play, elevated mode), and idle cost and
-memory are still far inside the budget. The full synthetic run (`Run-Benchmarks.ps1`) stops the tracker and moves the
-cursor, so it waits for a moment when the PC is not in use.
+Under load (`Run-Benchmarks.ps1 -Seconds 20`, same day). The script's `--stop` could not stop the elevated tracker
+(Windows drops window messages to an elevated process) and the benchmark tracker could not start next to it, so these
+rows measured the author's installed 0.1.0-beta.18 tracker, running as administrator, with the synthetic input. The
+injected moves landed on the "Software input" device, which is excluded from totals, so the real statistics were not
+affected. Since then `--stop` falls back to the pipe and the script refuses to run unless the tracker that answers
+writes to the benchmark folder.
+
+| Scenario | CPU % of one core (cycles) | Private WS max MB | Events/s | Phase 2 (CPU, WS) |
+|---|---|---|---|---|
+| idle | 0.003 | 4.85 | 0 | 0.000, 2.52 |
+| 1000 Hz | 0.353 | 4.89 | 950 | 0.340, 2.59 |
+| 8000 Hz (synthetic) | 0.604 | 4.92 | 2,850 | 0.609, 2.63 |
+
+CPU per event is unchanged since phase 2. The working set is about 2.3 MB larger: the tracker now also evaluates
+achievements, gear and fair-play limits and runs the achievement notifications; still a third of the 15 MB budget.
 
 ## Open items
 

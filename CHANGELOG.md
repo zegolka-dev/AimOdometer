@@ -5,6 +5,11 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), ver
 
 ## [Unreleased]
 
+### Fixed
+- `AimOdometer.Tracker --stop` could not stop a tracker running as administrator (window messages to an elevated
+  process are dropped); it now falls back to the pipe's Shutdown command. `Run-Benchmarks.ps1` refuses to run unless the
+  tracker that answers writes to the benchmark folder; `PerfProbe` prints that folder.
+
 ## [0.1.0-beta.18] - 2026-10-05
 
 ### Added
