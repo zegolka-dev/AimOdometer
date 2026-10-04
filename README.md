@@ -26,6 +26,10 @@ installs it and restarts. This can be switched off in Settings. .NET is included
 The builds are not code-signed yet, so Windows SmartScreen may say "Windows protected your PC": click
 **More info → Run anyway**.
 
+Code signing: free code signing provided by [SignPath.io](https://signpath.io), certificate by
+[SignPath Foundation](https://signpath.org) (being set up; see the
+[code signing policy](https://zegolka-dev.github.io/AimOdometer/code-signing.html)).
+
 ## Why another mouse odometer?
 
 Classic tools (Mousotron, Mouse Odometer, …) measure the **cursor** in screen pixels. In shooters like CS2, Apex or Valorant the cursor is locked to the center while the game reads raw input, so those tools miss most of the movement.

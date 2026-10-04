@@ -39,6 +39,7 @@ T = {
         h1='How far does your mouse <span class="glow">really</span> travel?',
         lead="AimOdometer counts the real centimeters your mouse covers on the pad, not pixels on screen: per game, per mouse, per day. It runs quietly in the tray and turns your aim into kilometers.",
         download="Download for Windows", portable="Portable zip",
+        signing_note='Code signing: free code signing provided by <a href="https://signpath.io">SignPath.io</a>, certificate by <a href="https://signpath.org">SignPath Foundation</a> (being set up; see the <a href="code-signing.html">code signing policy</a>).',
         meta="Version {version} · {size} MB · Windows 10 22H2+ / 11, 64-bit",
         meta_fallback="Windows 10 22H2+ / 11, 64-bit",
         shot_alt="AimOdometer overview: today's distance, this week, this month, all time and a 14-day chart",
@@ -84,6 +85,7 @@ T = {
         h1='Сколько твоя мышь проходит <span class="glow">на самом деле</span>?',
         lead="AimOdometer считает настоящие сантиметры, которые мышь проходит по коврику, а не пиксели на экране: по играм, по мышам, по дням. Он тихо живёт в трее и превращает твой аим в километры.",
         download="Скачать для Windows", portable="Zip без установки",
+        signing_note='Подпись кода: бесплатно от <a href="https://signpath.io">SignPath.io</a>, сертификат от <a href="https://signpath.org">SignPath Foundation</a> (подключается; см. <a href="code-signing.html">политику подписи кода</a>).',
         meta="Версия {version} · {size} МБ · Windows 10 22H2+ / 11, 64-бит",
         meta_fallback="Windows 10 22H2+ / 11, 64-бит",
         shot_alt="Обзор AimOdometer: пробег за сегодня, неделю, месяц, всё время и график за 14 дней",
@@ -249,10 +251,11 @@ def landing(t):
     {faq}
   </div>
 </section>
-<section class="final" aria-labelledby="final-title">
+<section class="final" id="download" aria-labelledby="final-title">
   <div class="wrap">
     <h2 id="final-title">{html.escape(t['final_title'])}</h2>
     {download_buttons(t)}
+    <p class="meta">{t['signing_note']}</p>
   </div>
 </section>"""
     return page(t, "index.html", t["title"], t["description"], body)
