@@ -8,6 +8,7 @@
 - [ ] `tools/Publish-Local.ps1`, then `tools/Test-UiSmoke.ps1` (empty) and `tools/Test-UiSmoke.ps1 -SeedDatabase …`
       (seeded) pass; the smoke test also checks that the window opens no network connections.
 - [ ] Map changed? `tools/Test-Map.ps1` (live services).
+- [ ] UI changed? `tools/Test-Accessibility.ps1 -SeedDatabase …`: every control has a name and is reachable by keyboard.
 - [ ] `<Version>` in `Directory.Build.props` bumped (SemVer; `-beta.N` while in beta).
 - [ ] `CHANGELOG.md`: a section for the version.
 - [ ] `data/whatsnew.json`: the user-facing notes for the version, in English and Russian (shown once after the update).

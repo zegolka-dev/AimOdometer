@@ -6,7 +6,7 @@
              x:Name="Root">
   <StackPanel>
     <DockPanel Margin="0,0,0,20">
-      <Button DockPanel.Dock="Right" Style="{StaticResource SecondaryButton}" VerticalAlignment="Top"
+      <Button AutomationProperties.Name="{l:T Share.Button}" DockPanel.Dock="Right" Style="{StaticResource SecondaryButton}" VerticalAlignment="Top"
               Command="{Binding DataContext.OpenShareCommand, RelativeSource={RelativeSource AncestorType=Window}}" CommandParameter="TopGames">
         <StackPanel Orientation="Horizontal">
           <TextBlock Style="{StaticResource Icon}" Text="&#xE72D;" Margin="0,0,8,0" />

@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Политика подписи кода · AimOdometer</title>
+<meta name="description" content="Бесплатная программа для геймеров под Windows: реальный пробег мыши по коврику по играм, мышам и дням. Ачивки, карта мира и рейтинги с друзьями из Steam.">
+<link rel="canonical" href="https://zegolka-dev.github.io/AimOdometer/ru/code-signing.html">
+<link rel="alternate" hreflang="en" href="https://zegolka-dev.github.io/AimOdometer/code-signing.html">
+<link rel="alternate" hreflang="ru" href="https://zegolka-dev.github.io/AimOdometer/ru/code-signing.html">
+<meta property="og:title" content="Политика подписи кода · AimOdometer">
+<meta property="og:description" content="Бесплатная программа для геймеров под Windows: реальный пробег мыши по коврику по играм, мышам и дням. Ачивки, карта мира и рейтинги с друзьями из Steam.">
+<meta property="og:image" content="https://zegolka-dev.github.io/AimOdometer/assets/og.png">
+<meta property="og:type" content="website">
+<meta name="theme-color" content="#0F0F23">
+<link rel="icon" type="image/png" href="../assets/favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Russo+One&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../style.css">
+</head>
+<body>
+<a class="skip" href="#main">Перейти к содержимому</a>
+<header class="top">
+  <div class="wrap">
+    <a class="brand" href="../ru/index.html"><img src="../assets/logo.png" alt="" width="32" height="32">AimOdometer</a>
+    <nav aria-label="Main">
+      <a href="../ru/index.html#features">Возможности</a>
+      <a href="anticheat.html">Античиты</a>
+      <a href="privacy.html">Приватность</a>
+      <a class="lang" href="../code-signing.html" hreflang="en" lang="en">English</a>
+    </nav>
+  </div>
+</header>
+<main id="main">
+<div class="wrap doc">
+<h1>Политика подписи кода</h1>
+<p>Программы для Windows подписывают, чтобы Windows и антивирусы видели, кто их выпустил и что по дороге их никто не изменил. AimOdometer будет подписываться бесплатно по программе SignPath Foundation для проектов с открытым кодом.</p>
+<p><strong>Free code signing provided by <a href="https://signpath.io">SignPath.io</a>, certificate by <a href="https://signpath.org">SignPath Foundation</a>.</strong> (Бесплатная подпись кода от SignPath.io, сертификат от SignPath Foundation.)</p>
+
+<h2>Что подписывается</h2>
+<ul>
+  <li>Программы AimOdometer: <code>AimOdometer.App.exe</code> (окно), <code>AimOdometer.Tracker.exe</code> (счётчик) и собственные библиотеки AimOdometer, а также установщик <code>AimOdometerApp-win-Setup.exe</code>.</li>
+  <li>Только файлы, собранные <a href="https://github.com/zegolka-dev/AimOdometer/actions">GitHub Actions</a> из отмеченного версией коммита открытого репозитория <a href="https://github.com/zegolka-dev/AimOdometer">zegolka-dev/AimOdometer</a>. То, что собрано на чьём-то компьютере, не подписывается никогда.</li>
+  <li>Чужие файлы, которые идут вместе с программой (среда .NET, SQLite, загрузчик WebView2, MapLibre), сохраняют подписи своих авторов или остаются без подписи; сертификат AimOdometer для них не используется.</li>
+</ul>
+
+<h2>Роли в команде</h2>
+<table>
+  <thead><tr><th>Роль</th><th>Кто</th></tr></thead>
+  <tbody>
+    <tr><td>Авторы кода и проверяющие</td><td><a href="https://github.com/zegolka-dev">zegolka-dev</a></td></tr>
+    <tr><td>Утверждающие (вручную одобряют каждую подпись)</td><td><a href="https://github.com/zegolka-dev">zegolka-dev</a></td></tr>
+  </tbody>
+</table>
+<p>Все участники входят в GitHub и SignPath с двухфакторной защитой. Изменения от других людей приходят как pull request и проверяются до слияния.</p>
+
+<h2>Конфиденциальность</h2>
+<p>Программа ничего не передаёт в другие сетевые системы, если пользователь сам этого не попросил, с одним исключением, которое включено по умолчанию и отключается: она спрашивает у GitHub, есть ли новая версия. Всё остальное (карта, вход через Steam и таблицы лидеров) работает только после того, как пользователь это включит. Подробности в <a href="privacy.html">политике приватности</a>.</p>
+
+<h2>Если что-то не так</h2>
+<p>Если тебе кажется, что подписанный файл AimOdometer делает то, чего не должен, напиши issue на <a href="https://github.com/zegolka-dev/AimOdometer/issues">GitHub</a>.</p>
+
+</div>
+</main>
+<footer>
+  <div class="wrap">
+    <span>© 2026 AimOdometer · Лицензия MIT</span>
+    <nav aria-label="Footer">
+      <a href="https://github.com/zegolka-dev/AimOdometer">Код на GitHub</a>
+      <a href="privacy.html">Приватность</a>
+      <a href="anticheat.html">Античиты</a>
+      <a href="code-signing.html">Подпись кода</a>
+      <a href="https://github.com/zegolka-dev/AimOdometer/releases">Releases</a>
+    </nav>
+  </div>
+</footer>
+<script src="../download.js" defer></script>
+</body>
+</html>

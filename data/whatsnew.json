@@ -1,6 +1,17 @@
 {
   "releases": [
     {
+      "version": "0.1.0-beta.18",
+      "en": [
+        "The Steam page does not load when you sign in? After 20 seconds AimOdometer explains why and offers to open it again.",
+        "Better for screen readers and easier to read: every button has a name, and the colors have more contrast."
+      ],
+      "ru": [
+        "Страница Steam не грузится при входе? Через 20 секунд AimOdometer подскажет почему и предложит открыть её ещё раз.",
+        "Удобнее с экранным диктором и легче читать: у всех кнопок есть названия, а цвета стали контрастнее."
+      ]
+    },
+    {
       "version": "0.1.0-beta.17",
       "en": [
         "Texts throughout the app read more naturally."

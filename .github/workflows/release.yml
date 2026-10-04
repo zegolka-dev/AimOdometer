@@ -44,6 +44,43 @@ jobs:
           dotnet publish src/AimOdometer.Tracker -c Release -o publish -p:Version=$env:VERSION
           Get-ChildItem publish -Filter *.pdb | Remove-Item
 
+      # ---- Code signing (SignPath Foundation; docs/CODE_SIGNING.md). Off until the repository variable
+      # SIGNPATH_ORGANIZATION_ID is set; every request waits for a manual approval in SignPath.
+      - name: Collect AimOdometer's own binaries for signing
+        if: ${{ vars.SIGNPATH_ORGANIZATION_ID != '' }}
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory unsigned | Out-Null
+          Get-ChildItem publish -File | Where-Object { $_.Name -like 'AimOdometer.*' -and $_.Extension -in '.exe', '.dll' } |
+            Copy-Item -Destination unsigned
+
+      - name: Upload binaries to sign
+        if: ${{ vars.SIGNPATH_ORGANIZATION_ID != '' }}
+        id: unsigned-binaries
+        uses: actions/upload-artifact@v4
+        with:
+          name: unsigned-binaries
+          path: unsigned/
+
+      - name: Sign binaries (SignPath)
+        if: ${{ vars.SIGNPATH_ORGANIZATION_ID != '' }}
+        uses: signpath/github-action-submit-signing-request@v1
+        with:
+          api-token: ${{ secrets.SIGNPATH_API_TOKEN }}
+          organization-id: ${{ vars.SIGNPATH_ORGANIZATION_ID }}
+          project-slug: ${{ vars.SIGNPATH_PROJECT_SLUG }}
+          signing-policy-slug: ${{ vars.SIGNPATH_POLICY_SLUG }}
+          artifact-configuration-slug: binaries
+          github-artifact-id: ${{ steps.unsigned-binaries.outputs.artifact-id }}
+          wait-for-completion: true
+          wait-for-completion-timeout-in-seconds: 3600
+          output-artifact-directory: signed
+
+      - name: Put the signed binaries back
+        if: ${{ vars.SIGNPATH_ORGANIZATION_ID != '' }}
+        shell: pwsh
+        run: Copy-Item signed/* publish -Force
+
       - name: Install vpk
         run: dotnet tool restore
 
@@ -58,6 +95,33 @@ jobs:
           "AimOdometer $env:VERSION. What changed: https://github.com/${{ github.repository }}/blob/main/CHANGELOG.md" | Set-Content notes.md
           dotnet vpk pack --packId AimOdometerApp --packVersion $env:VERSION --packDir publish --mainExe AimOdometer.App.exe `
             --packTitle AimOdometer --packAuthors zegolka-dev --icon assets/icon.ico --releaseNotes notes.md -o releases
+
+      - name: Upload the installer to sign
+        if: ${{ vars.SIGNPATH_ORGANIZATION_ID != '' }}
+        id: unsigned-setup
+        uses: actions/upload-artifact@v4
+        with:
+          name: unsigned-setup
+          path: releases/AimOdometerApp-win-Setup.exe
+
+      - name: Sign the installer (SignPath)
+        if: ${{ vars.SIGNPATH_ORGANIZATION_ID != '' }}
+        uses: signpath/github-action-submit-signing-request@v1
+        with:
+          api-token: ${{ secrets.SIGNPATH_API_TOKEN }}
+          organization-id: ${{ vars.SIGNPATH_ORGANIZATION_ID }}
+          project-slug: ${{ vars.SIGNPATH_PROJECT_SLUG }}
+          signing-policy-slug: ${{ vars.SIGNPATH_POLICY_SLUG }}
+          artifact-configuration-slug: installer
+          github-artifact-id: ${{ steps.unsigned-setup.outputs.artifact-id }}
+          wait-for-completion: true
+          wait-for-completion-timeout-in-seconds: 3600
+          output-artifact-directory: signed-setup
+
+      - name: Put the signed installer back
+        if: ${{ vars.SIGNPATH_ORGANIZATION_ID != '' }}
+        shell: pwsh
+        run: Copy-Item signed-setup/AimOdometerApp-win-Setup.exe releases -Force
 
       - name: Upload to GitHub Releases
         shell: pwsh

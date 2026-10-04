@@ -41,6 +41,17 @@ internal static unsafe partial class Program
         return (key?.GetValue("~MHz") is int mhz && mhz > 0 ? mhz : 3000) * 1_000_000.0;
     }
 
+    // Query-limited access is enough for cycles and memory, and it works on a tracker running as administrator
+    // (Process.Handle asks for full access, which a normal process cannot get on an elevated one).
+    private const uint ProcessQueryLimitedInformation = 0x1000;
+
+    [LibraryImport("kernel32.dll", SetLastError = true)]
+    private static partial nint OpenProcess(uint access, [MarshalAs(UnmanagedType.Bool)] bool inherit, int processId);
+
+    [LibraryImport("kernel32.dll")]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    private static partial bool CloseHandle(nint handle);
+
     [LibraryImport("psapi.dll", SetLastError = true)]
     [return: MarshalAs(UnmanagedType.Bool)]
     private static partial bool GetProcessMemoryInfo(nint process, ProcessMemoryCountersEx2* counters, uint size);
@@ -93,6 +104,12 @@ internal static unsafe partial class Program
         }
 
         using var tracker = Process.GetProcessById(pid);
+        var handle = OpenProcess(ProcessQueryLimitedInformation, false, pid);
+        if (handle == 0)
+        {
+            Console.Error.WriteLine($"Cannot open the tracker process (error {Marshal.GetLastPInvokeError()}).");
+            return 1;
+        }
 
         var before = TrackerClient.GetStatus();
         var cpuSamples = new List<double>();
@@ -102,7 +119,7 @@ internal static unsafe partial class Program
         var lastWall = Stopwatch.GetTimestamp();
         var cpuHz = CpuHz();
         ulong cyclesStart;
-        QueryProcessCycleTime(tracker.Handle, &cyclesStart);
+        QueryProcessCycleTime(handle, &cyclesStart);
         var wallStart = lastWall;
 
         for (var i = 0; i < seconds; i++)
@@ -116,7 +133,7 @@ internal static unsafe partial class Program
             lastWall = wall;
 
             var counters = new ProcessMemoryCountersEx2 { Cb = (uint)sizeof(ProcessMemoryCountersEx2) };
-            if (GetProcessMemoryInfo(tracker.Handle, &counters, counters.Cb))
+            if (GetProcessMemoryInfo(handle, &counters, counters.Cb))
             {
                 privateWs.Add(counters.PrivateWorkingSetSize / 1048576.0);
                 privateBytes.Add(counters.PrivateUsage / 1048576.0);
@@ -124,7 +141,7 @@ internal static unsafe partial class Program
         }
 
         ulong cyclesEnd;
-        QueryProcessCycleTime(tracker.Handle, &cyclesEnd);
+        QueryProcessCycleTime(handle, &cyclesEnd);
         var cyclePercent = (cyclesEnd - cyclesStart) / cpuHz / Stopwatch.GetElapsedTime(wallStart).TotalSeconds * 100;
 
         var after = TrackerClient.GetStatus();
@@ -150,6 +167,7 @@ internal static unsafe partial class Program
         Console.WriteLine();
         Console.WriteLine("| Scenario | CPU % of one core (cycles) | Private WS max MB | Events/s | Wake-ups/s | Alloc bytes |");
         Console.WriteLine($"| {label} | {cyclePercent:0.000} | {F(privateWs.DefaultIfEmpty().Max())} | {F(events / (double)seconds)} | {F(batches / (double)seconds)} | {allocated:N0} |");
+        CloseHandle(handle);
         return 0;
     }
 

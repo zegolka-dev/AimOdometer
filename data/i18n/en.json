@@ -562,5 +562,10 @@
   "Title.creator": "Creator",
   "Title.creator.Desc": "Made AimOdometer.",
   "Title.beta-tester": "Beta tester",
-  "Title.beta-tester.Desc": "Tested AimOdometer before its release."
+  "Title.beta-tester.Desc": "Tested AimOdometer before its release.",
+  "Cloud.SlowTitle": "Is the Steam page not loading?",
+  "Cloud.SlowText": "Some internet providers block steamcommunity.com, where Steam signs you in. Turn on a VPN just for this minute and open the page again. You stay signed in afterwards, so the VPN is needed only once.",
+  "Cloud.ReopenPage": "Open the Steam page again",
+  "Stats.CustomFrom": "Period start",
+  "Stats.CustomTo": "Period end"
 }

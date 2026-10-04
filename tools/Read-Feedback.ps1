@@ -7,6 +7,9 @@
 #>
 param([int]$Count = 20)
 
+# The Supabase CLI writes UTF-8; Windows PowerShell would decode it with the OEM code page.
+[Console]::OutputEncoding = [Text.Encoding]::UTF8
+
 $root = Split-Path $PSScriptRoot -Parent
 Push-Location $root
 try {

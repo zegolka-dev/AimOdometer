@@ -5,6 +5,22 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), ver
 
 ## [Unreleased]
 
+## [0.1.0-beta.18] - 2026-10-05
+
+### Added
+- Steam sign-in that has not come back after 20 s shows why that usually happens (providers blocking
+  steamcommunity.com: a VPN for that minute helps, the sign-in is kept) and a button to open the Steam page again.
+- `tools/Test-Accessibility.ps1`: visits every page and fails on controls without an accessible name or out of keyboard
+  reach. Code signing policy page on the site, `docs/CODE_SIGNING.md`, and SignPath steps in `release.yml` (skipped
+  until the SignPath variables exist).
+
+### Fixed
+- Screen readers announced icon-and-text buttons (Share, Sign in with Steam, Measure DPI, Check for updates,
+  Complaints and suggestions, onboarding Next) and date pickers as nameless.
+- Contrast to WCAG AA: muted text, white text on violet buttons and on the Creator tag reach 4.5:1.
+- What's new and the onboarding mouse list no longer put text under the scroll bar.
+- `PerfProbe` works on a tracker running as administrator; `Read-Feedback.ps1` prints Cyrillic correctly.
+
 ## [0.1.0-beta.17] - 2026-10-05
 
 ### Changed

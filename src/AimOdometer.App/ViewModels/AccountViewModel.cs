@@ -39,6 +39,10 @@ public sealed partial class AccountViewModel : ObservableObject
     [ObservableProperty]
     public partial bool IsSignedOut { get; set; }
 
+    /// <summary>The Steam page has not come back for a while: show why that usually happens.</summary>
+    [ObservableProperty]
+    public partial bool IsSignInSlow { get; set; }
+
     [ObservableProperty]
     public partial string PersonaName { get; set; } = string.Empty;
 
@@ -90,6 +94,9 @@ public sealed partial class AccountViewModel : ObservableObject
     private void CancelSignIn() => _cloud.CancelSignIn();
 
     [RelayCommand]
+    private void ReopenSignInPage() => _cloud.ReopenSignInPage();
+
+    [RelayCommand]
     private Task SyncNowAsync() => _cloud.SyncAsync();
 
     [RelayCommand]
@@ -118,6 +125,7 @@ public sealed partial class AccountViewModel : ObservableObject
         var session = _cloud.Client.Session;
         IsSignedIn = session is not null;
         IsSigningIn = _cloud.State == CloudState.SigningIn;
+        IsSignInSlow = IsSigningIn && _cloud.IsSignInSlow;
         IsSignedOut = !IsSignedIn && !IsSigningIn;
         PersonaName = session is null ? string.Empty
             : session.PersonaName.Length > 0 ? session.PersonaName : session.SteamId;

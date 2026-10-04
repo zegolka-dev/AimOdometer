@@ -13,7 +13,7 @@
           <Button Style="{StaticResource LinkButton}" Content="{l:T Onboarding.Skip}" Command="{Binding SkipCommand}" Margin="0,0,16,0" VerticalAlignment="Center" />
           <Button Style="{StaticResource SecondaryButton}" Content="{l:T Common.Back}" Command="{Binding BackCommand}" Margin="0,0,8,0"
                   Visibility="{Binding CanGoBack, Converter={StaticResource BoolToVisibility}}" />
-          <Button Style="{StaticResource PrimaryButton}" Command="{Binding NextCommand}" IsDefault="True" AutomationProperties.AutomationId="OnboardingNext">
+          <Button AutomationProperties.Name="{l:T Common.Next}" Style="{StaticResource PrimaryButton}" Command="{Binding NextCommand}" IsDefault="True" AutomationProperties.AutomationId="OnboardingNext">
             <TextBlock>
               <TextBlock.Style>
                 <Style TargetType="TextBlock">
@@ -68,7 +68,7 @@
           <TextBlock Style="{StaticResource PageTitle}" Text="{l:T Onboarding.MouseTitle}" />
           <TextBlock Style="{StaticResource PageSubtitle}" Text="{l:T Onboarding.MouseText}" Margin="0,4,0,16" />
           <ScrollViewer MaxHeight="300" VerticalScrollBarVisibility="Auto">
-            <ItemsControl ItemsSource="{Binding Mice.Devices}" ItemTemplate="{StaticResource DeviceRowTemplate}" />
+            <ItemsControl ItemsSource="{Binding Mice.Devices}" ItemTemplate="{StaticResource DeviceRowTemplate}" Margin="0,0,14,0" />
           </ScrollViewer>
           <TextBlock Style="{StaticResource Hint}" Text="{l:T Onboarding.DpiHint}" FontSize="13" Margin="0,4,0,0" />
         </StackPanel>

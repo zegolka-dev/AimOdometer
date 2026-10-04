@@ -56,7 +56,7 @@
         </StackPanel>
 
         <StackPanel Grid.Column="2" VerticalAlignment="Top" HorizontalAlignment="Right">
-          <Button Style="{StaticResource SecondaryButton}" Command="{Binding CalibrateCommand}" Margin="0,0,0,12"
+          <Button AutomationProperties.Name="{l:T Gear.Calibrate}" Style="{StaticResource SecondaryButton}" Command="{Binding CalibrateCommand}" Margin="0,0,0,12"
                   Visibility="{Binding CanCalibrate, Converter={StaticResource BoolToVisibility}}">
             <StackPanel Orientation="Horizontal">
               <TextBlock Style="{StaticResource Icon}" Text="&#xED5E;" Margin="0,0,8,0" />

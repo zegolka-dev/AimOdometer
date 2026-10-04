@@ -9,7 +9,7 @@
   <Color x:Key="BorderStrongColor">#3B2A6B</Color>
   <Color x:Key="TextPrimaryColor">#E2E8F0</Color>
   <Color x:Key="TextSecondaryColor">#94A3B8</Color>
-  <Color x:Key="TextMutedColor">#7C86A2</Color>
+  <Color x:Key="TextMutedColor">#8A93AD</Color> <!-- 4.5:1 even on hovered surfaces (WCAG AA) -->
   <Color x:Key="AccentColor">#8B5CF6</Color>
   <!-- Lighter violet for accent TEXT: #8B5CF6 on the background is below 4.5:1 contrast. -->
   <Color x:Key="AccentTextColor">#B9A4FC</Color>
@@ -35,14 +35,16 @@
   <SolidColorBrush x:Key="SuccessBrush" Color="{StaticResource SuccessColor}" />
   <SolidColorBrush x:Key="WarningBrush" Color="{StaticResource WarningColor}" />
   <SolidColorBrush x:Key="DangerBrush" Color="{StaticResource DangerColor}" />
+  <!-- Filled buttons: a shade deeper than the accent so white text keeps 4.5:1 (5.7:1, 4.8:1 while hovered). -->
+  <SolidColorBrush x:Key="PrimaryButtonBrush" Color="#7C3AED" />
   <SolidColorBrush x:Key="DangerSoftBrush" Color="{StaticResource DangerColor}" Opacity="0.16" />
 
   <!-- Leaderboard titles: the creator wears the app's violet (with a glow in the view), beta testers sky blue. -->
   <LinearGradientBrush x:Key="CreatorTagBrush" StartPoint="0,0" EndPoint="1,1">
-    <GradientStop Color="#7C3AED" Offset="0" />
-    <GradientStop Color="#A78BFA" Offset="1" />
+    <GradientStop Color="#6D28D9" Offset="0" />
+    <GradientStop Color="#7C3AED" Offset="1" />
   </LinearGradientBrush>
-  <SolidColorBrush x:Key="CreatorTagBorderBrush" Color="#C4B5FD" />
+  <SolidColorBrush x:Key="CreatorTagBorderBrush" Color="#A78BFA" />
   <SolidColorBrush x:Key="BetaTagBrush" Color="#38BDF8" />
   <SolidColorBrush x:Key="BetaTagSoftBrush" Color="#38BDF8" Opacity="0.14" />
 

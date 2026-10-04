@@ -73,6 +73,7 @@ T = {
         footer_license="MIT license", footer_source="Source on GitHub",
         privacy_page_title="Privacy policy",
         anticheat_page_title="Anti-cheat safety",
+        signing_page_title="Code signing policy", nav_signing="Code signing",
     ),
     "ru": dict(
         lang="ru", other="en", other_label="English", prefix="../",
@@ -117,6 +118,7 @@ T = {
         footer_license="Лицензия MIT", footer_source="Код на GitHub",
         privacy_page_title="Политика приватности",
         anticheat_page_title="Безопасность для античитов",
+        signing_page_title="Политика подписи кода", nav_signing="Подпись кода",
     ),
 }
 
@@ -169,6 +171,7 @@ def page(t, file, title, description, body):
       <a href="{REPO}">{t['footer_source']}</a>
       <a href="privacy.html">{t['nav_privacy']}</a>
       <a href="anticheat.html">{t['nav_safety']}</a>
+      <a href="code-signing.html">{t['nav_signing']}</a>
       <a href="{RELEASES}">Releases</a>
     </nav>
   </div>
@@ -270,7 +273,8 @@ if __name__ == "__main__":
     for code, t in T.items():
         folder = ROOT if code == "en" else os.path.join(ROOT, "ru")
         write(os.path.join(folder, "index.html"), landing(t))
-        for file, key in (("privacy.html", "privacy_page_title"), ("anticheat.html", "anticheat_page_title")):
+        for file, key in (("privacy.html", "privacy_page_title"), ("anticheat.html", "anticheat_page_title"),
+                          ("code-signing.html", "signing_page_title")):
             source = os.path.join(ROOT, "content", f"{file.replace('.html', '')}.{code}.html")
             with open(source, encoding="utf-8") as f:
                 write(os.path.join(folder, file), document(t, file, t[key], f.read()))

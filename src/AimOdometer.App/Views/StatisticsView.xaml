@@ -16,9 +16,9 @@
       <RadioButton Style="{StaticResource Segment}" GroupName="Range" Content="{l:T Stats.RangeAll}" IsChecked="{Binding Range, Converter={StaticResource EnumEquals}, ConverterParameter=All}" />
       <RadioButton Style="{StaticResource Segment}" GroupName="Range" Content="{l:T Stats.RangeCustom}" IsChecked="{Binding Range, Converter={StaticResource EnumEquals}, ConverterParameter=Custom}" />
       <StackPanel Orientation="Horizontal" Margin="8,0,0,0" Visibility="{Binding IsCustom, Converter={StaticResource BoolToVisibility}}">
-        <DatePicker SelectedDate="{Binding CustomFrom}" Width="140" />
+        <DatePicker AutomationProperties.Name="{l:T Stats.CustomFrom}" SelectedDate="{Binding CustomFrom}" Width="140" />
         <TextBlock Text="-" Margin="8,0" VerticalAlignment="Center" Foreground="{StaticResource TextSecondaryBrush}" />
-        <DatePicker SelectedDate="{Binding CustomTo}" Width="140" />
+        <DatePicker AutomationProperties.Name="{l:T Stats.CustomTo}" SelectedDate="{Binding CustomTo}" Width="140" />
       </StackPanel>
     </WrapPanel>
 

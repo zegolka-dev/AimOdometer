@@ -133,6 +133,20 @@ exception with a fast-fail (`0xC0000409`), and Windows Error Reporting does not 
 Verified with the `--crash-after 10` test hook: the worker fast-failed, was restarted within 2 s without the hook, and
 `--stop` then ended both processes.
 
+## Re-measured in phase 10 (2026-10-05, 0.1.0-beta.17)
+
+The author's installed tracker, running with administrator rights (the "count games that run as administrator" mode),
+measured passively for 60 s without stopping it (`PerfProbe --seconds 60`; the probe now opens the tracker with
+query-limited access, which also works on an elevated process):
+
+| Scenario | CPU % of one core (cycles) | Private WS MB | Events/s |
+|---|---|---|---|
+| idle, real installed tracker | 0.001 | 1.46 | 0 |
+
+The tracker has grown since phase 2 (achievements, notifications, gear, fair play, elevated mode), and idle cost and
+memory are still far inside the budget. The full synthetic run (`Run-Benchmarks.ps1`) stops the tracker and moves the
+cursor, so it waits for a moment when the PC is not in use.
+
 ## Open items
 
 - ~~Real high-rate mouse~~: confirmed, hardware input is coalesced to ~125/s for background listeners (0.116 % CPU).

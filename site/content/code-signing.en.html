@@ -1,0 +1,25 @@
+<p>Windows programs are signed so that Windows and antivirus software can tell who published them and that nobody changed them on the way. AimOdometer is going to be signed for free through the SignPath Foundation program for open-source projects.</p>
+<p><strong>Free code signing provided by <a href="https://signpath.io">SignPath.io</a>, certificate by <a href="https://signpath.org">SignPath Foundation</a>.</strong></p>
+
+<h2>What is signed</h2>
+<ul>
+  <li>The programs of AimOdometer: <code>AimOdometer.App.exe</code> (the window), <code>AimOdometer.Tracker.exe</code> (the counter) and AimOdometer's own libraries, plus the installer <code>AimOdometerApp-win-Setup.exe</code>.</li>
+  <li>Only files built by <a href="https://github.com/zegolka-dev/AimOdometer/actions">GitHub Actions</a> from a tagged commit of the public repository <a href="https://github.com/zegolka-dev/AimOdometer">zegolka-dev/AimOdometer</a>. Nothing built on a personal computer is ever signed.</li>
+  <li>Third-party files that ship with the app (the .NET runtime, SQLite, WebView2 loader, MapLibre) keep the signatures of their authors or stay unsigned; AimOdometer's certificate is not used for them.</li>
+</ul>
+
+<h2>Team roles</h2>
+<table>
+  <thead><tr><th>Role</th><th>Who</th></tr></thead>
+  <tbody>
+    <tr><td>Committers and reviewers</td><td><a href="https://github.com/zegolka-dev">zegolka-dev</a></td></tr>
+    <tr><td>Approvers (approve every signing request by hand)</td><td><a href="https://github.com/zegolka-dev">zegolka-dev</a></td></tr>
+  </tbody>
+</table>
+<p>Every team member uses multi-factor authentication on GitHub and SignPath. Changes from other people come in as pull requests and are reviewed before they are merged.</p>
+
+<h2>Privacy</h2>
+<p>This program will not transfer any information to other networked systems unless the user asks for it, with one exception that is on by default and can be switched off: it asks GitHub whether a newer version exists. Everything else (the map, Steam sign-in and leaderboards) happens only when the user turns it on. The details are in the <a href="privacy.html">privacy policy</a>.</p>
+
+<h2>Reporting a problem</h2>
+<p>If you believe a signed AimOdometer file does something it should not, open an issue on <a href="https://github.com/zegolka-dev/AimOdometer/issues">GitHub</a>.</p>

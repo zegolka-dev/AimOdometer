@@ -562,5 +562,10 @@
   "Title.creator": "Создатель",
   "Title.creator.Desc": "Сделал AimOdometer.",
   "Title.beta-tester": "Бета-тестер",
-  "Title.beta-tester.Desc": "Тестировал AimOdometer до выхода."
+  "Title.beta-tester.Desc": "Тестировал AimOdometer до выхода.",
+  "Cloud.SlowTitle": "Страница Steam не грузится?",
+  "Cloud.SlowText": "Некоторые провайдеры блокируют steamcommunity.com, где Steam проводит вход. Включи VPN на эту минуту и открой страницу ещё раз. Вход сохранится, так что VPN нужен только один раз.",
+  "Cloud.ReopenPage": "Открыть страницу Steam ещё раз",
+  "Stats.CustomFrom": "Начало периода",
+  "Stats.CustomTo": "Конец периода"
 }

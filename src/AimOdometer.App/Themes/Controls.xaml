@@ -103,6 +103,12 @@
     </Setter>
   </Style>
 
+  <!-- Date pickers: the inner text box is what a screen reader focuses; give it the picker's name. -->
+  <Style TargetType="DatePickerTextBox" BasedOn="{StaticResource {x:Type DatePickerTextBox}}">
+    <Setter Property="AutomationProperties.Name"
+            Value="{Binding (AutomationProperties.Name), RelativeSource={RelativeSource AncestorType=DatePicker}}" />
+  </Style>
+
   <!-- Surfaces -->
   <Style x:Key="Card" TargetType="Border">
     <Setter Property="Background" Value="{StaticResource SurfaceBrush}" />
@@ -212,10 +218,10 @@
     <Setter Property="Template">
       <Setter.Value>
         <ControlTemplate TargetType="Button">
-          <Border x:Name="Root" Background="{StaticResource AccentBrush}" CornerRadius="10" RenderTransformOrigin="0.5,0.5">
+          <Border x:Name="Root" Background="{StaticResource PrimaryButtonBrush}" CornerRadius="10" RenderTransformOrigin="0.5,0.5">
             <Border.RenderTransform><ScaleTransform x:Name="Scale" /></Border.RenderTransform>
             <Grid>
-              <Border x:Name="Hover" Background="#24FFFFFF" CornerRadius="9" Opacity="0" />
+              <Border x:Name="Hover" Background="#1AFFFFFF" CornerRadius="9" Opacity="0" />
               <ContentPresenter HorizontalAlignment="Center" Margin="18,9" />
             </Grid>
           </Border>

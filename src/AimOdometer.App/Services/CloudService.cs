@@ -48,6 +48,16 @@ public sealed partial class CloudService : ObservableObject, IDisposable
     [ObservableProperty]
     public partial CloudState State { get; set; }
 
+    /// <summary>
+    /// Signing in takes longer than <see cref="SlowSignIn"/>: usually the Steam page does not load at all (some
+    /// providers block steamcommunity.com). The window then offers a hint and to open the page again.
+    /// </summary>
+    [ObservableProperty]
+    public partial bool IsSignInSlow { get; set; }
+
+    private static readonly TimeSpan SlowSignIn = TimeSpan.FromSeconds(20);
+    private Uri? _signInPage;
+
     [ObservableProperty]
     public partial DateTimeOffset? LastSync { get; set; }
 
@@ -93,10 +103,15 @@ public sealed partial class CloudService : ObservableObject, IDisposable
         _signIn = new CancellationTokenSource();
         State = CloudState.SigningIn;
         Problem = null;
+        IsSignInSlow = false;
+        var signIn = _signIn;
+        _ = Task.Delay(SlowSignIn, signIn.Token).ContinueWith(
+            t => { if (!t.IsCanceled && State == CloudState.SigningIn) { IsSignInSlow = true; } },
+            CancellationToken.None, TaskContinuationOptions.None, TaskScheduler.FromCurrentSynchronizationContext());
         try
         {
             var pages = new SignInPages(L["Cloud.PageSuccessTitle"], L["Cloud.PageSuccessText"], L["Cloud.PageFailureTitle"], L["Cloud.PageFailureText"]);
-            await SteamSignIn.SignInAsync(Client, OpenBrowser, pages, _signIn.Token);
+            await SteamSignIn.SignInAsync(Client, page => OpenBrowser(_signInPage = page), pages, _signIn.Token);
             UpdateState();
             await RefreshProfileThenSyncAsync();
         }
@@ -113,11 +128,22 @@ public sealed partial class CloudService : ObservableObject, IDisposable
         {
             _signIn.Dispose();
             _signIn = null;
+            _signInPage = null;
+            IsSignInSlow = false;
             UpdateState();
         }
     }
 
     public void CancelSignIn() => _signIn?.Cancel();
+
+    /// <summary>Opens the same sign-in page again (after switching on a VPN, or in another browser tab).</summary>
+    public void ReopenSignInPage()
+    {
+        if (_signInPage is { } page)
+        {
+            OpenBrowser(page);
+        }
+    }
 
     public async Task SyncAsync()
     {

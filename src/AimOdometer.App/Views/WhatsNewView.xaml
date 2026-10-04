@@ -12,7 +12,7 @@
       <Button DockPanel.Dock="Bottom" Style="{StaticResource PrimaryButton}" Content="{l:T WhatsNew.Ok}" Command="{Binding CloseCommand}"
               HorizontalAlignment="Right" Margin="0,18,0,0" AutomationProperties.AutomationId="WhatsNewOk" />
       <ScrollViewer VerticalScrollBarVisibility="Auto">
-        <ItemsControl ItemsSource="{Binding Releases}">
+        <ItemsControl ItemsSource="{Binding Releases}" Margin="0,0,18,0"> <!-- room for the overlay scroll bar -->
           <ItemsControl.ItemTemplate>
             <DataTemplate>
               <StackPanel Margin="0,0,0,14">

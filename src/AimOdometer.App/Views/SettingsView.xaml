@@ -14,7 +14,7 @@
         <!-- Signed out -->
         <StackPanel Visibility="{Binding IsSignedOut, Converter={StaticResource BoolToVisibility}}">
           <TextBlock Text="{l:T Cloud.Pitch}" TextWrapping="Wrap" FontSize="14" LineHeight="21" Foreground="{StaticResource TextSecondaryBrush}" />
-          <Button Style="{StaticResource PrimaryButton}" Command="{Binding SignInCommand}" HorizontalAlignment="Left" Margin="0,16,0,0"
+          <Button AutomationProperties.Name="{l:T Cloud.SignIn}" Style="{StaticResource PrimaryButton}" Command="{Binding SignInCommand}" HorizontalAlignment="Left" Margin="0,16,0,0"
                   AutomationProperties.AutomationId="CloudSignIn">
             <StackPanel Orientation="Horizontal">
               <TextBlock Style="{StaticResource Icon}" Text="&#xE77B;" Margin="0,0,8,0" />
@@ -27,6 +27,16 @@
         <!-- Waiting for the browser -->
         <StackPanel Visibility="{Binding IsSigningIn, Converter={StaticResource BoolToVisibility}}">
           <TextBlock Text="{l:T Cloud.ContinueInBrowser}" TextWrapping="Wrap" FontSize="14" />
+          <!-- The Steam page did not come back: usually steamcommunity.com is blocked by the provider. -->
+          <Border Background="{StaticResource AccentSoftBrush}" CornerRadius="10" Padding="14,10" Margin="0,12,0,0"
+                  Visibility="{Binding IsSignInSlow, Converter={StaticResource BoolToVisibility}}">
+            <StackPanel>
+              <TextBlock Text="{l:T Cloud.SlowTitle}" FontSize="14" FontWeight="SemiBold" />
+              <TextBlock Text="{l:T Cloud.SlowText}" Style="{StaticResource Hint}" FontSize="13" TextWrapping="Wrap" Margin="0,4,0,8" />
+              <Button Style="{StaticResource SecondaryButton}" Content="{l:T Cloud.ReopenPage}" Command="{Binding ReopenSignInPageCommand}"
+                      HorizontalAlignment="Left" />
+            </StackPanel>
+          </Border>
           <Button Style="{StaticResource SecondaryButton}" Content="{l:T Common.Cancel}" Command="{Binding CancelSignInCommand}" HorizontalAlignment="Left" Margin="0,12,0,0" />
         </StackPanel>
 

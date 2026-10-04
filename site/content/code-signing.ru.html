@@ -1,0 +1,25 @@
+<p>Программы для Windows подписывают, чтобы Windows и антивирусы видели, кто их выпустил и что по дороге их никто не изменил. AimOdometer будет подписываться бесплатно по программе SignPath Foundation для проектов с открытым кодом.</p>
+<p><strong>Free code signing provided by <a href="https://signpath.io">SignPath.io</a>, certificate by <a href="https://signpath.org">SignPath Foundation</a>.</strong> (Бесплатная подпись кода от SignPath.io, сертификат от SignPath Foundation.)</p>
+
+<h2>Что подписывается</h2>
+<ul>
+  <li>Программы AimOdometer: <code>AimOdometer.App.exe</code> (окно), <code>AimOdometer.Tracker.exe</code> (счётчик) и собственные библиотеки AimOdometer, а также установщик <code>AimOdometerApp-win-Setup.exe</code>.</li>
+  <li>Только файлы, собранные <a href="https://github.com/zegolka-dev/AimOdometer/actions">GitHub Actions</a> из отмеченного версией коммита открытого репозитория <a href="https://github.com/zegolka-dev/AimOdometer">zegolka-dev/AimOdometer</a>. То, что собрано на чьём-то компьютере, не подписывается никогда.</li>
+  <li>Чужие файлы, которые идут вместе с программой (среда .NET, SQLite, загрузчик WebView2, MapLibre), сохраняют подписи своих авторов или остаются без подписи; сертификат AimOdometer для них не используется.</li>
+</ul>
+
+<h2>Роли в команде</h2>
+<table>
+  <thead><tr><th>Роль</th><th>Кто</th></tr></thead>
+  <tbody>
+    <tr><td>Авторы кода и проверяющие</td><td><a href="https://github.com/zegolka-dev">zegolka-dev</a></td></tr>
+    <tr><td>Утверждающие (вручную одобряют каждую подпись)</td><td><a href="https://github.com/zegolka-dev">zegolka-dev</a></td></tr>
+  </tbody>
+</table>
+<p>Все участники входят в GitHub и SignPath с двухфакторной защитой. Изменения от других людей приходят как pull request и проверяются до слияния.</p>
+
+<h2>Конфиденциальность</h2>
+<p>Программа ничего не передаёт в другие сетевые системы, если пользователь сам этого не попросил, с одним исключением, которое включено по умолчанию и отключается: она спрашивает у GitHub, есть ли новая версия. Всё остальное (карта, вход через Steam и таблицы лидеров) работает только после того, как пользователь это включит. Подробности в <a href="privacy.html">политике приватности</a>.</p>
+
+<h2>Если что-то не так</h2>
+<p>Если тебе кажется, что подписанный файл AimOdometer делает то, чего не должен, напиши issue на <a href="https://github.com/zegolka-dev/AimOdometer/issues">GitHub</a>.</p>
