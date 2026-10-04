@@ -125,3 +125,12 @@ export function validateStart(params: URLSearchParams): { challenge: string; por
   if (!Number.isInteger(port) || port < 1024 || port > 65535) return null;
   return { challenge, port, state };
 }
+
+/** Leaderboard parameters: period week|month|all and a game key ('*' = all movement). */
+export function validateBoard(params: URLSearchParams): { period: string; game: string } | null {
+  const period = params.get("period") ?? "week";
+  const game = params.get("game") ?? "*";
+  if (!["week", "month", "all"].includes(period)) return null;
+  if (game !== "*" && (game.length === 0 || !GAME_KEY.test(game))) return null;
+  return { period, game };
+}

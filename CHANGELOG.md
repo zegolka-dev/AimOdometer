@@ -5,6 +5,16 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), ver
 
 ## [Unreleased]
 
+## [0.1.0-beta.4] - 2026-10-04
+
+### Added
+- Phase 8: "Friends" tab with leaderboards (Steam friends who use AimOdometer, and the world), by week, month or all
+  time, overall or per game; your world place even outside the top 100; invite link; privacy switches in Settings
+  (friends see you by default, the world board is opt-in).
+- Cloud: `social` Edge Function, Steam friend lists cached for an hour, world ranks precomputed every 15 minutes
+  (materialized view + pg_cron), service-only board functions that never expose other players' ids; 16 more pgTAP and
+  3 more Deno tests.
+
 ## [0.1.0-beta.3] - 2026-10-04
 
 ### Added

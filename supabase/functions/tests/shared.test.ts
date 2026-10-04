@@ -1,7 +1,7 @@
 // Unit tests of the pure server code. Run: npx deno test supabase/functions/tests
 import { assert, assertEquals, assertFalse } from "jsr:@std/assert@1";
-import { readAssertion, STEAM_OPENID, steamLoginUrl, verifyWithSteam, playerSummary } from "../_shared/steam.ts";
-import { LIMITS, validateStart, validateSync } from "../_shared/validate.ts";
+import { friendList, playerSummary, readAssertion, STEAM_OPENID, steamLoginUrl, verifyWithSteam } from "../_shared/steam.ts";
+import { LIMITS, validateBoard, validateStart, validateSync } from "../_shared/validate.ts";
 import { base64Url, randomToken, safeEqual, sha256Base64Url } from "../_shared/crypto.ts";
 
 const RETURN_TO = "https://x.supabase.co/functions/v1/auth-steam/callback?pending=abc";
@@ -154,4 +154,24 @@ Deno.test("crypto: S256 matches the PKCE reference vector", async () => {
   assert(safeEqual("abc", "abc"));
   assertFalse(safeEqual("abc", "abd"));
   assertFalse(safeEqual("abc", "ab"));
+});
+
+Deno.test("steam: friend list keeps valid SteamIDs once", async () => {
+  const fake = (async () => Response.json({
+    friendslist: { friends: [{ steamid: "76561190000000002" }, { steamid: "76561190000000002" }, { steamid: "bad" }, {}] },
+  })) as typeof fetch;
+  assertEquals(await friendList("76561190000000001", "key", fake), { private: false, steamIds: ["76561190000000002"] });
+});
+
+Deno.test("steam: a hidden friend list is reported as private", async () => {
+  const fake = (async () => new Response("Unauthorized", { status: 401 })) as typeof fetch;
+  assertEquals(await friendList("76561190000000001", "key", fake), { private: true });
+});
+
+Deno.test("board: parameters are validated", () => {
+  assertEquals(validateBoard(new URLSearchParams()), { period: "week", game: "*" });
+  assertEquals(validateBoard(new URLSearchParams({ period: "all", game: "steam:730" })), { period: "all", game: "steam:730" });
+  for (const bad of [[["period", "year"]], [["game", ""]], [["game", "<x>"]]]) {
+    assertEquals(validateBoard(new URLSearchParams(bad)), null);
+  }
 });

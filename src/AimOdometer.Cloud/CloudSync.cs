@@ -195,7 +195,7 @@ public static class CloudSync
     }
 
     // The server accepts letters, digits and ":._ -" up to 64 characters (exe names can contain anything).
-    internal static string Limit(string gameKey)
+    public static string Limit(string gameKey)
     {
         var safe = string.Concat(gameKey.Select(c => char.IsAsciiLetterOrDigit(c) || c is ':' or '.' or '_' or ' ' or '-' ? c : '_'));
         return safe.Length <= 64 ? safe : safe[..64];

@@ -1,0 +1,84 @@
+<UserControl x:Class="AimOdometer.App.Views.FriendsView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:l="clr-namespace:AimOdometer.App.Localization">
+  <StackPanel MaxWidth="900" HorizontalAlignment="Left">
+    <TextBlock Style="{StaticResource PageTitle}" Text="{l:T Friends.Title}" />
+    <TextBlock Style="{StaticResource PageSubtitle}" Text="{l:T Friends.Subtitle}" Margin="0,0,0,20" />
+
+    <!-- Not signed in -->
+    <Border Style="{StaticResource AccentCard}" Visibility="{Binding IsSignedIn, Converter={StaticResource InverseBoolToVisibility}}">
+      <StackPanel>
+        <TextBlock Style="{StaticResource SectionTitle}" Text="{l:T Friends.SignInTitle}" />
+        <TextBlock Text="{l:T Friends.SignInText}" TextWrapping="Wrap" FontSize="14" LineHeight="21" Foreground="{StaticResource TextSecondaryBrush}" />
+        <Button Style="{StaticResource PrimaryButton}" Command="{Binding SignInCommand}" HorizontalAlignment="Left" Margin="0,16,0,0">
+          <StackPanel Orientation="Horizontal">
+            <TextBlock Style="{StaticResource Icon}" Text="&#xE77B;" Margin="0,0,8,0" />
+            <TextBlock Text="{l:T Cloud.SignIn}" />
+          </StackPanel>
+        </Button>
+      </StackPanel>
+    </Border>
+
+    <!-- Boards -->
+    <StackPanel Visibility="{Binding IsSignedIn, Converter={StaticResource BoolToVisibility}}">
+      <WrapPanel Margin="0,0,0,16">
+        <RadioButton Style="{StaticResource Segment}" GroupName="Board" Content="{l:T Friends.BoardFriends}" IsChecked="{Binding Board, Converter={StaticResource EnumEquals}, ConverterParameter=Friends}" />
+        <RadioButton Style="{StaticResource Segment}" GroupName="Board" Content="{l:T Friends.BoardWorld}" IsChecked="{Binding Board, Converter={StaticResource EnumEquals}, ConverterParameter=World}" Margin="0,0,24,0" />
+        <RadioButton Style="{StaticResource Segment}" GroupName="BoardPeriod" Content="{l:T Common.ThisWeek}" IsChecked="{Binding Period, Converter={StaticResource EnumEquals}, ConverterParameter=Week}" />
+        <RadioButton Style="{StaticResource Segment}" GroupName="BoardPeriod" Content="{l:T Common.ThisMonth}" IsChecked="{Binding Period, Converter={StaticResource EnumEquals}, ConverterParameter=Month}" />
+        <RadioButton Style="{StaticResource Segment}" GroupName="BoardPeriod" Content="{l:T Common.AllTime}" IsChecked="{Binding Period, Converter={StaticResource EnumEquals}, ConverterParameter=All}" Margin="0,0,24,0" />
+        <ComboBox ItemsSource="{Binding Games}" SelectedItem="{Binding Game}" DisplayMemberPath="Name" MinWidth="200" VerticalAlignment="Center"
+                  AutomationProperties.Name="{l:T Friends.Game}" />
+      </WrapPanel>
+
+      <!-- Hints and actions -->
+      <Border Style="{StaticResource Card}" Margin="0,0,0,12" Visibility="{Binding Message, Converter={StaticResource NullToCollapsed}}">
+        <StackPanel>
+          <TextBlock Text="{Binding Message}" TextWrapping="Wrap" FontSize="14" LineHeight="21" Foreground="{StaticResource TextSecondaryBrush}" />
+          <WrapPanel Margin="0,12,0,0">
+            <Button Style="{StaticResource PrimaryButton}" Content="{l:T Friends.JoinWorld}" Command="{Binding JoinWorldCommand}" Margin="0,0,8,0"
+                    Visibility="{Binding CanJoinWorld, Converter={StaticResource BoolToVisibility}}" />
+            <Button Style="{StaticResource SecondaryButton}" Content="{l:T Friends.CopyInvite}" Command="{Binding CopyInviteCommand}"
+                    Visibility="{Binding CanInvite, Converter={StaticResource BoolToVisibility}}" />
+          </WrapPanel>
+        </StackPanel>
+      </Border>
+
+      <TextBlock Style="{StaticResource Hint}" Text="{l:T Common.Loading}" Margin="0,0,0,8" Visibility="{Binding IsLoading, Converter={StaticResource BoolToVisibility}}" />
+
+      <ItemsControl ItemsSource="{Binding Rows}">
+        <ItemsControl.ItemTemplate>
+          <DataTemplate>
+            <Border x:Name="Row" CornerRadius="10" Padding="14,8" Margin="0,0,0,6" Background="{StaticResource SurfaceBrush}" BorderThickness="1" BorderBrush="{StaticResource BorderBrush}">
+              <Grid>
+                <Grid.ColumnDefinitions>
+                  <ColumnDefinition Width="48" />
+                  <ColumnDefinition Width="Auto" />
+                  <ColumnDefinition Width="*" />
+                  <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <TextBlock Text="{Binding Rank}" FontFamily="{StaticResource NumberFont}" FontSize="16" Foreground="{StaticResource TextSecondaryBrush}" VerticalAlignment="Center" />
+                <Border Grid.Column="1" Width="36" Height="36" CornerRadius="8" ClipToBounds="True" Background="{StaticResource SurfaceElevatedBrush}" Margin="0,0,12,0">
+                  <Image Source="{Binding Avatar}" Width="36" Height="36" RenderOptions.BitmapScalingMode="HighQuality" />
+                </Border>
+                <TextBlock Grid.Column="2" Text="{Binding Name}" FontSize="15" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" />
+                <TextBlock Grid.Column="3" Text="{Binding Distance}" FontFamily="{StaticResource NumberFont}" FontSize="16" VerticalAlignment="Center" />
+              </Grid>
+            </Border>
+            <DataTemplate.Triggers>
+              <DataTrigger Binding="{Binding IsMe}" Value="True">
+                <Setter TargetName="Row" Property="BorderBrush" Value="{StaticResource AccentBrush}" />
+                <Setter TargetName="Row" Property="Background" Value="{StaticResource SurfaceElevatedBrush}" />
+              </DataTrigger>
+            </DataTemplate.Triggers>
+          </DataTemplate>
+        </ItemsControl.ItemTemplate>
+      </ItemsControl>
+
+      <TextBlock Text="{Binding MyPlace}" FontSize="14" Foreground="{StaticResource AccentTextBrush}" Margin="0,8,0,0"
+                 Visibility="{Binding MyPlace, Converter={StaticResource NullToCollapsed}}" />
+      <TextBlock Style="{StaticResource Hint}" Text="{l:T Friends.Footer}" TextWrapping="Wrap" Margin="0,16,0,0" />
+    </StackPanel>
+  </StackPanel>
+</UserControl>

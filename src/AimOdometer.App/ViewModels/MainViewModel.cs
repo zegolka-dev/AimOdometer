@@ -22,6 +22,7 @@ public sealed partial class MainViewModel : ObservableObject, ICalibrationHost, 
             new StatisticsViewModel(data),
             new AchievementsViewModel(data),
             new MapViewModel(data),
+            new FriendsViewModel(data, cloud),
             new GearViewModel(data, this),
             new SettingsViewModel(data, this, cloud, updates),
         ];

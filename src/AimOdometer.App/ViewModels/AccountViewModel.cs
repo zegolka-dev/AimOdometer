@@ -63,6 +63,14 @@ public sealed partial class AccountViewModel : ObservableObject
 
     public ObservableCollection<AccountPc> Pcs { get; } = [];
 
+    [ObservableProperty]
+    public partial bool ShareWithFriends { get; set; } = true;
+
+    [ObservableProperty]
+    public partial bool ShowInWorld { get; set; }
+
+    private bool _loadingPrivacy;
+
     private static Loc L => Loc.Instance;
 
     /// <summary>Called when the Settings page opens.</summary>
@@ -134,6 +142,12 @@ public sealed partial class AccountViewModel : ObservableObject
             WeekAll = Format.Distance(days.Where(d => d.Day >= weekStart && d.Day <= today).Sum(d => d.Centimeters));
             AllTimeAll = Format.Distance(days.Sum(d => d.Centimeters));
 
+            var privacy = await _cloud.Client.GetPrivacyAsync(CancellationToken.None);
+            _loadingPrivacy = true;
+            ShareWithFriends = privacy.ShareWithFriends;
+            ShowInWorld = privacy.ShowInWorld;
+            _loadingPrivacy = false;
+
             var devices = await _cloud.Client.GetDevicesAsync(CancellationToken.None);
             var thisPc = _data.Setting(SettingKeys.CloudPcId);
             Pcs.Clear();
@@ -143,6 +157,27 @@ public sealed partial class AccountViewModel : ObservableObject
                 var name = isThis ? L["Cloud.ThisPc"] : device.Name.Length > 0 ? device.Name : L["Cloud.OtherPc"];
                 Pcs.Add(new AccountPc(name, L.Format("Cloud.PcDetails", Format.Distance(device.Centimeters), device.LastSync.ToLocalTime().ToString("g", L.Culture)), isThis));
             }
+        }
+        catch (CloudException ex)
+        {
+            Problem = CloudService.Describe(ex.Error);
+        }
+    }
+
+    partial void OnShareWithFriendsChanged(bool value) => _ = SavePrivacyAsync();
+
+    partial void OnShowInWorldChanged(bool value) => _ = SavePrivacyAsync();
+
+    private async Task SavePrivacyAsync()
+    {
+        if (_loadingPrivacy || !_cloud.Client.IsSignedIn)
+        {
+            return;
+        }
+
+        try
+        {
+            await _cloud.Client.SetPrivacyAsync(new Privacy(ShareWithFriends, ShowInWorld), CancellationToken.None);
         }
         catch (CloudException ex)
         {

@@ -426,3 +426,6 @@ verify_jwt = false
 
 [functions.account-delete]
 verify_jwt = false
+
+[functions.social]
+verify_jwt = false

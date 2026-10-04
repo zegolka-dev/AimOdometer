@@ -1,6 +1,19 @@
 {
   "releases": [
     {
+      "version": "0.1.0-beta.4",
+      "en": [
+        "New \"Friends\" tab: leaderboards with your Steam friends who use AimOdometer, by week, month or all time, overall or per game.",
+        "World leaderboard: your place among all players, even outside the top 100. Taking part is your choice.",
+        "Settings › Steam account: choose who sees you (friends, everyone)."
+      ],
+      "ru": [
+        "Новая вкладка «Друзья»: рейтинги с твоими друзьями из Steam, у которых есть AimOdometer, за неделю, месяц или всё время, по всем играм или по одной.",
+        "Мировой рейтинг: твоё место среди всех игроков, даже за пределами топ-100. Участвовать или нет — решаешь ты.",
+        "Настройки › Аккаунт Steam: выбери, кто тебя видит (друзья, все)."
+      ]
+    },
+    {
       "version": "0.1.0-beta.3",
       "en": [
         "This window: after every update AimOdometer tells you what is new.",

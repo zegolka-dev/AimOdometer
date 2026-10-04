@@ -91,3 +91,22 @@ function httpsOrEmpty(value: unknown): string {
   const text = String(value);
   return text.startsWith("https://") && text.length <= 512 ? text : "";
 }
+
+export type FriendList = { private: false; steamIds: string[] } | { private: true };
+
+/**
+ * SteamIDs of a player's friends (ISteamUser/GetFriendList). Steam answers 401 when the friend list is not public;
+ * that is reported as private rather than as an error.
+ */
+export async function friendList(steamId: string, apiKey: string, fetchImpl: typeof fetch = fetch): Promise<FriendList> {
+  const url = `https://api.steampowered.com/ISteamUser/GetFriendList/v1/?key=${encodeURIComponent(apiKey)}&steamid=${steamId}&relationship=friend`;
+  const response = await fetchImpl(url);
+  if (response.status === 401) return { private: true };
+  if (!response.ok) throw new Error(`Steam Web API: HTTP ${response.status}`);
+  const data = await response.json();
+  const friends: unknown[] = data?.friendslist?.friends ?? [];
+  const ids = friends
+    .map((f) => (f as { steamid?: unknown }).steamid)
+    .filter((id): id is string => typeof id === "string" && /^\d{17}$/.test(id));
+  return { private: false, steamIds: [...new Set(ids)] };
+}

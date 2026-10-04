@@ -17,6 +17,21 @@ public sealed record CloudDevice(Guid PcId, string Name, DateTimeOffset LastSync
 /// <summary>What the server did with an upload.</summary>
 public sealed record SyncResponse(int Accepted, int Rejected);
 
+/// <summary>One line of a leaderboard. Other players are known by name and avatar only.</summary>
+public sealed record BoardRow(int Rank, string Name, string AvatarUrl, double Centimeters, bool IsMe);
+
+/// <summary>The caller and their Steam friends who use AimOdometer. <paramref name="IsPrivate"/>: the Steam friend list is hidden.</summary>
+public sealed record FriendsBoard(bool IsPrivate, int FriendsOnSteam, IReadOnlyList<BoardRow> Rows);
+
+/// <summary>The caller's place in the world leaderboard.</summary>
+public sealed record WorldPlace(int Rank, double Centimeters, int Players);
+
+/// <summary>Top of the world leaderboard; <paramref name="Me"/> is null when the caller is not ranked.</summary>
+public sealed record WorldBoard(bool Participating, int Players, IReadOnlyList<BoardRow> Rows, WorldPlace? Me);
+
+/// <summary>Who may see the caller: Steam friends (on by default) and the world leaderboard (opt-in).</summary>
+public sealed record Privacy(bool ShareWithFriends, bool ShowInWorld);
+
 /// <summary>
 /// HTTP client for the AimOdometer cloud: the Steam sign-in exchange, token refresh, Edge Functions and the two read
 /// functions. Holds the current session; the access token is refreshed shortly before it expires.
@@ -127,6 +142,62 @@ public sealed class CloudClient : IDisposable
             r.GetProperty("name").GetString() ?? string.Empty,
             r.GetProperty("last_sync_at").GetDateTimeOffset(),
             r.GetProperty("centimeters").GetDouble()))];
+    }
+
+    /// <summary>Friends leaderboard; <paramref name="period"/> week|month|all, <paramref name="game"/> "*" or a game key.</summary>
+    public async Task<FriendsBoard> GetFriendsBoardAsync(string period, string game, CancellationToken cancellation)
+    {
+        var root = await GetSocialAsync("friends", period, game, cancellation).ConfigureAwait(false);
+        var rows = root.GetProperty("rows").EnumerateArray().Select((r, i) => new BoardRow(
+            i + 1,
+            Text(r, "name"),
+            Text(r, "avatar"),
+            r.GetProperty("centimeters").GetDouble(),
+            r.GetProperty("isMe").GetBoolean())).ToList();
+        return new FriendsBoard(root.GetProperty("private").GetBoolean(), root.GetProperty("friendsOnSteam").GetInt32(), rows);
+    }
+
+    /// <summary>World leaderboard (top 100) and the caller's own place.</summary>
+    public async Task<WorldBoard> GetWorldBoardAsync(string period, string game, CancellationToken cancellation)
+    {
+        var root = await GetSocialAsync("world", period, game, cancellation).ConfigureAwait(false);
+        var rows = root.GetProperty("rows").EnumerateArray().Select(r => new BoardRow(
+            r.GetProperty("rank").GetInt32(),
+            Text(r, "name"),
+            Text(r, "avatar"),
+            r.GetProperty("centimeters").GetDouble(),
+            r.GetProperty("isMe").GetBoolean())).ToList();
+        var me = root.TryGetProperty("me", out var m) && m.ValueKind == JsonValueKind.Object
+            ? new WorldPlace(m.GetProperty("rank").GetInt32(), m.GetProperty("centimeters").GetDouble(), m.GetProperty("players").GetInt32())
+            : null;
+        return new WorldBoard(root.GetProperty("participating").GetBoolean(), root.GetProperty("players").GetInt32(), rows, me);
+    }
+
+    /// <summary>The caller's privacy switches (their own profile row; row level security allows exactly that).</summary>
+    public async Task<Privacy> GetPrivacyAsync(CancellationToken cancellation)
+    {
+        var token = await AccessTokenAsync(cancellation).ConfigureAwait(false);
+        var url = new Uri(CloudConfig.ProjectUrl, "rest/v1/profiles?select=share_with_friends,show_in_world");
+        using var response = await SendAsync(HttpMethod.Get, url, null, token, cancellation).ConfigureAwait(false);
+        var root = await ReadAsync(response, cancellation).ConfigureAwait(false);
+        var row = root.EnumerateArray().FirstOrDefault();
+        return row.ValueKind == JsonValueKind.Object
+            ? new Privacy(row.GetProperty("share_with_friends").GetBoolean(), row.GetProperty("show_in_world").GetBoolean())
+            : new Privacy(true, false);
+    }
+
+    /// <summary>Saves the privacy switches (the only columns a client may change). The world board follows within 15 minutes.</summary>
+    public async Task SetPrivacyAsync(Privacy privacy, CancellationToken cancellation)
+    {
+        ArgumentNullException.ThrowIfNull(privacy);
+        var token = await AccessTokenAsync(cancellation).ConfigureAwait(false);
+        var url = new Uri(CloudConfig.ProjectUrl, $"rest/v1/profiles?user_id=eq.{Uri.EscapeDataString(Session!.UserId)}");
+        var body = Json(w =>
+        {
+            w.WriteBoolean("share_with_friends", privacy.ShareWithFriends);
+            w.WriteBoolean("show_in_world", privacy.ShowInWorld);
+        });
+        using var response = await SendAsync(HttpMethod.Patch, url, body, token, cancellation).ConfigureAwait(false);
     }
 
     /// <summary>Deletes the account and everything in the cloud; local statistics stay.</summary>
@@ -273,6 +344,14 @@ public sealed class CloudClient : IDisposable
 
             throw new CloudException(error, $"{url.AbsolutePath}: HTTP {(int)response.StatusCode} {Trim(text)}");
         }
+    }
+
+    private async Task<JsonElement> GetSocialAsync(string board, string period, string game, CancellationToken cancellation)
+    {
+        var token = await AccessTokenAsync(cancellation).ConfigureAwait(false);
+        var url = CloudConfig.Functions($"social/{board}?period={Uri.EscapeDataString(period)}&game={Uri.EscapeDataString(game)}");
+        using var response = await SendAsync(HttpMethod.Get, url, null, token, cancellation).ConfigureAwait(false);
+        return await ReadAsync(response, cancellation).ConfigureAwait(false);
     }
 
     private static async Task<JsonElement> ReadAsync(HttpResponseMessage response, CancellationToken cancellation)
