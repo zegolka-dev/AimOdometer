@@ -46,15 +46,15 @@
           <UniformGrid Columns="3" Margin="-6,0">
             <StackPanel Margin="6,0">
               <TextBlock Style="{StaticResource CardLabel}" Text="{l:T Common.Today}" />
-              <TextBlock Style="{StaticResource MediumNumber}" Text="{Binding TodayAll, TargetNullValue='—'}" />
+              <TextBlock Style="{StaticResource MediumNumber}" Text="{Binding TodayAll, TargetNullValue='-'}" />
             </StackPanel>
             <StackPanel Margin="6,0">
               <TextBlock Style="{StaticResource CardLabel}" Text="{l:T Common.ThisWeek}" />
-              <TextBlock Style="{StaticResource MediumNumber}" Text="{Binding WeekAll, TargetNullValue='—'}" />
+              <TextBlock Style="{StaticResource MediumNumber}" Text="{Binding WeekAll, TargetNullValue='-'}" />
             </StackPanel>
             <StackPanel Margin="6,0">
               <TextBlock Style="{StaticResource CardLabel}" Text="{l:T Common.AllTime}" />
-              <TextBlock Style="{StaticResource MediumNumber}" Text="{Binding AllTimeAll, TargetNullValue='—'}" />
+              <TextBlock Style="{StaticResource MediumNumber}" Text="{Binding AllTimeAll, TargetNullValue='-'}" />
             </StackPanel>
           </UniformGrid>
 

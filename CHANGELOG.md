@@ -5,6 +5,12 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), ver
 
 ## [Unreleased]
 
+## [0.1.0-beta.17] - 2026-10-05
+
+### Changed
+- No long dashes in anything people read (app texts, tray menu, site, README, docs): a plain hyphen instead, and the
+  tray shows a mouse as "Name (800 DPI)". Code comments keep theirs.
+
 ## [0.1.0-beta.16] - 2026-10-05
 
 ### Added
@@ -134,7 +140,7 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), ver
 
 ## [0.1.0-beta.1] - 2026-10-04
 
-First beta for friends: everything from phases 1–7 plus automatic updates.
+First beta for friends: everything from phases 1-7 plus automatic updates.
 
 ### Added
 - Releases and automatic updates (Velopack): Setup.exe and a portable zip on GitHub Releases, built by CI from a

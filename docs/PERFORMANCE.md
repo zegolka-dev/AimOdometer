@@ -6,7 +6,7 @@ Budget for the always-running tracker (from the project brief):
 |---|---|---|---|
 | Private working set | ≤ 15 MB | **4.2 MB** (worker 2.45 MB + supervisor 1.77 MB) | ✅ |
 | CPU when the mouse is idle | ≈ 0 % | **0.000 %** (no wake-ups at all) | ✅ |
-| CPU, 1000 Hz mouse | — | **0.34 %** of one core | ✅ |
+| CPU, 1000 Hz mouse | - | **0.34 %** of one core | ✅ |
 | CPU, 8000 Hz mouse in a game | < 0.5 % of one core | **0.116 %** with the author's real ~6000 Hz mouse (2 min); 0.61 % with synthetic input | ✅ |
 | Managed allocations on the input path | 0 | **0 bytes** (unit test + live counter) | ✅ |
 | Statistics window: time to first window | < 1.5 s | **~0.6 s** (published, ReadyToRun; 3 runs: 616, 582, 585 ms) | ✅ |
@@ -128,7 +128,7 @@ exception with a fast-fail (`0xC0000409`), and Windows Error Reporting does not 
 - **Supervisor** (1.8 MB, no window, no database, waits in `WaitForExit`, 0 % CPU) starts the worker and restarts it
   after 2 s if it exits with a non-zero code, at most 5 times in 10 minutes. It does not restart during logoff or
   shutdown, and exits when the worker exits normally.
-- **Worker** — the actual tracker.
+- **Worker** - the actual tracker.
 
 Verified with the `--crash-after 10` test hook: the worker fast-failed, was restarted within 2 s without the hook, and
 `--stop` then ended both processes.
@@ -138,4 +138,4 @@ Verified with the `--crash-after 10` test hook: the worker fast-failed, was rest
 - ~~Real high-rate mouse~~: confirmed, hardware input is coalesced to ~125/s for background listeners (0.116 % CPU).
 - Accuracy loss from coalescing during intense aim (−2.3 % measured): GameInput spike.
 - Windows 10 has no background coalescing; an 8000 Hz mouse there would deliver 8000 reports/s. Estimated cost from
-  the kernel-dominated profile: roughly 1–1.5 % of one core. Needs a Windows 10 machine to confirm.
+  the kernel-dominated profile: roughly 1-1.5 % of one core. Needs a Windows 10 machine to confirm.

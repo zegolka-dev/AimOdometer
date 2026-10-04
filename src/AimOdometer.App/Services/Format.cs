@@ -33,7 +33,7 @@ public static class Format
 
     /// <summary>Distance per hour: km/h or mi/h.</summary>
     public static string PerHour(double? kilometersPerHour) => kilometersPerHour is not { } kmh
-        ? "—"
+        ? "-"
         : Units == UnitSystem.Metric
             ? L.Format("Unit.KmPerHour", kmh.ToString("0.00", L.Culture))
             : L.Format("Unit.MiPerHour", (kmh / 1.609344).ToString("0.00", L.Culture));

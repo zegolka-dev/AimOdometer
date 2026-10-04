@@ -1,6 +1,6 @@
 # Architecture
 
-AimOdometer measures the **physical distance a mouse travels on the mouse pad** — not the cursor path — by reading raw sensor counts through the Windows Raw Input API.
+AimOdometer measures the **physical distance a mouse travels on the mouse pad** - not the cursor path - by reading raw sensor counts through the Windows Raw Input API.
 
 ```
 distance_cm = path_counts / DPI × 2.54        path_counts = Σ sqrt(dx² + dy²)
@@ -105,12 +105,12 @@ Windows 11 coalesces raw mouse input delivered to background listeners to roughl
 | `src/AimOdometer.Win32` | Internal source-generated P/Invoke declarations (`LibraryImport`) | yes |
 | `src/AimOdometer.Tracker` | Background process | NativeAOT |
 | `src/AimOdometer.App` | WPF UI | no (ReadyToRun) |
-| `tests/AimOdometer.Core.Tests`, `tests/AimOdometer.Tracker.Tests` | xUnit v3 tests on Microsoft Testing Platform | — |
-| `tools/IconGen` | Renders `assets/logo.svg` into `assets/icon.ico` | — |
-| `tools/InputSimulator` | Synthetic mouse input up to 8000 Hz (`SendInput`) | — |
-| `tools/PerfProbe` | CPU/memory of the tracker, pipe diagnostics, database dump | — |
-| `tools/InputProbe` | Foreground full-rate reader to measure background coalescing loss | — |
-| `tools/Run-Benchmarks.ps1` | Runs the PERFORMANCE.md scenarios | — |
+| `tests/AimOdometer.Core.Tests`, `tests/AimOdometer.Tracker.Tests` | xUnit v3 tests on Microsoft Testing Platform | - |
+| `tools/IconGen` | Renders `assets/logo.svg` into `assets/icon.ico` | - |
+| `tools/InputSimulator` | Synthetic mouse input up to 8000 Hz (`SendInput`) | - |
+| `tools/PerfProbe` | CPU/memory of the tracker, pipe diagnostics, database dump | - |
+| `tools/InputProbe` | Foreground full-rate reader to measure background coalescing loss | - |
+| `tools/Run-Benchmarks.ps1` | Runs the PERFORMANCE.md scenarios | - |
 
 Projects listed in the plan but not yet present (`AimOdometer.Cloud`, a BenchmarkDotNet project) are created in the
 phase that first needs them, so the repository never contains empty shells.

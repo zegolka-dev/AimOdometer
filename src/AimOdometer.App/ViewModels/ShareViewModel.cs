@@ -152,7 +152,7 @@ public sealed partial class ShareViewModel : ObservableObject
                 return Distance("Share.Card.Day", Format.Date(today), periods.Today.Centimeters);
             case ShareKind.Week:
                 var weekStart = StatsSummary.StartOfWeek(today, firstDay);
-                return Distance("Share.Card.Week", $"{Format.ShortDate(weekStart)} – {Format.ShortDate(today)}", periods.Week.Centimeters);
+                return Distance("Share.Card.Week", $"{Format.ShortDate(weekStart)} - {Format.ShortDate(today)}", periods.Week.Centimeters);
             case ShareKind.Month:
                 return Distance("Share.Card.Month", today.ToString("MMMM yyyy", L.Culture), periods.Month.Centimeters);
             case ShareKind.AllTime:

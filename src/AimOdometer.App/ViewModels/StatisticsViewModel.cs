@@ -142,18 +142,18 @@ public sealed partial class StatisticsViewModel(AppData data) : PageViewModel(da
         ActiveDaysText = L.Format("Stats.ActiveDaysOf", averages.ActiveDays, averages.CalendarDays);
 
         var records = StatsSummary.Records(days, today, firstDay);
-        BestDay = records.BestDay is { } d ? $"{Format.Distance(d.Centimeters)} · {Format.Date(d.Date)}" : "—";
-        BestWeek = records.BestWeek is { } w ? $"{Format.Distance(w.Centimeters)} · {Format.ShortDate(w.WeekStart)}–{Format.ShortDate(w.WeekStart.AddDays(6))}" : "—";
+        BestDay = records.BestDay is { } d ? $"{Format.Distance(d.Centimeters)} · {Format.Date(d.Date)}" : "-";
+        BestWeek = records.BestWeek is { } w ? $"{Format.Distance(w.Centimeters)} · {Format.ShortDate(w.WeekStart)} - {Format.ShortDate(w.WeekStart.AddDays(6))}" : "-";
         LongestStreak = records.LongestStreak is { } s
-            ? $"{L.Format("Stats.DaysCount", s.Days)} · {Format.ShortDate(s.Start)}–{Format.ShortDate(s.End)}"
-            : "—";
+            ? $"{L.Format("Stats.DaysCount", s.Days)} · {Format.ShortDate(s.Start)} - {Format.ShortDate(s.End)}"
+            : "-";
         FlickRecord = FormatFlickRecord(from, to);
 
         var axisTotal = sum.XCentimeters + sum.YCentimeters;
         HorizontalShare = axisTotal > 0 ? sum.XCentimeters / axisTotal : 0.5;
         AxisSplit = L.Format("Stats.AxisSplit", Format.Percent(HorizontalShare), Format.Percent(1 - HorizontalShare));
-        ClicksPerMinute = sum.MoveSeconds > 0 ? Format.Number(sum.Clicks / (sum.MoveSeconds / 60.0), "0.0") : "—";
-        ClicksPerMeter = sum.Centimeters >= 100 ? Format.Number(sum.Clicks / (sum.Centimeters / 100), "0.0") : "—";
+        ClicksPerMinute = sum.MoveSeconds > 0 ? Format.Number(sum.Clicks / (sum.MoveSeconds / 60.0), "0.0") : "-";
+        ClicksPerMeter = sum.Centimeters >= 100 ? Format.Number(sum.Clicks / (sum.Centimeters / 100), "0.0") : "-";
         WheelNotches = Format.Number(sum.WheelNotches);
 
         BuildChart(days, from, to, firstDay);
@@ -186,7 +186,7 @@ public sealed partial class StatisticsViewModel(AppData data) : PageViewModel(da
         {
             // The all-time record lies outside the period: show the period's best day value instead.
             var best = Data.Store.GetDailyTotals(from, to).MaxBy(d => d.PeakSpeedCmPerSecond);
-            return best is null || best.PeakSpeedCmPerSecond <= 0 ? "—" : $"{Format.Speed(best.PeakSpeedCmPerSecond)} · {Format.Date(best.Date)}";
+            return best is null || best.PeakSpeedCmPerSecond <= 0 ? "-" : $"{Format.Speed(best.PeakSpeedCmPerSecond)} · {Format.Date(best.Date)}";
         }
 
         var app = Data.Store.GetApps().FirstOrDefault(a => a.Id == record.AppId);
@@ -212,6 +212,6 @@ public sealed partial class StatisticsViewModel(AppData data) : PageViewModel(da
         Bars = [.. series
             .GroupBy(d => StatsSummary.StartOfWeek(d.Date, firstDay))
             .Select(g => new ChartBar(g.Sum(d => d.Centimeters), Format.ShortDate(g.Key),
-                $"{Format.ShortDate(g.Key)}–{Format.ShortDate(g.Key.AddDays(6))}: {Format.Distance(g.Sum(d => d.Centimeters))}"))];
+                $"{Format.ShortDate(g.Key)} - {Format.ShortDate(g.Key.AddDays(6))}: {Format.Distance(g.Sum(d => d.Centimeters))}"))];
     }
 }

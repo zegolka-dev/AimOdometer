@@ -118,7 +118,7 @@ public sealed class HeatMap : FrameworkElement
         if (_hover is ( >= 0, >= 0))
         {
             var day = (DayOfWeek)(((int)data.FirstDay + _hover.Row) % 7);
-            var text = $"{data.Culture.DateTimeFormat.GetDayName(day)} {_hover.Hour:00}:00–{_hover.Hour + 1:00}:00 · {data.FormatValue(data.Values[(int)day, _hover.Hour])}";
+            var text = $"{data.Culture.DateTimeFormat.GetDayName(day)} {_hover.Hour:00}:00-{_hover.Hour + 1:00}:00 · {data.FormatValue(data.Values[(int)day, _hover.Hour])}";
             drawingContext.DrawText(Text(text, (Brush)FindResource("TextPrimaryBrush"), dpi), new Point(LabelWidth, HeaderHeight + (7 * 22) + 6));
         }
     }

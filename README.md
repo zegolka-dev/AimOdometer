@@ -2,7 +2,7 @@
 
 <h1 align="center">AimOdometer</h1>
 
-<p align="center">How far does your mouse really travel? Real centimeters on the pad — per game, per mouse, per day.</p>
+<p align="center">How far does your mouse really travel? Real centimeters on the pad - per game, per mouse, per day.</p>
 
 <p align="center"><a href="README.ru.md">Русская версия</a></p>
 
