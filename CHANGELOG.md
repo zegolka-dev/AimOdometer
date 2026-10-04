@@ -6,6 +6,12 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), ver
 ## [Unreleased]
 
 ### Added
+- New website design: huge gradient headings, a two-row marquee of app screens that moves with scrolling, a magnetic
+  hero picture, text that lights up letter by letter, a light features section with large numbers, stacking cards
+  with the app's pages, and the anti-cheat, privacy, FAQ and download sections. Same Neon Violet palette, type Exo 2
+  (Latin and Cyrillic). Motion lives in `site/site.js` and stays off with "reduce motion"; tiles are cut from the
+  demo screenshots by `tools/make_site_tiles.py`; CSS and JS links carry a content hash so browsers never keep an old
+  copy.
 - `tools/GameInputProbe`: reads the mouse through Microsoft GameInput and background Raw Input at once. Phase 10 result:
   GameInput is coalesced the same way (0.43 % less path than Raw Input), so the tracker stays on Raw Input.
 
