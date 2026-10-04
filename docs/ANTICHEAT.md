@@ -27,8 +27,11 @@ Games: **CS2** (VAC, normal mode, no `-insecure`), **CS2 on FACEIT** (client + m
 | Counter-Strike 2 | VAC | OK | 0.0.1 | 2026-10-02 | 30+ min, distance recorded |
 | Counter-Strike 2 on FACEIT | FACEIT AC | OK | 0.0.1 | 2026-10-02 | anti-cheat client running, no warnings |
 | Apex Legends | Easy Anti-Cheat | OK | 0.0.1 | 2026-10-03 | full screen, distance recorded |
-| VALORANT | Vanguard | not tested yet | | | |
-| Fortnite | EAC / BattlEye | not tested yet | | | |
+| Apex Legends | Easy Anti-Cheat | OK | 0.1.0-beta.15 to .17 | 2026-10-04 | author's PC, tracker running as administrator, about 6 h, 1.2 km recorded |
+| VALORANT | Vanguard | OK | 0.1.0-beta | 2026-10-04 | a beta tester's PC, reported by the author: no warnings or kicks, distance recorded |
+| Fortnite | EAC / BattlEye | OK | 0.1.0-beta | 2026-10-04 | a beta tester's PC, reported by the author |
+| Counter-Strike 2 | VAC | OK | 0.1.0-beta | 2026-10-04 | retest on the beta, a beta tester's PC, reported by the author |
+| Counter-Strike 2 on FACEIT | FACEIT AC | OK | 0.1.0-beta | 2026-10-04 | retest on the beta, a beta tester's PC, reported by the author |
 
 When a result changes, update this table and the table on the website (`site/content/anticheat.*.html`, then
 `python tools/build_site.py`).
