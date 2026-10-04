@@ -28,13 +28,10 @@ MARQUEE = [
 
 # (screenshot, name, x, y, width, height) for the stacking cards.
 CARDS = [
-    ("overview", "card-overview", 250, 60, 930, 700),
-    ("stats", "card-heatmap", 270, 560, 900, 200),
-    ("games", "card-games", 548, 160, 610, 260),
-    ("achievements", "card-achievements", 250, 60, 930, 700),
-    ("map", "card-map", 250, 60, 930, 700),
-    ("map", "card-route", 276, 330, 880, 420),
-    ("stats", "card-days", 270, 280, 900, 300),
+    # Right column of the stacking cards: about 6:5, without the Share button at the window's right edge.
+    ("overview", "card-overview", 250, 50, 850, 710),
+    ("achievements", "card-achievements", 250, 50, 850, 710),
+    ("map", "card-map", 250, 50, 850, 710),
 ]
 
 

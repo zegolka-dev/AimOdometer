@@ -68,9 +68,9 @@ T = {
         ],
         inside_title="Inside",
         inside=[
-            ("Statistics", "Every day in numbers", ("overview-days", "Distance of the last 14 days"), ("card-games", "Distance per game with time and km/h"), ("card-overview", "Overview: today, this week, this month and all time")),
+            ("Statistics", "Every day in numbers", ("overview-days", "Distance of the last 14 days"), ("games-list", "Distance per game with time and km/h"), ("card-overview", "Overview: today, this week, this month and all time")),
             ("Achievements", "Goals worth chasing", ("achievements-progress", "Achievements with progress bars"), ("stats-totals", "Totals for any period"), ("card-achievements", "The achievements page")),
-            ("Map", "Your aim as a journey", ("map-top", "Pick a destination or let AimOdometer choose"), ("card-route", "The route on a real map"), ("card-map", "Where would you get: your month as a walk")),
+            ("Map", "Your aim as a journey", ("map-route", "The route on a real map"), ("overview-totals", "All-time distance compared with famous places"), ("card-map", "Where would you get: your month as a walk")),
         ],
         trust_title="Safe and private",
         safety_title="Safe with anti-cheats",
@@ -120,9 +120,9 @@ T = {
         ],
         inside_title="Внутри",
         inside=[
-            ("Статистика", "Каждый день в цифрах", ("overview-days", "Пробег за последние 14 дней"), ("card-games", "Пробег по играм со временем и км/ч"), ("card-overview", "Обзор: сегодня, неделя, месяц и всё время")),
+            ("Статистика", "Каждый день в цифрах", ("overview-days", "Пробег за последние 14 дней"), ("games-list", "Пробег по играм со временем и км/ч"), ("card-overview", "Обзор: сегодня, неделя, месяц и всё время")),
             ("Ачивки", "Цели, за которыми интересно гнаться", ("achievements-progress", "Ачивки с прогрессом"), ("stats-totals", "Итоги за любой период"), ("card-achievements", "Страница ачивок")),
-            ("Карта", "Твой аим как путешествие", ("map-top", "Выбери цель или доверь выбор AimOdometer"), ("card-route", "Маршрут на настоящей карте"), ("card-map", "Куда бы ты дошёл: твой месяц как прогулка")),
+            ("Карта", "Твой аим как путешествие", ("map-route", "Маршрут на настоящей карте"), ("overview-totals", "Пробег за всё время в сравнении с известными местами"), ("card-map", "Куда бы ты дошёл: твой месяц как прогулка")),
         ],
         trust_title="Безопасно и приватно",
         safety_title="Безопасно для античитов",

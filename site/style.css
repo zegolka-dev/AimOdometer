@@ -156,8 +156,9 @@ h2 .giant, h2.plain { font-size: clamp(3rem, 12vw, 160px); text-align: center; }
   width: clamp(280px, 54vw, 860px);
   translate: -50% 0;
   z-index: 2;
+  perspective: 1400px;
 }
-.hero-visual .magnet { position: relative; will-change: transform; }
+.hero-visual .magnet { position: relative; will-change: transform; transform-origin: 50% 100%; }
 .hero-visual img {
   width: 100%; height: auto;
   border-radius: clamp(16px, 2vw, 28px) clamp(16px, 2vw, 28px) 0 0;
@@ -243,7 +244,7 @@ h2 .giant, h2.plain { font-size: clamp(3rem, 12vw, 160px); text-align: center; }
   font-size: clamp(1.05rem, 2vw, 1.4rem);
   color: var(--text);
 }
-.js .reveal .ch { opacity: 0.2; transition: opacity 0.12s linear; }
+.js .reveal .ch { opacity: 0.2; }
 
 .stats {
   display: grid;
@@ -349,7 +350,8 @@ h2 .giant, h2.plain { font-size: clamp(3rem, 12vw, 160px); text-align: center; }
   border-radius: clamp(36px, 4.5vw, 60px);
   background: var(--bg);
   padding: clamp(16px, 2.2vw, 32px);
-  box-shadow: 0 -20px 60px rgba(0, 0, 0, 0.35);
+  box-shadow: 0 -12px 40px rgba(0, 0, 0, 0.3);
+  backface-visibility: hidden;
 }
 .card-head { display: flex; align-items: center; gap: clamp(14px, 2.4vw, 32px); margin-bottom: clamp(14px, 2vw, 24px); flex-wrap: wrap; }
 .card-head .num {
@@ -360,16 +362,17 @@ h2 .giant, h2.plain { font-size: clamp(3rem, 12vw, 160px); text-align: center; }
 .card-title { flex: 1; min-width: 180px; }
 .kicker { display: block; color: var(--accent-text); text-transform: uppercase; letter-spacing: 0.16em; font-size: clamp(0.72rem, 1vw, 0.9rem); font-weight: 600; }
 .card-head h3 { font-size: clamp(1.25rem, 2.8vw, 2.6rem); font-weight: 800; text-transform: uppercase; line-height: 1.05; }
-.card-grid { display: grid; grid-template-columns: 2fr 3fr; gap: clamp(10px, 1.4vw, 18px); }
+/* 11:17 makes the right picture (two 42:27 tiles high) about 6:5, the shape of its screenshot, so it is not cut. */
+.card-grid { display: grid; grid-template-columns: 11fr 17fr; gap: clamp(10px, 1.4vw, 18px); }
 .col-left { display: grid; gap: clamp(10px, 1.4vw, 18px); }
-.pic { overflow: hidden; border-radius: clamp(24px, 3.4vw, 48px); background: var(--surface); border: 1px solid var(--border); }
+.pic { overflow: hidden; border-radius: clamp(18px, 2.2vw, 32px); background: var(--surface); border: 1px solid var(--border); }
 .pic img { width: 100%; height: 100%; object-fit: cover; object-position: 0 0; }
-.pic.a { height: clamp(120px, 15vw, 220px); }
-.pic.b { height: clamp(150px, 20vw, 320px); }
-.pic.c { min-height: 100%; }
+/* The left pictures keep the tiles' own shape (420:270), so nothing is cut; the right one fills their height. */
+.pic.a, .pic.b { aspect-ratio: 42 / 27; }
+.pic.c { height: 100%; }
 @media (max-width: 640px) {
   .card-grid { grid-template-columns: 1fr; }
-  .pic.c { height: 220px; min-height: 0; }
+  .pic.c { height: auto; aspect-ratio: 6 / 5; }
   .card-head .btn-ghost { display: none; }
 }
 
