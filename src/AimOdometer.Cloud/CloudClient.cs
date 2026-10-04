@@ -200,6 +200,25 @@ public sealed class CloudClient : IDisposable
         using var response = await SendAsync(HttpMethod.Patch, url, body, token, cancellation).ConfigureAwait(false);
     }
 
+    /// <summary>
+    /// Sends a complaint or suggestion to the author. Works signed out too; when signed in, the Steam name is attached
+    /// by the server. <paramref name="kind"/>: bug, idea or other.
+    /// </summary>
+    public async Task SendFeedbackAsync(string kind, string message, string? contact, string? version, string? os, string? language, CancellationToken cancellation)
+    {
+        var token = IsSignedIn ? await AccessTokenAsync(cancellation).ConfigureAwait(false) : null;
+        var body = Json(w =>
+        {
+            w.WriteString("kind", kind);
+            w.WriteString("message", message);
+            w.WriteString("contact", contact);
+            w.WriteString("version", version);
+            w.WriteString("os", os);
+            w.WriteString("language", language);
+        });
+        using var response = await SendAsync(HttpMethod.Post, CloudConfig.Functions("feedback"), body, token, cancellation).ConfigureAwait(false);
+    }
+
     /// <summary>Deletes the account and everything in the cloud; local statistics stay.</summary>
     public async Task DeleteAccountAsync(CancellationToken cancellation)
     {

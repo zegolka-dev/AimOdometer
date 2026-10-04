@@ -55,6 +55,13 @@ public sealed partial class SettingsViewModel : PageViewModel
     [ObservableProperty]
     public partial bool AutoUpdate { get; set; } = true;
 
+    /// <summary>"Count games that run as administrator": the tracker runs elevated through a Task Scheduler task.</summary>
+    [ObservableProperty]
+    public partial bool CountElevatedGames { get; set; }
+
+    [ObservableProperty]
+    public partial string? ElevatedMessage { get; set; }
+
     [ObservableProperty]
     public partial string Version { get; set; } = string.Empty;
 
@@ -79,6 +86,7 @@ public sealed partial class SettingsViewModel : PageViewModel
         ShowTrayIcon = TrackerExe() is { } exe && TrayIconVisibility.IsPromoted(exe);
         Notifications = Data.Setting(SettingKeys.Notifications) != "0";
         AutoUpdate = Data.Setting(SettingKeys.AutoUpdate) != "0";
+        CountElevatedGames = Data.Setting(SettingKeys.ElevatedTracker) == "1";
         Version = AppIdentity.Version;
         StartupTime = MeasuredStartup is { } t ? Loc.Instance.Format("Settings.StartupTime", Format.Number(t.TotalMilliseconds)) : string.Empty;
         _loading = false;
@@ -128,6 +136,49 @@ public sealed partial class SettingsViewModel : PageViewModel
 
     [RelayCommand]
     private Task CheckUpdatesAsync() => Updates.CheckNowAsync();
+
+    partial void OnCountElevatedGamesChanged(bool value)
+    {
+        if (!_loading)
+        {
+            _ = SwitchElevatedAsync(value);
+        }
+    }
+
+    /// <summary>
+    /// On: register the elevated task (one UAC prompt), stop the normal tracker, start the elevated one.
+    /// Off: delete the task (one UAC prompt), stop the elevated tracker, start the normal one.
+    /// </summary>
+    private async Task SwitchElevatedAsync(bool on)
+    {
+        var L = Loc.Instance;
+        if (AppIdentity.IsDataDirectoryOverridden)
+        {
+            _loading = true;
+            CountElevatedGames = !on; // a test window never touches the real tracker or Task Scheduler
+            _loading = false;
+            return;
+        }
+
+        ElevatedMessage = L["Settings.ElevatedWorking"];
+        var tracker = TrackerConnection.TrackerExePath;
+        var ok = on
+            ? System.IO.File.Exists(tracker) && await Task.Run(() => ElevatedTask.Create(tracker))
+            : await Task.Run(ElevatedTask.Delete) || !await Task.Run(ElevatedTask.Exists);
+        if (!ok)
+        {
+            _loading = true;
+            CountElevatedGames = !on; // UAC was declined: nothing changed
+            _loading = false;
+            ElevatedMessage = L["Settings.ElevatedDeclined"];
+            return;
+        }
+
+        Data.Store.SetSetting(SettingKeys.ElevatedTracker, on ? "1" : "0");
+        await Updates.StopTrackerAsync();
+        var running = await TrackerConnection.EnsureRunningAsync(elevated: on);
+        ElevatedMessage = !running ? L["Settings.ElevatedNotRunning"] : on ? L["Settings.ElevatedOn"] : L["Settings.ElevatedOff"];
+    }
 
     partial void OnAutoUpdateChanged(bool value)
     {

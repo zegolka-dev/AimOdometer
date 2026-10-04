@@ -5,6 +5,7 @@
   <li><strong>Mouse:</strong> Windows Raw Input in background mode (<code>RIDEV_INPUTSINK</code>), the same public API games and mouse software use. It only receives a copy of what the mouse sends; it cannot change or block input.</li>
   <li><strong>Which game:</strong> it asks Windows which window is in front and reads the path of that program's .exe. Nothing else about the game.</li>
   <li><strong>Notifications:</strong> achievements wait until you leave a full-screen game.</li>
+  <li><strong>Games that run as administrator</strong> (Genshin Impact, Honkai: Star Rail, Zenless Zone Zero): Windows hides the mouse from normal programs while such a window is in front. The optional setting “Count games that run as administrator” starts the tracker with administrator rights through Windows Task Scheduler; it still only reads the mouse.</li>
 </ul>
 
 <h2>What it never does</h2>

@@ -10,9 +10,12 @@ public sealed partial class MainViewModel : ObservableObject, ICalibrationHost, 
 {
     private readonly AppData _data;
 
+    private readonly CloudService _cloud;
+
     public MainViewModel(AppData data, CloudService cloud, Updates updates)
     {
         _data = data;
+        _cloud = cloud;
         Updates = updates;
         Tracker = new TrackerConnection();
         Pages =
@@ -77,7 +80,16 @@ public sealed partial class MainViewModel : ObservableObject, ICalibrationHost, 
     [NotifyPropertyChangedFor(nameof(HasOverlay), nameof(IsWhatsNewVisible))]
     public partial WhatsNewViewModel? WhatsNew { get; set; }
 
-    public bool IsWhatsNewVisible => WhatsNew is not null && Onboarding is null;
+    public bool IsWhatsNewVisible => WhatsNew is not null && Onboarding is null && Feedback is null;
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(HasOverlay), nameof(IsFeedbackVisible), nameof(IsWhatsNewVisible))]
+    public partial FeedbackViewModel? Feedback { get; set; }
+
+    public bool IsFeedbackVisible => Feedback is not null;
+
+    [CommunityToolkit.Mvvm.Input.RelayCommand]
+    private void OpenFeedback() => Feedback = new FeedbackViewModel(_cloud, () => Feedback = null);
 
     /// <summary>Calibration can open on top of onboarding; then only calibration is shown.</summary>
     public bool IsOnboardingVisible => Onboarding is not null && Calibration is null;
@@ -91,7 +103,7 @@ public sealed partial class MainViewModel : ObservableObject, ICalibrationHost, 
     public partial StatusKind Status { get; set; } = StatusKind.Unknown;
 
     /// <summary>True while a modal overlay (onboarding, calibration) is shown.</summary>
-    public bool HasOverlay => Onboarding is not null || Calibration is not null || Share is not null || WhatsNew is not null;
+    public bool HasOverlay => Onboarding is not null || Calibration is not null || Share is not null || WhatsNew is not null || Feedback is not null;
 
     /// <summary>Raw mouse reports from the window, routed to whichever overlay is open.</summary>
     public void OnRawReport(RawMouseReport report)
@@ -153,7 +165,7 @@ public sealed partial class MainViewModel : ObservableObject, ICalibrationHost, 
 
     private async Task EnsureTrackerAsync()
     {
-        await TrackerConnection.EnsureRunningAsync();
+        await TrackerConnection.EnsureRunningAsync(_data.Setting(SettingKeys.ElevatedTracker) == "1");
         _trackerFolder = (await Task.Run(Core.Ipc.TrackerClient.GetInfo))?.DataDirectory;
         await Tracker.PollAsync();
     }

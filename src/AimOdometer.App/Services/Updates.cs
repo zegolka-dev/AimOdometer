@@ -121,6 +121,10 @@ public sealed partial class Updates : ObservableObject, IDisposable
         {
             StopTrackerAsync().GetAwaiter().GetResult();
             Autostart.Set(false, string.Empty);
+            if (ElevatedTask.Exists())
+            {
+                ElevatedTask.Delete(); // asks for UAC once
+            }
         }
         catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or InvalidOperationException)
         {
@@ -147,7 +151,14 @@ public sealed partial class Updates : ObservableObject, IDisposable
         {
             using (process)
             {
-                process.Kill();
+                try
+                {
+                    process.Kill();
+                }
+                catch (System.ComponentModel.Win32Exception)
+                {
+                    // An elevated tracker cannot be killed from here; it was asked to exit over the pipe.
+                }
             }
         }
     }
@@ -158,16 +169,17 @@ public sealed partial class Updates : ObservableObject, IDisposable
         foreach (var process in Process.GetProcessesByName("AimOdometer.Tracker"))
         {
             string? path = null;
+            var readable = true;
             try
             {
                 path = process.MainModule?.FileName;
             }
             catch (System.ComponentModel.Win32Exception)
             {
-                // Exited meanwhile.
+                readable = false; // an elevated tracker (or one that just exited): assume it is ours
             }
 
-            if (path is not null && path.StartsWith(folder, StringComparison.OrdinalIgnoreCase))
+            if (!readable || (path is not null && path.StartsWith(folder, StringComparison.OrdinalIgnoreCase)))
             {
                 result.Add(process);
             }

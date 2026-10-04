@@ -134,3 +134,32 @@ export function validateBoard(params: URLSearchParams): { period: string; game: 
   if (game !== "*" && (game.length === 0 || !GAME_KEY.test(game))) return null;
   return { period, game };
 }
+
+export interface Feedback {
+  kind: "bug" | "idea" | "other";
+  message: string;
+  contact: string | null;
+  version: string | null;
+  os: string | null;
+  language: string | null;
+}
+
+/** A feedback message: kind, 3..4000 characters of text, optional short contact and technical details. */
+export function validateFeedback(body: unknown): Feedback | null {
+  if (typeof body !== "object" || body === null) return null;
+  const b = body as Record<string, unknown>;
+  const kind = b.kind;
+  if (kind !== "bug" && kind !== "idea" && kind !== "other") return null;
+  const message = typeof b.message === "string" ? b.message.trim() : "";
+  if (message.length < 3 || message.length > 4000) return null;
+  const short = (value: unknown, max: number) =>
+    typeof value === "string" && value.trim().length > 0 ? value.trim().slice(0, max) : null;
+  return {
+    kind,
+    message,
+    contact: short(b.contact, 200),
+    version: short(b.version, 40),
+    os: short(b.os, 120),
+    language: short(b.language, 10),
+  };
+}

@@ -609,6 +609,13 @@ internal sealed unsafe class TrackerHost : IDisposable
             return false;
         }
 
+        if (ElevatedTask.IsElevated)
+        {
+            // Never hand administrator rights to the window: Explorer starts it as a normal program.
+            Process.Start(new ProcessStartInfo("explorer.exe", $"\"{app}\"") { UseShellExecute = false })?.Dispose();
+            return true;
+        }
+
         // The window must use the real data folder: never pass a test override from our own environment.
         var start = new ProcessStartInfo(app) { UseShellExecute = false };
         start.Environment.Remove(AppIdentity.DataDirectoryVariable);
@@ -665,7 +672,10 @@ internal sealed unsafe class TrackerHost : IDisposable
             }
 
             User32.AppendMenuW(menu, User32.MfSeparator, 0, null);
-            User32.AppendMenuW(menu, User32.MfString | (Autostart.IsEnabled() ? User32.MfChecked : 0), CmdAutostart, _strings.StartWithWindows);
+            if (_store.GetSetting(SettingKeys.ElevatedTracker) != "1")
+            {
+                User32.AppendMenuW(menu, User32.MfString | (Autostart.IsEnabled() ? User32.MfChecked : 0), CmdAutostart, _strings.StartWithWindows);
+            }
             User32.AppendMenuW(menu, User32.MfString, CmdOpenDataFolder, _strings.OpenDataFolder);
             User32.AppendMenuW(menu, User32.MfSeparator, 0, null);
             User32.AppendMenuW(menu, User32.MfString, CmdExit, _strings.Exit);
@@ -888,6 +898,12 @@ internal sealed unsafe class TrackerHost : IDisposable
 
     private void ApplyAutostartDefault()
     {
+        if (_store.GetSetting(SettingKeys.ElevatedTracker) == "1")
+        {
+            Autostart.Set(false, string.Empty); // the elevated Task Scheduler task starts the tracker at logon
+            return;
+        }
+
         var setting = _store.GetSetting(SettingKeys.Autostart);
         if (setting is null)
         {

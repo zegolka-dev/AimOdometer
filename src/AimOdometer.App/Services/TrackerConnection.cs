@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using System.IO;
 using System.Windows.Threading;
+using AimOdometer.Core;
 using AimOdometer.Core.Diagnostics;
 using AimOdometer.Core.Ipc;
 using CommunityToolkit.Mvvm.ComponentModel;
@@ -39,7 +40,7 @@ public sealed partial class TrackerConnection : ObservableObject, IDisposable
     }
 
     /// <summary>Starts the tracker if it is not answering and its exe is next to the app (installed layout).</summary>
-    public static async Task<bool> EnsureRunningAsync()
+    public static async Task<bool> EnsureRunningAsync(bool elevated = false)
     {
         if (await Task.Run(TrackerClient.IsRunning))
         {
@@ -57,7 +58,12 @@ public sealed partial class TrackerConnection : ObservableObject, IDisposable
             return false;
         }
 
-        Process.Start(new ProcessStartInfo(TrackerExePath) { UseShellExecute = false })?.Dispose();
+        // "Count games that run as administrator": the tracker starts through its Task Scheduler task.
+        if (!elevated || !await Task.Run(ElevatedTask.Start))
+        {
+            Process.Start(new ProcessStartInfo(TrackerExePath) { UseShellExecute = false })?.Dispose();
+        }
+
         for (var i = 0; i < 20; i++)
         {
             await Task.Delay(150);

@@ -5,6 +5,20 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), ver
 
 ## [Unreleased]
 
+## [0.1.0-beta.6] - 2026-10-04
+
+### Added
+- "Complaints and suggestions": a message to the author from the app (bug / idea / other, optional contact, version),
+  stored in the cloud (`feedback` table and Edge Function, rate limited); `tools/Read-Feedback.ps1` lists them.
+- Settings › Startup › "Count games that run as administrator": Windows does not deliver raw mouse input to a normal
+  program while an elevated window is in front, so elevated games (Genshin Impact, Honkai: Star Rail, ZZZ) showed 0 m.
+  The tracker can now run elevated through a Task Scheduler task (one UAC prompt to switch on or off); its pipe gets a
+  medium integrity label so the normal window still reaches it, and it opens the window de-elevated through Explorer.
+
+### Fixed
+- Updates and uninstall handle a tracker running with administrator rights (cannot be inspected or killed from the
+  window: it is asked to exit over the pipe).
+
 ## [0.1.0-beta.5] - 2026-10-04
 
 ### Added

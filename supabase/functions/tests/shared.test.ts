@@ -1,7 +1,7 @@
 // Unit tests of the pure server code. Run: npx deno test supabase/functions/tests
 import { assert, assertEquals, assertFalse } from "jsr:@std/assert@1";
 import { friendList, playerSummary, readAssertion, STEAM_OPENID, steamLoginUrl, verifyWithSteam } from "../_shared/steam.ts";
-import { LIMITS, validateBoard, validateStart, validateSync } from "../_shared/validate.ts";
+import { LIMITS, validateBoard, validateFeedback, validateStart, validateSync } from "../_shared/validate.ts";
 import { base64Url, randomToken, safeEqual, sha256Base64Url } from "../_shared/crypto.ts";
 
 const RETURN_TO = "https://x.supabase.co/functions/v1/auth-steam/callback?pending=abc";
@@ -173,5 +173,15 @@ Deno.test("board: parameters are validated", () => {
   assertEquals(validateBoard(new URLSearchParams({ period: "all", game: "steam:730" })), { period: "all", game: "steam:730" });
   for (const bad of [[["period", "year"]], [["game", ""]], [["game", "<x>"]]]) {
     assertEquals(validateBoard(new URLSearchParams(bad)), null);
+  }
+});
+
+Deno.test("feedback: valid messages are trimmed and limited", () => {
+  assertEquals(validateFeedback({ kind: "idea", message: "  Add a dark theme  ", contact: "", version: "0.1.0-beta.6" }), {
+    kind: "idea", message: "Add a dark theme", contact: null, version: "0.1.0-beta.6", os: null, language: null,
+  });
+  assertEquals(validateFeedback({ kind: "bug", message: "x".repeat(4000), contact: "c".repeat(500) })?.contact?.length, 200);
+  for (const bad of [null, { kind: "spam", message: "hello" }, { kind: "bug", message: "hi" }, { kind: "bug", message: "x".repeat(4001) }, { kind: "bug" }]) {
+    assertEquals(validateFeedback(bad), null);
   }
 });

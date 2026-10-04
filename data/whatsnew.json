@@ -1,6 +1,17 @@
 {
   "releases": [
     {
+      "version": "0.1.0-beta.6",
+      "en": [
+        "“Complaints and suggestions” at the bottom left: write to the author directly from the app.",
+        "Genshin Impact and other games that run as administrator: turn on Settings › Startup › “Count games that run as administrator” to count them (Windows asks for permission once)."
+      ],
+      "ru": [
+        "«Жалобы и предложения» внизу слева: пиши автору прямо из программы.",
+        "Genshin Impact и другие игры, запущенные от имени администратора: включи Настройки › Запуск › «Считать игры, запущенные от имени администратора» (Windows один раз спросит разрешение)."
+      ]
+    },
+    {
       "version": "0.1.0-beta.5",
       "en": [
         "Settings › Your data: export your statistics to CSV (opens in Excel) or delete everything AimOdometer keeps on this PC.",

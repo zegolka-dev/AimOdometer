@@ -25,6 +25,15 @@
           <TextBlock Text="AimOdometer" FontSize="17" FontWeight="SemiBold" Margin="10,0,0,0" VerticalAlignment="Center" />
         </StackPanel>
 
+        <!-- Complaints and suggestions -->
+        <Button DockPanel.Dock="Bottom" Style="{StaticResource LinkButton}" Command="{Binding OpenFeedbackCommand}" HorizontalAlignment="Left"
+                Margin="4,0,0,10" AutomationProperties.AutomationId="OpenFeedback">
+          <StackPanel Orientation="Horizontal">
+            <TextBlock Style="{StaticResource Icon}" Text="&#xED15;" Margin="0,0,8,0" VerticalAlignment="Center" />
+            <TextBlock Text="{l:T Feedback.Button}" />
+          </StackPanel>
+        </Button>
+
         <!-- Live tracker status -->
         <Border DockPanel.Dock="Bottom" Background="{StaticResource SurfaceElevatedBrush}" CornerRadius="10" Padding="12,10">
           <StackPanel Orientation="Horizontal">
@@ -91,6 +100,7 @@
     <!-- Overlays -->
     <Grid Grid.ColumnSpan="2" Background="#CC07071A" Visibility="{Binding HasOverlay, Converter={StaticResource BoolToVisibility}}">
       <v:OnboardingView DataContext="{Binding Onboarding}" Visibility="{Binding DataContext.IsOnboardingVisible, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource BoolToVisibility}}" />
+      <v:FeedbackView DataContext="{Binding Feedback}" Visibility="{Binding DataContext.IsFeedbackVisible, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource BoolToVisibility}}" />
       <v:WhatsNewView DataContext="{Binding WhatsNew}" Visibility="{Binding DataContext.IsWhatsNewVisible, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource BoolToVisibility}}" />
       <v:ShareView DataContext="{Binding Share}" Visibility="{Binding DataContext.IsShareVisible, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource BoolToVisibility}}" />
       <v:CalibrationView DataContext="{Binding Calibration}" Visibility="{Binding DataContext.IsCalibrationVisible, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource BoolToVisibility}}" />

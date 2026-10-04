@@ -2,6 +2,7 @@ using System.IO.Pipes;
 using System.Runtime.InteropServices;
 using System.Security.AccessControl;
 using System.Security.Principal;
+using AimOdometer.Core;
 using AimOdometer.Core.Diagnostics;
 using AimOdometer.Core.Ipc;
 using AimOdometer.Win32;
@@ -40,21 +41,45 @@ internal sealed unsafe class PipeServer : IDisposable
         _thread.Start();
     }
 
-    private void Run()
+    /// <summary>Only the current user may connect.</summary>
+    internal static PipeSecurity CreateSecurity()
     {
-        var security = new PipeSecurity();
         var user = WindowsIdentity.GetCurrent().User
             ?? throw new InvalidOperationException("Cannot determine the current user SID.");
+        var security = new PipeSecurity();
         security.AddAccessRule(new PipeAccessRule(user, PipeAccessRights.FullControl, AccessControlType.Allow));
+        return security;
+    }
+
+    /// <summary>
+    /// One pipe instance. When the tracker runs as administrator ("count games that run as administrator"), the pipe
+    /// would get the high integrity label and the normal window could not write to it, so it is lowered to medium.
+    /// </summary>
+    internal static NamedPipeServerStream CreatePipe(string name, PipeSecurity security, bool elevated)
+    {
+        var server = NamedPipeServerStreamAcl.Create(
+            name, PipeDirection.InOut, 1, PipeTransmissionMode.Byte, PipeOptions.Asynchronous,
+            TrackerProtocol.MaxResponseSize, TrackerProtocol.RequestSize, security,
+            additionalAccessRights: elevated ? PipeAccessRights.TakeOwnership : 0);
+        if (elevated && !IntegrityLabel.SetMedium(server.SafePipeHandle))
+        {
+            Log.Warning("Could not lower the pipe's integrity label: the window may not reach this elevated tracker");
+        }
+
+        return server;
+    }
+
+    private void Run()
+    {
+        var security = CreateSecurity();
+        var elevated = ElevatedTask.IsElevated;
 
         var buffer = new byte[TrackerProtocol.RequestSize];
         while (!_stop.IsCancellationRequested)
         {
             try
             {
-                using var server = NamedPipeServerStreamAcl.Create(
-                    _pipeName, PipeDirection.InOut, 1, PipeTransmissionMode.Byte, PipeOptions.Asynchronous,
-                    TrackerProtocol.MaxResponseSize, TrackerProtocol.RequestSize, security);
+                using var server = CreatePipe(_pipeName, security, elevated);
                 server.WaitForConnectionAsync(_stop.Token).GetAwaiter().GetResult();
                 server.ReadExactly(buffer);
 
