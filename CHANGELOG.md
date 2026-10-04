@@ -5,6 +5,11 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), ver
 
 ## [Unreleased]
 
+## [0.1.0-beta.11] - 2026-10-04
+
+### Changed
+- The activity heat map lights up from midnight to 23:00 when it appears or the period changes.
+
 ## [0.1.0-beta.10] - 2026-10-04
 
 ### Changed

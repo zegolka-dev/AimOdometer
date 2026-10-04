@@ -1,12 +1,12 @@
 {
   "releases": [
     {
-      "version": "0.1.0-beta.10",
+      "version": "0.1.0-beta.11",
       "en": [
-        "Smoother: buttons and menus react to the mouse with soft animations; charts, rings and bars grow in; windows open smoothly."
+        "Smoother: buttons and menus react to the mouse with soft animations; charts, the ring, bars and the heat map grow in; windows open smoothly."
       ],
       "ru": [
-        "Плавнее: кнопки и меню мягко реагируют на мышь, графики, кольцо и полоски вырастают, окна открываются плавно."
+        "Плавнее: кнопки и меню мягко реагируют на мышь, графики, кольцо, полоски и тепловая карта плавно появляются, окна открываются мягко."
       ]
     },
     {

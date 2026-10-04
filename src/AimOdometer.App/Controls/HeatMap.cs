@@ -2,6 +2,7 @@ using System.Globalization;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Windows.Media.Animation;
 
 namespace AimOdometer.App.Controls;
 
@@ -13,7 +14,28 @@ public sealed class HeatMap : FrameworkElement
 {
     public static readonly DependencyProperty DataProperty = DependencyProperty.Register(
         nameof(Data), typeof(HeatMapData), typeof(HeatMap),
-        new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.AffectsRender));
+        new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.AffectsRender, (d, _) => ((HeatMap)d).OnDataChanged()));
+
+    /// <summary>0..1 while the cells light up, sweeping from midnight to 23:00.</summary>
+    public static readonly DependencyProperty GrowProperty = DependencyProperty.Register(
+        nameof(Grow), typeof(double), typeof(HeatMap),
+        new FrameworkPropertyMetadata(1.0, FrameworkPropertyMetadataOptions.AffectsRender));
+
+    private static readonly CubicEase GrowEase = new() { EasingMode = EasingMode.EaseOut };
+
+    public double Grow
+    {
+        get => (double)GetValue(GrowProperty);
+        set => SetValue(GrowProperty, value);
+    }
+
+    private void OnDataChanged()
+    {
+        if (SystemParameters.ClientAreaAnimation)
+        {
+            BeginAnimation(GrowProperty, new DoubleAnimation(0, 1, TimeSpan.FromMilliseconds(700)) { EasingFunction = GrowEase });
+        }
+    }
 
     private const double LabelWidth = 34;
     private const double HeaderHeight = 18;
@@ -86,7 +108,9 @@ public sealed class HeatMap : FrameworkElement
                 var rect = new Rect(LabelWidth + (hour * cell) + 1, y + 1, Math.Max(1, cell - 2), 20);
                 Brush fill = value <= 0 || max <= 0
                     ? empty
-                    : new SolidColorBrush(Color.FromArgb((byte)(60 + (195 * Math.Sqrt(value / max))), accent.R, accent.G, accent.B));
+                    : new SolidColorBrush(Color.FromArgb(
+                        (byte)((60 + (195 * Math.Sqrt(value / max))) * Math.Clamp((Grow - (0.4 * ((hour / 23.0 * 0.8) + (row / 6.0 * 0.2)))) / 0.6, 0, 1)),
+                        accent.R, accent.G, accent.B));
                 drawingContext.DrawRoundedRectangle(fill, (row, hour) == _hover ? new Pen(Brushes.White, 1) : null, rect, 3, 3);
             }
         }
