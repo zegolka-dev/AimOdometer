@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://zegolka-dev.github.io/AimOdometer/sitemap.xml
