@@ -5,6 +5,17 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), ver
 
 ## [Unreleased]
 
+## [0.1.0-beta.8] - 2026-10-04
+
+### Fixed
+- A damaged statistics file (power cut mid-write) stopped both the window and the counter for good with a raw SQLite
+  error. It is now kept as `aimodometer.db.broken-<time>` and the newest readable daily backup takes its place (or an
+  empty database when there is none); the window says so once.
+- A database that failed to open kept its file handle, so it could not be moved or replaced.
+- Typing "NaN" as DPI crashed the window; "NaN" or "Infinity" as gear lifetime saved a broken item.
+- A pipe client that connected and never wrote blocked the tracker's pipe for good (now dropped after 2 s).
+- Name, DPI, lifetime and map search fields have length limits.
+
 ## [0.1.0-beta.7] - 2026-10-04
 
 ### Changed

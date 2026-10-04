@@ -29,6 +29,8 @@ internal sealed unsafe class PipeServer : IDisposable
     public const uint RequestMessage = User32.WmApp + 2;
 
     private readonly nint _hwnd;
+    private static readonly TimeSpan RequestTimeout = TimeSpan.FromSeconds(2);
+
     private readonly string _pipeName;
     private readonly CancellationTokenSource _stop = new();
     private readonly Thread _thread;
@@ -81,7 +83,12 @@ internal sealed unsafe class PipeServer : IDisposable
             {
                 using var server = CreatePipe(_pipeName, security, elevated);
                 server.WaitForConnectionAsync(_stop.Token).GetAwaiter().GetResult();
-                server.ReadExactly(buffer);
+                using (var read = CancellationTokenSource.CreateLinkedTokenSource(_stop.Token))
+                {
+                    // A client that connects and never writes must not block the only pipe instance.
+                    read.CancelAfter(RequestTimeout);
+                    server.ReadExactlyAsync(buffer, read.Token).AsTask().GetAwaiter().GetResult();
+                }
 
                 var (command, argument) = TrackerProtocol.ReadRequest(buffer);
                 var request = new PipeRequest { Command = command, Argument = argument };
@@ -101,6 +108,10 @@ internal sealed unsafe class PipeServer : IDisposable
 
                 server.Flush();
                 server.WaitForPipeDrain();
+            }
+            catch (OperationCanceledException) when (!_stop.IsCancellationRequested)
+            {
+                Log.Debug("Pipe client sent no request in time; dropped");
             }
             catch (OperationCanceledException)
             {

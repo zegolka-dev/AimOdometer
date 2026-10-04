@@ -39,7 +39,7 @@
             <ColumnDefinition Width="*" />
             <ColumnDefinition Width="Auto" />
           </Grid.ColumnDefinitions>
-          <TextBox x:Name="SearchBox" Text="{Binding Query, UpdateSourceTrigger=PropertyChanged}" AutomationProperties.Name="{Binding SearchHint}"
+          <TextBox x:Name="SearchBox" MaxLength="120" Text="{Binding Query, UpdateSourceTrigger=PropertyChanged}" AutomationProperties.Name="{Binding SearchHint}"
                    AutomationProperties.AutomationId="MapSearch">
             <TextBox.InputBindings>
               <KeyBinding Key="Enter" Command="{Binding SearchCommand}" />

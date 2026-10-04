@@ -17,7 +17,7 @@
 
         <StackPanel Grid.Column="1">
           <StackPanel Orientation="Horizontal">
-            <TextBox Text="{Binding Name, UpdateSourceTrigger=PropertyChanged}" MinWidth="260" FontSize="15"
+            <TextBox MaxLength="60" Text="{Binding Name, UpdateSourceTrigger=PropertyChanged}" MinWidth="260" FontSize="15"
                      AutomationProperties.Name="{l:T Gear.Name}">
               <TextBox.InputBindings>
                 <KeyBinding Key="Enter" Command="{Binding SaveNameCommand}" />
@@ -31,7 +31,7 @@
 
           <TextBlock Style="{StaticResource CardLabel}" Text="{l:T Gear.Dpi}" Margin="0,0,0,6" />
           <WrapPanel>
-            <TextBox Text="{Binding DpiText, UpdateSourceTrigger=PropertyChanged}" Width="100" FontFamily="{StaticResource NumberFont}" FontSize="15"
+            <TextBox MaxLength="9" Text="{Binding DpiText, UpdateSourceTrigger=PropertyChanged}" Width="100" FontFamily="{StaticResource NumberFont}" FontSize="15"
                      AutomationProperties.Name="{l:T Gear.Dpi}">
               <TextBox.InputBindings>
                 <KeyBinding Key="Enter" Command="{Binding SaveDpiCommand}" />

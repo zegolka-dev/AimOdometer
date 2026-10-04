@@ -35,17 +35,25 @@ public sealed class SqliteDatabase : IDisposable
         }
 
         var database = new SqliteDatabase(db);
-        _ = SqliteNative.sqlite3_busy_timeout(db, 2000);
-        if (!readOnly)
+        try
         {
-            database.Execute("PRAGMA journal_mode=WAL;");
-            database.Execute("PRAGMA synchronous=NORMAL;");
-        }
+            _ = SqliteNative.sqlite3_busy_timeout(db, 2000);
+            if (!readOnly)
+            {
+                database.Execute("PRAGMA journal_mode=WAL;");
+                database.Execute("PRAGMA synchronous=NORMAL;");
+            }
 
-        // Small page cache: the tracker has a 15 MB memory budget.
-        database.Execute("PRAGMA cache_size=-512;");
-        database.Execute("PRAGMA foreign_keys=ON;");
-        return database;
+            // Small page cache: the tracker has a 15 MB memory budget.
+            database.Execute("PRAGMA cache_size=-512;");
+            database.Execute("PRAGMA foreign_keys=ON;");
+            return database;
+        }
+        catch
+        {
+            database.Dispose(); // a damaged file fails here; keep no handle so it can be moved aside
+            throw;
+        }
     }
 
     internal nint Handle => _db != 0 ? _db : throw new ObjectDisposedException(nameof(SqliteDatabase));

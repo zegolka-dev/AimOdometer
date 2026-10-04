@@ -90,7 +90,7 @@
                       <StackPanel VerticalAlignment="Center">
                         <TextBlock Text="{Binding Name}" FontSize="14" TextTrimming="CharacterEllipsis" MaxWidth="260"
                                    Visibility="{Binding IsRenaming, Converter={StaticResource InverseBoolToVisibility}}" />
-                        <TextBox Text="{Binding Name, UpdateSourceTrigger=PropertyChanged}" MinWidth="200"
+                        <TextBox MaxLength="80" Text="{Binding Name, UpdateSourceTrigger=PropertyChanged}" MinWidth="200"
                                  Visibility="{Binding IsRenaming, Converter={StaticResource BoolToVisibility}}">
                           <TextBox.InputBindings>
                             <KeyBinding Key="Enter" Command="{Binding CommitRenameCommand}" />

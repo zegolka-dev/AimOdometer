@@ -42,7 +42,7 @@ internal static class Program
             StatsStore store;
             try
             {
-                store = StatsStore.Open(Path.Combine(options.DataDirectory, "aimodometer.db"));
+                store = Backups.OpenOrRecover(Path.Combine(options.DataDirectory, "aimodometer.db"));
             }
             catch (Exception ex) when (ex is SqliteException or IOException or UnauthorizedAccessException or InvalidOperationException)
             {

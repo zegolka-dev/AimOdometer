@@ -611,6 +611,11 @@ public sealed class StatsStore : IDisposable
     public long SaveGear(GearItem item)
     {
         ArgumentNullException.ThrowIfNull(item);
+        if (!double.IsFinite(item.LifetimeKm) || item.LifetimeKm <= 0)
+        {
+            throw new ArgumentOutOfRangeException(nameof(item), item.LifetimeKm, "Lifetime must be positive.");
+        }
+
         using var statement = _db.Prepare(item.Id == 0
             ? "INSERT INTO gear (kind, name, device_id, started_on, lifetime_km, retired_on) VALUES (?1, ?2, ?3, ?4, ?5, ?6);"
             : "UPDATE gear SET kind = ?1, name = ?2, device_id = ?3, started_on = ?4, lifetime_km = ?5, retired_on = ?6 WHERE id = ?7;");
@@ -728,4 +733,7 @@ public static class SettingKeys
     public const string AutoUpdate = "auto_update";
     public const string ElevatedTracker = "elevated_tracker";
     public const string LastSeenVersion = "last_seen_version";
+
+    /// <summary>Set when a damaged database was replaced: the backup date (yyyy-MM-dd) or "none".</summary>
+    public const string RecoveredFrom = "recovered_from";
 }

@@ -534,5 +534,7 @@
   "Settings.ElevatedDeclined": "Windows did not allow it (the request was declined). Nothing changed.",
   "Settings.ElevatedOn": "Done: the counter runs with administrator rights and starts that way with Windows.",
   "Settings.ElevatedOff": "Done: the counter runs as a normal program again.",
-  "Settings.ElevatedNotRunning": "The setting is saved, but the counter did not start. Restart AimOdometer."
+  "Settings.ElevatedNotRunning": "The setting is saved, but the counter did not start. Restart AimOdometer.",
+  "App.RecoveredFromBackup": "The statistics file was damaged (for example, the PC lost power while it was being written). AimOdometer restored the backup from {0}; distance since then is lost. The damaged file was kept next to it as aimodometer.db.broken-….",
+  "App.RecoveredEmpty": "The statistics file was damaged (for example, the PC lost power while it was being written) and there was no readable backup, so counting starts again. The damaged file was kept next to it as aimodometer.db.broken-…."
 }

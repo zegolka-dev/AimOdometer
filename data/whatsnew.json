@@ -1,6 +1,17 @@
 {
   "releases": [
     {
+      "version": "0.1.0-beta.8",
+      "en": [
+        "If the statistics file gets damaged (for example, the PC loses power), AimOdometer restores yesterday's backup by itself instead of refusing to start.",
+        "Fixes found by a stress test: odd values in the DPI and lifetime fields no longer break anything."
+      ],
+      "ru": [
+        "Если файл статистики повредится (например, ПК внезапно выключится), AimOdometer сам восстановит вчерашнюю резервную копию, а не перестанет запускаться.",
+        "Исправления после стресс-теста: странные значения в полях DPI и ресурса больше ничего не ломают."
+      ]
+    },
+    {
       "version": "0.1.0-beta.7",
       "en": [
         "New icons for mouse pads, sleeves, glides and mice on the Gear page."

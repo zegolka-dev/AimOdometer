@@ -158,7 +158,7 @@ public sealed partial class GearItemsViewModel(AppData data) : ObservableObject
             return;
         }
 
-        if (!double.TryParse(NewLifetime.Replace(',', '.'), NumberStyles.Float, CultureInfo.InvariantCulture, out var lifetime) || lifetime <= 0)
+        if (!double.TryParse(NewLifetime.Replace(',', '.'), NumberStyles.Float, CultureInfo.InvariantCulture, out var lifetime) || lifetime is not (> 0 and <= 1_000_000)) // also rejects "NaN" and "Infinity"
         {
             Error = Loc.Instance["Gear.LifetimeInvalid"];
             return;

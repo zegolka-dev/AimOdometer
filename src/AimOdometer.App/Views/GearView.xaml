@@ -85,7 +85,7 @@
           </StackPanel>
           <StackPanel Margin="0,0,12,8">
             <TextBlock Style="{StaticResource CardLabel}" Text="{l:T Gear.Name}" Margin="0,0,0,4" />
-            <TextBox Text="{Binding Gear.NewName, UpdateSourceTrigger=PropertyChanged}" Width="220" AutomationProperties.Name="{l:T Gear.Name}" />
+            <TextBox MaxLength="60" Text="{Binding Gear.NewName, UpdateSourceTrigger=PropertyChanged}" Width="220" AutomationProperties.Name="{l:T Gear.Name}" />
           </StackPanel>
           <StackPanel Margin="0,0,12,8" Visibility="{Binding Gear.NeedsMouse, Converter={StaticResource BoolToVisibility}}">
             <TextBlock Style="{StaticResource CardLabel}" Text="{l:T Gear.ForMouse}" Margin="0,0,0,4" />
@@ -98,7 +98,7 @@
           </StackPanel>
           <StackPanel Margin="0,0,12,8">
             <TextBlock Style="{StaticResource CardLabel}" Text="{l:T Gear.LifetimeKm}" Margin="0,0,0,4" />
-            <TextBox Text="{Binding Gear.NewLifetime, UpdateSourceTrigger=PropertyChanged}" Width="100" AutomationProperties.Name="{l:T Gear.LifetimeKm}" />
+            <TextBox MaxLength="9" Text="{Binding Gear.NewLifetime, UpdateSourceTrigger=PropertyChanged}" Width="100" AutomationProperties.Name="{l:T Gear.LifetimeKm}" />
           </StackPanel>
           <Button Style="{StaticResource PrimaryButton}" Content="{l:T Gear.AddButton}" Command="{Binding Gear.AddCommand}" VerticalAlignment="Bottom" Margin="0,0,0,8" />
         </WrapPanel>

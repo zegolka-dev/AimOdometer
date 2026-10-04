@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.Windows;
 using System.Windows.Threading;
@@ -45,7 +46,7 @@ public partial class App : Application
         StatsStore store;
         try
         {
-            store = StatsStore.Open(StatsStore.DefaultPath);
+            store = Backups.OpenOrRecover(StatsStore.DefaultPath);
         }
         catch (Exception ex) when (ex is SqliteException or IOException or UnauthorizedAccessException or InvalidOperationException)
         {
@@ -74,6 +75,23 @@ public partial class App : Application
         _main.Start();
         _cloud.Start();
         _updates.Start();
+        Dispatcher.BeginInvoke(DispatcherPriority.ApplicationIdle, ShowRecoveryNotice);
+    }
+
+    /// <summary>Tells the user once that a damaged database was replaced (by this window or by the tracker).</summary>
+    private void ShowRecoveryNotice()
+    {
+        if (_data?.Setting(SettingKeys.RecoveredFrom) is not { Length: > 0 } from)
+        {
+            return;
+        }
+
+        _data.Store.SetSetting(SettingKeys.RecoveredFrom, string.Empty);
+        var L = Loc.Instance;
+        var text = DateOnly.TryParseExact(from, "yyyy-MM-dd", CultureInfo.InvariantCulture, DateTimeStyles.None, out var day)
+            ? L.Format("App.RecoveredFromBackup", Format.Date(day))
+            : L["App.RecoveredEmpty"];
+        MessageBox.Show(MainWindow, text, "AimOdometer", MessageBoxButton.OK, MessageBoxImage.Warning);
     }
 
     protected override void OnExit(ExitEventArgs e)

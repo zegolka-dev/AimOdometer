@@ -73,7 +73,7 @@ public sealed partial class DeviceRowViewModel : ObservableObject
     [RelayCommand]
     private void SaveDpi()
     {
-        if (!double.TryParse(DpiText.Replace(',', '.'), NumberStyles.Float, CultureInfo.InvariantCulture, out var dpi) || dpi is < 50 or > 50_000)
+        if (!double.TryParse(DpiText.Replace(',', '.'), NumberStyles.Float, CultureInfo.InvariantCulture, out var dpi) || dpi is not (>= 50 and <= 50_000)) // "NaN" parses and passes "< 50 or > 50000"
         {
             DpiError = Loc.Instance["Gear.DpiInvalid"];
             return;
