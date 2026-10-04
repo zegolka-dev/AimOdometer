@@ -168,6 +168,20 @@ phase that first needs them, so the repository never contains empty shells.
 - **Only the window talks to the cloud**, and only when signed in: on open, every 15 minutes while open, on close.
 - Account deletion deletes the auth user; every table cascades from it.
 
+## Releases and updates (Velopack)
+
+- Publishing a version = pushing a tag `vX.Y.Z[-beta.N]`. `.github/workflows/release.yml` tests, publishes the window
+  (self-contained, .NET included) and the tracker (NativeAOT) into one folder, packs it with `vpk` (pinned in
+  `dotnet-tools.json`; package id `AimOdometerApp`) and uploads Setup.exe, the portable zip, the full package and a
+  delta to GitHub Releases (prerelease for `-` versions). Bump `<Version>` in `Directory.Build.props` and CHANGELOG.
+- Installed: `%LOCALAPPDATA%\AimOdometerApp\current\…` next to `Update.exe`; portable: the same layout inside the
+  unzipped folder (`AimOdometer.exe` is Velopack's launcher). Statistics stay in `%LOCALAPPDATA%\AimOdometer`.
+- `Program.Main` runs Velopack first (install/update/uninstall hooks; uninstall stops the tracker and removes the Run
+  value). The window (`Services/Updates.cs`) checks GitHub when it opens and every hour, downloads the update, waits a
+  few seconds with a banner, syncs the cloud, stops the tracker (its files are replaced; pipe `Shutdown`, then kill
+  after 5 s) and calls `ApplyUpdatesAndRestart`. The new window starts the new tracker, which rewrites the Run value.
+  Developer builds (not installed) never check. Verified 2026-10-04: beta.1 → beta.2 with a 0.2 MB delta in 8 s.
+
 ## Named pipe
 
 `\\.\pipe\AimOdometer.Tracker.<session id>`, accessible only to the current user. Request: 1-byte command + 8-byte
