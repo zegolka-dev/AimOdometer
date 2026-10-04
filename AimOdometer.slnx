@@ -13,6 +13,7 @@
     <Project Path="tests/AimOdometer.Tracker.Tests/AimOdometer.Tracker.Tests.csproj" />
   </Folder>
   <Folder Name="/tools/">
+    <Project Path="tools/GameInputProbe/GameInputProbe.csproj" />
     <Project Path="tools/IconGen/IconGen.csproj" />
     <Project Path="tools/InputProbe/InputProbe.csproj" />
     <Project Path="tools/InputSimulator/InputSimulator.csproj" />

@@ -5,6 +5,10 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), ver
 
 ## [Unreleased]
 
+### Added
+- `tools/GameInputProbe`: reads the mouse through Microsoft GameInput and background Raw Input at once. Phase 10 result:
+  GameInput is coalesced the same way (0.43 % less path than Raw Input), so the tracker stays on Raw Input.
+
 ### Fixed
 - `AimOdometer.Tracker --stop` could not stop a tracker running as administrator (window messages to an elevated
   process are dropped); it now falls back to the pipe's Shutdown command. `Run-Benchmarks.ps1` refuses to run unless the

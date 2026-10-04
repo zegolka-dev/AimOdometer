@@ -159,6 +159,24 @@ writes to the benchmark folder.
 CPU per event is unchanged since phase 2. The working set is about 2.3 MB larger: the tracker now also evaluates
 achievements, gear and fair-play limits and runs the achievement notifications; still a third of the 15 MB budget.
 
+## GameInput experiment (phase 10, 2026-10-05)
+
+Question: does Microsoft GameInput give a background process the mouse without the coalescing Windows 11 applies to
+background Raw Input (the -2.3 % path loss under active aim, see Accuracy)? `tools/GameInputProbe` reads the mouse
+through GameInput (runtime 3.1 from the redistributable, `GameInputEnableBackgroundInput`) and through background Raw
+Input at the same time, from a console that is never in front. 30 s of active aim in a game, the author's ~6000 Hz
+mouse:
+
+| Source | Events | Path (counts) | sum of abs(dx) | sum of abs(dy) |
+|---|---|---|---|---|
+| GameInput | 3,448 | 657,662 | 571,589 | 234,784 |
+| Raw Input | 3,484 | 660,522 | 574,107 | 236,054 |
+
+GameInput delivered the same ~115 events per second as Raw Input and 0.43 % less path: it is coalesced the same way
+(its package even ships `GameInputRawInputProxy.exe`, so for mice it sits on top of Raw Input) and lost a few events on
+top. **Decision: no second input source**; the tracker stays on Raw Input. The probe stays in `tools/` to repeat the
+check when a new GameInput or Windows version comes out.
+
 ## Open items
 
 - ~~Real high-rate mouse~~: confirmed, hardware input is coalesced to ~125/s for background listeners (0.116 % CPU).
