@@ -268,7 +268,7 @@ AimOdometer/
 
 ### Фаза 9 — Релиз
 - [x] (сделано раньше фазы 8, по просьбе автора, 2026-10-04) Velopack: `vpk pack` в CI по тегу `v*` (`.github/workflows/release.yml`), публикация в GitHub Releases, дельты; окно самодостаточное (.NET внутри); хук удаления (Run-ключ, остановка трекера через pipe `Shutdown`); автообновление в App при открытии и раз в час (отключаемое): скачать → остановить трекер → применить → перезапуск. Setup.exe и portable zip.
-- [x] Лендинг `site/` EN/RU (генератор `tools/build_site.py`, тексты privacy/anticheat в `site/content/`), скриншоты на демо-данных (без личных программ), кнопка «Скачать» берёт новейший релиз (бета тоже) через GitHub API, деплой через Actions (`pages.yml`) вместе с `services.json`.
+- [x] Лендинг `site/` EN/RU (генератор `tools/build_site.py`, тексты privacy/anticheat в `site/content/`), скриншоты на демо-данных (без личных программ), кнопка «Скачать» берёт новейший релиз (бета тоже) через GitHub API, деплой через Actions (`pages.yml`) вместе с `services.json`. Сайт опубликован 2026-10-04: https://zegolka-dev.github.io/AimOdometer/
 - [x] README (EN) + README.ru.md (про SmartScreen), PRIVACY (EN+RU), `docs/ANTICHEAT.md` (чек-лист и таблица результатов), `docs/RELEASE_CHECKLIST.md`.
 - [x] Настройки › Твои данные: экспорт в CSV и «Удалить статистику на этом ПК» (останавливает трекер, удаляет всё, кроме логов, перезапускает окно).
 - [ ] **Ручное античит-тестирование** VALORANT / Fortnite и повтор CS2/Apex/FACEIT на финальной версии — делаешь ты по `docs/ANTICHEAT.md`.
