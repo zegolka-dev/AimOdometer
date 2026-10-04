@@ -60,6 +60,13 @@
               <Setter TargetName="Glyph" Property="Foreground" Value="{StaticResource AccentTextBrush}" />
               <Setter TargetName="Bar" Property="Foreground" Value="{StaticResource AccentBrush}" />
             </DataTrigger>
+            <!-- Shame: inflated distance, in red. -->
+            <DataTrigger Binding="{Binding IsShame}" Value="True">
+              <Setter TargetName="Card" Property="BorderBrush" Value="{StaticResource DangerBrush}" />
+              <Setter TargetName="Badge" Property="Background" Value="{StaticResource DangerSoftBrush}" />
+              <Setter TargetName="Glyph" Property="Foreground" Value="{StaticResource DangerBrush}" />
+              <Setter TargetName="Bar" Property="Foreground" Value="{StaticResource DangerBrush}" />
+            </DataTrigger>
           </DataTemplate.Triggers>
         </DataTemplate>
       </ItemsControl.ItemTemplate>

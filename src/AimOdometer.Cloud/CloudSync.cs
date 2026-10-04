@@ -2,13 +2,16 @@ using System.Globalization;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
+using AimOdometer.Core.Fun;
 using AimOdometer.Core.Games;
 using AimOdometer.Core.Storage;
 
 namespace AimOdometer.Cloud;
 
 /// <summary>One uploaded row: a local date x game x mouse of this PC.</summary>
-public sealed record CloudRow(DateOnly Day, string GameKey, string MouseKey, double Centimeters, long Clicks, long MoveSeconds, double PeakSpeed);
+public sealed record CloudRow(
+    DateOnly Day, string GameKey, string MouseKey, double Centimeters, long Clicks, long MoveSeconds, double PeakSpeed,
+    double Dpi = 0, double PeakDpi = 0);
 
 /// <summary>Result of a sync run.</summary>
 public sealed record SyncOutcome(int Uploaded, int Rejected, DateTimeOffset At);
@@ -61,8 +64,12 @@ public static class CloudSync
         store.SetSetting(SettingKeys.CloudSyncedUser, session.UserId);
         store.SetSetting(SettingKeys.CloudSyncedThrough, today.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture));
         store.SetSetting(SettingKeys.CloudLastSync, now.ToString("O", CultureInfo.InvariantCulture));
+        store.SetSetting(SettingKeys.CloudRowFormat, RowFormat);
         return new SyncOutcome(uploaded, rejected, now);
     }
+
+    /// <summary>Rows carry DPI since 0.1.0-beta.14; history uploaded before is sent again once.</summary>
+    internal const string RowFormat = "2";
 
     /// <summary>Forget what was uploaded: the next sync sends the whole history again (after rule, device or DPI changes).</summary>
     public static void RequestFullUpload(StatsStore store)
@@ -83,7 +90,7 @@ public static class CloudSync
     /// <summary>Null = everything (first sync for this account, or a full upload was requested).</summary>
     internal static DateOnly? FirstDayToUpload(StatsStore store, string userId)
     {
-        if (store.GetSetting(SettingKeys.CloudSyncedUser) != userId)
+        if (store.GetSetting(SettingKeys.CloudSyncedUser) != userId || store.GetSetting(SettingKeys.CloudRowFormat) != RowFormat)
         {
             return null;
         }
@@ -135,7 +142,9 @@ public static class CloudSync
                 Math.Round(g.Sum(b => b.Centimeters), 2),
                 g.Sum(b => b.Clicks),
                 g.Sum(b => b.MoveSeconds),
-                Math.Round(g.Max(b => b.PeakSpeed), 2)))
+                Math.Round(g.Max(b => b.PeakSpeed), 2),
+                Math.Round(FairPlay.WeightedDpi(g.Select(b => (b.Centimeters, b.Dpi))), 1),
+                Math.Round(g.MaxBy(b => b.PeakSpeed)!.PeakDpi, 1)))
             .Where(r => r.Centimeters > 0 || r.Clicks > 0)
             .OrderBy(r => r.Day)];
 
@@ -184,6 +193,8 @@ public static class CloudSync
                 w.WriteNumber("clicks", r.Clicks);
                 w.WriteNumber("moveSeconds", r.MoveSeconds);
                 w.WriteNumber("peakSpeed", r.PeakSpeed);
+                w.WriteNumber("dpi", r.Dpi);
+                w.WriteNumber("peakDpi", r.PeakDpi);
                 w.WriteEndObject();
             }
 

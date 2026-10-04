@@ -29,6 +29,7 @@ public static class AchievementService
             .ToDictionary(g => g.Key, g => g.Centimeters / 100, StringComparer.Ordinal);
         var nights = store.GetHourRangeTotals(NightFromHour, NightToHour);
         var devices = store.GetDeviceTotals().Where(d => d.Device.Kind != DeviceKind.Software).ToList();
+        var lowDpi = store.GetLowDpiTotals(FairPlay.ClownMaxDpi, FairPlay.BlockheadMaxDpi);
 
         return new AchievementSnapshot(
             TotalMeters: all.Centimeters / 100,
@@ -41,7 +42,9 @@ public static class AchievementService
             TotalClicks: all.Clicks,
             TotalWheelNotches: all.WheelNotches,
             MaxDeviceMeters: devices.Count == 0 ? 0 : devices.Max(d => d.Centimeters) / 100,
-            ActiveDays: days.Count(d => d.Centimeters > 0));
+            ActiveDays: days.Count(d => d.Centimeters > 0),
+            LowDpiBestDayMeters: lowDpi.BestDayCentimeters / 100,
+            VeryLowDpiMeters: lowDpi.VeryLowCentimeters / 100);
     }
 
     /// <summary>

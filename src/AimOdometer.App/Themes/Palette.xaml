@@ -35,6 +35,7 @@
   <SolidColorBrush x:Key="SuccessBrush" Color="{StaticResource SuccessColor}" />
   <SolidColorBrush x:Key="WarningBrush" Color="{StaticResource WarningColor}" />
   <SolidColorBrush x:Key="DangerBrush" Color="{StaticResource DangerColor}" />
+  <SolidColorBrush x:Key="DangerSoftBrush" Color="{StaticResource DangerColor}" Opacity="0.16" />
 
   <!-- Categorical chart series, in order. -->
   <Color x:Key="Series1Color">#8B5CF6</Color>

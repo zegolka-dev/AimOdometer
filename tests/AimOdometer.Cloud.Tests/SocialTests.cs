@@ -30,7 +30,26 @@ public sealed class SocialClientTests : IDisposable
         Assert.Equal("/functions/v1/social/friends?period=week&game=steam%3A730", server.Requests[0].Path);
         Assert.Equal(12, board.FriendsOnSteam);
         Assert.False(board.IsPrivate);
-        Assert.Equal([new BoardRow(1, "B", "https://a/b.jpg", 500, false), new BoardRow(2, "me", "", 300, true)], board.Rows);
+        Assert.Equal([new BoardRow(1, "B", "https://a/b.jpg", 500, false), new BoardRow(2, "me", "", 300, true)],
+            board.Rows.Select(r => r with { Badges = null }));
+        Assert.All(board.Rows, r => Assert.Empty(r.Badges!)); // an older server sends no DPI and no badges
+    }
+
+    [Fact]
+    public async Task BoardRowsCarryDpiAndShameBadges()
+    {
+        var server = new FakeServer((_, _) => (HttpStatusCode.OK, """
+            {"private":false,"friendsOnSteam":1,"rows":[
+              {"name":"C","avatar":"","centimeters":1200000,"isMe":false,"dpi":100,"peakSpeed":900,"peakDpi":100,"badges":["clown",7]},
+              {"name":"me","avatar":"","centimeters":300,"isMe":true,"dpi":null,"peakSpeed":0,"peakDpi":null,"badges":[]}]}
+            """));
+        using var client = new CloudClient(SignedIn(), server, new FixedTime(Now));
+        var board = await client.GetFriendsBoardAsync("week", "*", TestContext.Current.CancellationToken);
+        var c = board.Rows[0];
+        Assert.Equal((100.0, 900.0, 100.0), (c.Dpi, c.PeakSpeed, c.PeakDpi));
+        Assert.Equal(["clown"], c.Badges!);
+        Assert.Null(board.Rows[1].Dpi);
+        Assert.Null(board.Rows[1].PeakDpi);
     }
 
     [Fact]

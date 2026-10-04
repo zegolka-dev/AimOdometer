@@ -42,6 +42,7 @@ async function friends(userId: string, period: string, game: string): Promise<Re
     avatar: r.avatar_url,
     centimeters: r.centimeters,
     isMe: r.is_me,
+    ...fairPlay(r),
   }));
   return json({ private: isPrivate, friendsOnSteam: steamIds.length, rows });
 }
@@ -60,6 +61,7 @@ async function world(userId: string, period: string, game: string): Promise<Resp
     avatar: r.avatar_url,
     centimeters: r.centimeters,
     isMe: r.user_id === userId,
+    ...fairPlay(r),
   }));
   const me = (mine.data as { rank: number; centimeters: number; players: number }[])[0] ?? null;
   return json({
@@ -101,14 +103,31 @@ async function cachedFriends(userId: string): Promise<{ steamIds: string[]; isPr
   }
 }
 
-interface FriendRow {
+// What the distance and the fastest flick were measured with, and badges for inflated distance (FairPlay.cs).
+function fairPlay(r: FairPlayColumns) {
+  return {
+    dpi: r.dpi === null ? null : Math.round(r.dpi),
+    peakSpeed: r.peak_speed,
+    peakDpi: r.peak_dpi === null ? null : Math.round(r.peak_dpi),
+    badges: r.badges ?? [],
+  };
+}
+
+interface FairPlayColumns {
+  dpi: number | null;
+  peak_speed: number;
+  peak_dpi: number | null;
+  badges: string[] | null;
+}
+
+interface FriendRow extends FairPlayColumns {
   persona_name: string;
   avatar_url: string;
   centimeters: number;
   is_me: boolean;
 }
 
-interface WorldRow {
+interface WorldRow extends FairPlayColumns {
   rank: number;
   user_id: string;
   persona_name: string;

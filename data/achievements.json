@@ -1,5 +1,5 @@
 {
-  "$comment": "Achievement definitions. Names and descriptions are in data/i18n (Ach.<id>.Name / Ach.<id>.Desc). 'icon' is a Segoe Fluent Icons code point. Units by type: distances in meters, speed in m/s, the rest are counts/days. Add entries freely; ids must be unique.",
+  "$comment": "Achievement definitions. Names and descriptions are in data/i18n (Ach.<id>.Name / Ach.<id>.Desc). 'icon' is a Segoe Fluent Icons code point. Units by type: distances in meters, speed in m/s, the rest are counts/days. Add entries freely; ids must be unique. \"shame\": true marks inflated-distance achievements (src/AimOdometer.Core/Fun/FairPlay.cs): hidden until unlocked, shown on leaderboards.",
   "version": 1,
   "achievements": [
     { "id": "distance-100m",   "type": "totalDistance", "target": 100,      "icon": "E7C1" },
@@ -50,6 +50,11 @@
     { "id": "mouse-100km", "type": "deviceDistance", "target": 100000, "icon": "E962" },
     { "id": "mouse-500km", "type": "deviceDistance", "target": 500000, "icon": "E962" },
 
-    { "id": "active-30", "type": "activeDays", "target": 30, "icon": "E787" }
+    { "id": "active-30", "type": "activeDays", "target": 30, "icon": "E787" },
+
+    { "id": "shame-clown",     "type": "lowDpiDay",      "target": 10000, "icon": "E7BA", "shame": true },
+    { "id": "shame-blockhead", "type": "lowDpiDistance", "target": 100,   "icon": "E8C9", "shame": true },
+    { "id": "shame-fool",      "type": "peakSpeed",      "target": 30,    "icon": "E783", "shame": true },
+    { "id": "shame-booster",   "type": "boost",          "target": 1,     "icon": "E730", "shame": true }
   ]
 }

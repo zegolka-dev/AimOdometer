@@ -808,7 +808,8 @@ internal sealed unsafe class TrackerHost : IDisposable
                 // Newest first is the most relevant; the rest are summarized.
                 var name = _texts.GetValueOrDefault($"Ach.{pending[^1]}.Name", pending[^1]);
                 var text = pending.Count == 1 ? name : string.Format(TrayStrings.Culture, _strings.MoreAchievementsFormat, name, pending.Count - 1);
-                _tray.ShowBalloon(_strings.AchievementTitle, text);
+                var shame = AchievementEngine.All.Any(d => d.Shame && d.Id == pending[^1]);
+                _tray.ShowBalloon(shame ? _strings.ShameTitle : _strings.AchievementTitle, text);
             }
 
             // Rare event, logged at the default level so "did the notification come?" can be answered from the log.

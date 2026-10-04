@@ -62,7 +62,29 @@
                 <Border Grid.Column="1" Width="36" Height="36" CornerRadius="8" ClipToBounds="True" Background="{StaticResource SurfaceElevatedBrush}" Margin="0,0,12,0">
                   <Image Source="{Binding Avatar}" Width="36" Height="36" RenderOptions.BitmapScalingMode="HighQuality" />
                 </Border>
-                <TextBlock Grid.Column="2" Text="{Binding Name}" FontSize="15" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" />
+                <StackPanel Grid.Column="2" VerticalAlignment="Center" Margin="0,0,12,0">
+                  <WrapPanel>
+                    <TextBlock Text="{Binding Name}" FontSize="15" TextTrimming="CharacterEllipsis" VerticalAlignment="Center" Margin="0,0,8,0" />
+                    <ItemsControl ItemsSource="{Binding Badges}" Focusable="False" VerticalAlignment="Center"
+                                  Visibility="{Binding HasBadges, Converter={StaticResource BoolToVisibility}}">
+                      <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate><WrapPanel /></ItemsPanelTemplate>
+                      </ItemsControl.ItemsPanel>
+                      <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                          <!-- Shame badge: inflated distance; the tooltip says why. -->
+                          <Border CornerRadius="9" Padding="8,1" Margin="0,0,6,0" Background="{StaticResource DangerSoftBrush}"
+                                  BorderBrush="{StaticResource DangerBrush}" BorderThickness="1" ToolTip="{Binding Description}"
+                                  AutomationProperties.Name="{Binding Name}" AutomationProperties.HelpText="{Binding Description}">
+                            <TextBlock Text="{Binding Name}" FontSize="12" FontWeight="SemiBold" Foreground="{StaticResource DangerBrush}" />
+                          </Border>
+                        </DataTemplate>
+                      </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                  </WrapPanel>
+                  <TextBlock Text="{Binding Measured}" Style="{StaticResource Hint}" FontSize="12" Margin="0,2,0,0" TextTrimming="CharacterEllipsis"
+                             Visibility="{Binding Measured, Converter={StaticResource NullToCollapsed}}" />
+                </StackPanel>
                 <TextBlock Grid.Column="3" Text="{Binding Distance}" FontFamily="{StaticResource NumberFont}" FontSize="16" VerticalAlignment="Center" />
               </Grid>
             </Border>

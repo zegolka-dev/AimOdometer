@@ -130,6 +130,25 @@ Deno.test("sync: a day that is impossible as a whole is dropped entirely", () =>
   assertEquals(v.rejected, 2);
 });
 
+Deno.test("sync: DPI is kept, optional for older clients, and bounded", () => {
+  const v = validateSync({
+    pcId: PC,
+    rows: [row({ dpi: 800, peakDpi: 1600 }), row({ gameKey: "old" }), row({ gameKey: "bad", dpi: -5 }), row({ gameKey: "huge", peakDpi: 1e9 })],
+  }, NOW);
+  assert(v.ok);
+  assertEquals(v.request.rows.map((r) => [r.gameKey, r.dpi, r.peakDpi]), [["steam:730", 800, 1600], ["old", 0, 0]]);
+  assertEquals(v.rejected, 2);
+  assertFalse(v.boosted);
+});
+
+Deno.test("sync: an impossible day or flick marks the player as a booster", () => {
+  for (const rows of [[row({ centimeters: 20_000_000 })], [row({ peakSpeed: 9_000 })], [row({ gameKey: "a", centimeters: 6_000_000 }), row({ gameKey: "b", centimeters: 6_000_000 })]]) {
+    const v = validateSync({ pcId: PC, rows }, NOW);
+    assert(v.ok);
+    assert(v.boosted);
+  }
+});
+
 Deno.test("sync: tomorrow (UTC) is allowed for far-east time zones", () => {
   const v = validateSync({ pcId: PC, rows: [row({ day: "2026-10-05" })] }, NOW);
   assert(v.ok);

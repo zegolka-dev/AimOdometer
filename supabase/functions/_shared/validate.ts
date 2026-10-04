@@ -7,6 +7,7 @@ export const LIMITS = {
   maxClicksPerDay: 2_000_000,
   maxMoveSecondsPerDay: 86_400,
   maxPeakSpeed: 5_000, // cm/s; the fastest human flicks are ~10 m/s
+  maxDpi: 100_000,
   firstDay: "2020-01-01",
 } as const;
 
@@ -18,6 +19,8 @@ export interface SyncRow {
   clicks: number;
   moveSeconds: number;
   peakSpeed: number;
+  dpi: number; // distance-weighted DPI of the row; 0 = not sent (clients before 0.1.0-beta.14)
+  peakDpi: number; // DPI of the fastest flick
 }
 
 export interface SyncRequest {
@@ -27,7 +30,7 @@ export interface SyncRequest {
 }
 
 export type Validation =
-  | { ok: true; request: SyncRequest; rejected: number }
+  | { ok: true; request: SyncRequest; rejected: number; boosted: boolean }
   | { ok: false; error: string };
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -52,7 +55,10 @@ export function validateSync(body: unknown, now = new Date()): Validation {
   const rows: SyncRow[] = [];
   const seen = new Set<string>();
   let rejected = 0;
+  // An impossible distance or flick (inflated by a DPI set far too low) earns the "booster" badge (FairPlay.cs).
+  let boosted = false;
   for (const raw of b.rows) {
+    if (isBoosted(raw)) boosted = true;
     const row = readRow(raw);
     const key = row && `${row.day}|${row.gameKey}|${row.mouseKey}`;
     if (!row || row.day < LIMITS.firstDay || row.day > latest || seen.has(key!)) {
@@ -79,9 +85,10 @@ export function validateSync(body: unknown, now = new Date()): Validation {
       t.cm > LIMITS.maxCentimetersPerDay || t.clicks > LIMITS.maxClicksPerDay || t.seconds > LIMITS.maxMoveSecondsPerDay
     ).map(([day]) => day),
   );
+  if ([...perDay.values()].some((t) => t.cm > LIMITS.maxCentimetersPerDay)) boosted = true;
   const accepted = rows.filter((r) => !impossible.has(r.day));
   rejected += rows.length - accepted.length;
-  return { ok: true, request: { pcId: b.pcId.toLowerCase(), pcName, rows: accepted }, rejected };
+  return { ok: true, request: { pcId: b.pcId.toLowerCase(), pcName, rows: accepted }, rejected, boosted };
 }
 
 function readRow(raw: unknown): SyncRow | null {
@@ -97,8 +104,20 @@ function readRow(raw: unknown): SyncRow | null {
   const clicks = integer(r.clicks ?? 0, 0, LIMITS.maxClicksPerDay);
   const moveSeconds = integer(r.moveSeconds ?? 0, 0, LIMITS.maxMoveSecondsPerDay);
   const peakSpeed = number(r.peakSpeed ?? 0, 0, LIMITS.maxPeakSpeed);
-  if (centimeters === null || clicks === null || moveSeconds === null || peakSpeed === null) return null;
-  return { day, gameKey, mouseKey, centimeters, clicks, moveSeconds, peakSpeed };
+  const dpi = number(r.dpi ?? 0, 0, LIMITS.maxDpi);
+  const peakDpi = number(r.peakDpi ?? 0, 0, LIMITS.maxDpi);
+  if (centimeters === null || clicks === null || moveSeconds === null || peakSpeed === null || dpi === null || peakDpi === null) {
+    return null;
+  }
+  return { day, gameKey, mouseKey, centimeters, clicks, moveSeconds, peakSpeed, dpi, peakDpi };
+}
+
+/** A row whose distance or flick is over the limits (numbers only: malformed rows are just rejected). */
+function isBoosted(raw: unknown): boolean {
+  if (typeof raw !== "object" || raw === null) return false;
+  const r = raw as Record<string, unknown>;
+  return (typeof r.centimeters === "number" && r.centimeters > LIMITS.maxCentimetersPerDay) ||
+    (typeof r.peakSpeed === "number" && r.peakSpeed > LIMITS.maxPeakSpeed);
 }
 
 function isRealDate(day: string): boolean {

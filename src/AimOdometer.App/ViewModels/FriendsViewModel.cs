@@ -30,8 +30,15 @@ public sealed record BoardGame(string Key, string Name)
     public override string ToString() => Name;
 }
 
-/// <summary>One leaderboard line as shown.</summary>
-public sealed record BoardItem(string Rank, string Name, Uri? Avatar, string Distance, bool IsMe);
+/// <summary>A shame badge next to a name: inflated distance (FairPlay).</summary>
+public sealed record BoardBadge(string Name, string Description);
+
+/// <summary>One leaderboard line as shown. <paramref name="Measured"/>: the DPI behind the distance and the fastest flick.</summary>
+public sealed record BoardItem(string Rank, string Name, Uri? Avatar, string Distance, bool IsMe, string? Measured = null,
+    IReadOnlyList<BoardBadge>? Badges = null)
+{
+    public bool HasBadges => Badges is { Count: > 0 };
+}
 
 /// <summary>
 /// Friends and world leaderboards (needs Steam sign-in). Friends: everyone in your Steam friend list who uses
@@ -245,6 +252,27 @@ public sealed partial class FriendsViewModel : PageViewModel
         }
     }
 
+    private static readonly HashSet<string> KnownBadges = new(StringComparer.Ordinal) { "clown", "blockhead", "fool", "booster" };
+
+    /// <summary>"800 DPI · flick 4.7 m/s at 1600 DPI": what the distance and the record were measured with.</summary>
+    private static string? Measured(BoardRow row)
+    {
+        var parts = new List<string>(2);
+        if (row.Dpi is > 0 and var dpi)
+        {
+            parts.Add(L.Format("Friends.DistanceDpi", Format.Number(Math.Round(dpi))));
+        }
+
+        if (row.PeakSpeed > 0)
+        {
+            parts.Add(row.PeakDpi is > 0 and var peakDpi
+                ? L.Format("Friends.FlickAtDpi", Format.Speed(row.PeakSpeed), Format.Number(Math.Round(peakDpi)))
+                : L.Format("Friends.Flick", Format.Speed(row.PeakSpeed)));
+        }
+
+        return parts.Count == 0 ? null : string.Join(" · ", parts);
+    }
+
     private void Show(IReadOnlyList<BoardRow> rows)
     {
         Rows.Clear();
@@ -252,7 +280,8 @@ public sealed partial class FriendsViewModel : PageViewModel
         {
             var avatar = Uri.TryCreate(row.AvatarUrl, UriKind.Absolute, out var url) && url.Scheme == Uri.UriSchemeHttps ? url : null;
             var name = row.Name.Length > 0 ? row.Name : L["Friends.NoName"];
-            Rows.Add(new BoardItem(Format.Number(row.Rank), row.IsMe ? L.Format("Friends.Me", name) : name, avatar, Format.Distance(row.Centimeters), row.IsMe));
+            Rows.Add(new BoardItem(Format.Number(row.Rank), row.IsMe ? L.Format("Friends.Me", name) : name, avatar, Format.Distance(row.Centimeters), row.IsMe,
+                Measured(row), [.. (row.Badges ?? []).Where(KnownBadges.Contains).Select(b => new BoardBadge(L[$"Badge.{b}"], L[$"Badge.{b}.Desc"]))]));
         }
     }
 }

@@ -32,6 +32,10 @@ values ('00000000-0000-4000-8000-000000000001', '10000000-0000-4000-8000-0000000
        ('00000000-0000-4000-8000-000000000004', '10000000-0000-4000-8000-000000000004', current_date, 'steam:730', 900),
        ('00000000-0000-4000-8000-000000000005', '10000000-0000-4000-8000-000000000005', current_date, '', 9000);
 
+-- Real players on the linked project must not disturb the ranks (the transaction is rolled back).
+update public.profiles set hidden_from_leaderboards = true
+where user_id not in (select ('00000000-0000-4000-8000-00000000000' || n)::uuid from unnest(array['1', '2', '3', '4', '5']) n);
+
 refresh materialized view public.world_ranks;
 
 -- ------------------------------------------------------------ friends

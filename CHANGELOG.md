@@ -5,6 +5,20 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), ver
 
 ## [Unreleased]
 
+## [0.1.0-beta.14] - 2026-10-05
+
+### Added
+- Fair play. Leaderboards show the distance-weighted DPI behind each player's distance and the DPI of their fastest
+  flick, so a DPI set far below the mouse's real one is visible. Four "shame" achievements, hidden until earned, shown
+  first in red and as badges next to the name on leaderboards (`FairPlay`, `fair_play_badges`):
+  Clown (10 km in a day below 200 DPI), Blockhead (100 m below 100 DPI), Fool (a flick over 30 m/s) and Booster
+  (a day over 100 km or a flick over 50 m/s, rejected by the sync and remembered in `profiles.boosted_at`).
+- Cloud rows carry `dpi` and `peakDpi` (migration `20261005000000_fair_play.sql`); history is uploaded again once so
+  older days get their DPI.
+
+### Changed
+- The social pgTAP test hides real players inside its rolled-back transaction, so it passes on a live project.
+
 ## [0.1.0-beta.13] - 2026-10-04
 
 ### Added

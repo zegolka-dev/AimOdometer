@@ -321,6 +321,18 @@ public sealed class CloudSyncTests : IDisposable
     }
 
     [Fact]
+    public void AggregatedRowsCarryWeightedDpiAndTheDpiOfTheFastestFlick()
+    {
+        DailyBreakdown[] breakdown =
+        [
+            new(Day1, AppId: 1, DeviceId: 10, 100, 0, 60, 200, Dpi: 800, PeakDpi: 800),
+            new(Day1, AppId: 2, DeviceId: 10, 300, 0, 60, 500, Dpi: 1600, PeakDpi: 3200),
+        ];
+        var row = Assert.Single(CloudSync.Aggregate(breakdown, _ => string.Empty, _ => "m"));
+        Assert.Equal((1400.0, 3200.0), (row.Dpi, row.PeakDpi));
+    }
+
+    [Fact]
     public void BatchesNeverSplitADay()
     {
         var rows = Enumerable.Range(0, 7).Select(i => new CloudRow(Day1.AddDays(i / 3), $"g{i}", "", 1, 0, 0, 0)).ToList();
@@ -352,6 +364,10 @@ public sealed class CloudSyncTests : IDisposable
         Assert.Equal("2026-10-01", row.GetProperty("day").GetString());
         Assert.Equal(12.5, row.GetProperty("centimeters").GetDouble());
         Assert.Equal(60, row.GetProperty("moveSeconds").GetInt32());
+
+        using var withDpi = JsonDocument.Parse(CloudSync.Payload(pc, "PC", [new CloudRow(Day1, "", "", 1, 0, 0, 0, 800, 1600)]));
+        var dpiRow = withDpi.RootElement.GetProperty("rows")[0];
+        Assert.Equal((800.0, 1600.0), (dpiRow.GetProperty("dpi").GetDouble(), dpiRow.GetProperty("peakDpi").GetDouble()));
     }
 
     [Fact]
@@ -387,6 +403,14 @@ public sealed class CloudSyncTests : IDisposable
         CloudSync.RequestFullUpload(store); // e.g. after a DPI correction
         await CloudSync.RunAsync(client, store, catalog, time, TestContext.Current.CancellationToken);
         Assert.Contains("2026-01-15", sent[^1], StringComparison.Ordinal);
+
+        // History uploaded before rows carried DPI is sent again once.
+        store.SetSetting(SettingKeys.CloudRowFormat, "1");
+        await CloudSync.RunAsync(client, store, catalog, time, TestContext.Current.CancellationToken);
+        Assert.Contains("2026-01-15", sent[^1], StringComparison.Ordinal);
+        Assert.Contains("\"dpi\":800", sent[^1], StringComparison.Ordinal);
+        await CloudSync.RunAsync(client, store, catalog, time, TestContext.Current.CancellationToken);
+        Assert.DoesNotContain("2026-01-15", sent[^1], StringComparison.Ordinal);
 
         // Another account on this PC gets the full history too.
         sessionStore.Save(new CloudSession("a", "r", time.Now.AddHours(1), "user-2", "76561197960435531", "y", "", ""));

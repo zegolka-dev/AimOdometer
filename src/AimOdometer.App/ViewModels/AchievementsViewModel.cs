@@ -15,7 +15,8 @@ public sealed record AchievementItem(
     bool IsUnlocked,
     double Fraction,
     string ProgressText,
-    string? UnlockedText);
+    string? UnlockedText,
+    bool IsShame = false);
 
 /// <summary>All achievements with progress; unlocked first (newest on top), then the closest to unlocking.</summary>
 public sealed partial class AchievementsViewModel(AppData data) : PageViewModel(data)
@@ -47,18 +48,22 @@ public sealed partial class AchievementsViewModel(AppData data) : PageViewModel(
             AchievementEngine.All, snapshot, stored.ToDictionary(s => s.Key, s => s.Value.UnlockedAtUtc));
 
         Items.Clear();
+        // Shame achievements stay hidden until earned (they are not goals), then lead the list; they do not count toward the total.
         foreach (var p in progress
-                     .OrderByDescending(p => p.IsUnlocked)
+                     .Where(p => !p.Definition.Shame || p.IsUnlocked)
+                     .OrderByDescending(p => p.Definition.Shame) // earned shame on top: hard to miss
+                     .ThenByDescending(p => p.IsUnlocked)
                      .ThenByDescending(p => p.UnlockedAtUtc)
                      .ThenByDescending(p => p.Fraction))
         {
             Items.Add(ToItem(p));
         }
 
-        var unlocked = Items.Count(i => i.IsUnlocked);
-        Summary = Loc.Instance.Format("Ach.Summary", unlocked, Items.Count);
-        UnlockedFraction = Items.Count == 0 ? 0 : (double)unlocked / Items.Count;
-        Latest = Items.FirstOrDefault(i => i.IsUnlocked);
+        var goals = Items.Where(i => !i.IsShame).ToList();
+        var unlocked = goals.Count(i => i.IsUnlocked);
+        Summary = Loc.Instance.Format("Ach.Summary", unlocked, goals.Count);
+        UnlockedFraction = goals.Count == 0 ? 0 : (double)unlocked / goals.Count;
+        Latest = goals.FirstOrDefault(i => i.IsUnlocked);
     }
 
     public static AchievementItem ToItem(AchievementProgress p)
@@ -75,13 +80,15 @@ public sealed partial class AchievementsViewModel(AppData data) : PageViewModel(
             p.IsUnlocked,
             p.IsUnlocked ? 1 : p.Fraction,
             p.IsUnlocked ? target : $"{current} / {target}",
-            p.UnlockedAtUtc is { } at ? L.Format("Ach.UnlockedOn", Format.Date(DateOnly.FromDateTime(at.ToLocalTime()))) : null);
+            p.UnlockedAtUtc is { } at ? L.Format("Ach.UnlockedOn", Format.Date(DateOnly.FromDateTime(at.ToLocalTime()))) : null,
+            d.Shame);
     }
 
     /// <summary>Target and progress in the achievement's own unit.</summary>
     public static string FormatValue(string type, double value) => type switch
     {
-        "totalDistance" or "dayDistance" or "gameDistance" or "nightDistance" or "nightOneNight" or "deviceDistance" =>
+        "totalDistance" or "dayDistance" or "gameDistance" or "nightDistance" or "nightOneNight" or "deviceDistance"
+            or "lowDpiDay" or "lowDpiDistance" =>
             Format.Distance(value * 100),
         "peakSpeed" => Format.Speed(value * 100),
         "streak" or "activeDays" => Loc.Instance.Format("Stats.DaysCount", Format.Number(value)),

@@ -58,7 +58,13 @@ public sealed record DayTotal(
 public sealed record HourOfWeekTotal(DayOfWeek Day, int Hour, double Centimeters);
 
 /// <summary>One local date x app x mouse, for cloud sync. Peak speed in cm/s.</summary>
-public sealed record DailyBreakdown(DateOnly Date, long AppId, long DeviceId, double Centimeters, long Clicks, long MoveSeconds, double PeakSpeed);
+/// <summary>
+/// One day of one program and mouse. <paramref name="Dpi"/>: distance-weighted DPI the movement was measured with;
+/// <paramref name="PeakDpi"/>: the DPI of the hour with the fastest flick.
+/// </summary>
+public sealed record DailyBreakdown(
+    DateOnly Date, long AppId, long DeviceId, double Centimeters, long Clicks, long MoveSeconds, double PeakSpeed,
+    double Dpi = 0, double PeakDpi = 0);
 
 /// <summary>What a piece of gear is.</summary>
 public enum GearKind
@@ -366,7 +372,9 @@ public sealed class StatsStore : IDisposable
             SELECT h.local_date, h.app_id, h.device_id,
                    sum(h.path_counts / h.dpi) * 2.54,
                    sum(h.clicks_left + h.clicks_right + h.clicks_middle + h.clicks_x1 + h.clicks_x2),
-                   sum(h.move_seconds), max(h.peak_speed / h.dpi) * 2.54
+                   sum(h.move_seconds), max(h.peak_speed / h.dpi) * 2.54,
+                   coalesce(sum(h.path_counts) / nullif(sum(h.path_counts / h.dpi), 0), avg(h.dpi)),
+                   h.dpi -- SQLite: a bare column next to the only max() comes from the row with that max
             FROM hourly h JOIN devices d ON d.id = h.device_id
             WHERE d.excluded = 0 AND h.local_date >= ?1
             GROUP BY h.local_date, h.app_id, h.device_id
@@ -378,10 +386,34 @@ public sealed class StatsStore : IDisposable
         {
             result.Add(new DailyBreakdown(
                 DateOnly.ParseExact(select.GetString(0)!, "yyyy-MM-dd", CultureInfo.InvariantCulture),
-                select.GetInt64(1), select.GetInt64(2), select.GetDouble(3), select.GetInt64(4), select.GetInt64(5), select.GetDouble(6)));
+                select.GetInt64(1), select.GetInt64(2), select.GetDouble(3), select.GetInt64(4), select.GetInt64(5), select.GetDouble(6),
+                select.GetDouble(7), select.GetDouble(8)));
         }
 
         return result;
+    }
+
+    /// <summary>
+    /// For the shame achievements: the longest day measured at a DPI below <paramref name="dayMaxDpi"/>
+    /// (distance-weighted over the day) and everything moved with a DPI below <paramref name="veryLowDpi"/>.
+    /// </summary>
+    public (double BestDayCentimeters, double VeryLowCentimeters) GetLowDpiTotals(double dayMaxDpi, double veryLowDpi)
+    {
+        using var select = _db.Prepare("""
+            SELECT
+                coalesce((SELECT max(cm) FROM (
+                    SELECT sum(h.path_counts / h.dpi) * 2.54 AS cm, sum(h.path_counts) / sum(h.path_counts / h.dpi) AS dpi
+                    FROM hourly h JOIN devices d ON d.id = h.device_id
+                    WHERE d.excluded = 0
+                    GROUP BY h.local_date
+                    HAVING sum(h.path_counts) > 0)
+                  WHERE dpi < ?1), 0),
+                coalesce((SELECT sum(h.path_counts / h.dpi) * 2.54
+                    FROM hourly h JOIN devices d ON d.id = h.device_id
+                    WHERE d.excluded = 0 AND h.dpi < ?2), 0);
+            """);
+        select.Bind(1, dayMaxDpi).Bind(2, veryLowDpi);
+        return select.Step() ? (select.GetDouble(0), select.GetDouble(1)) : (0, 0);
     }
 
     /// <summary>Movement per local hour of day (0..23) and weekday, for the activity heat map.</summary>
@@ -736,4 +768,7 @@ public static class SettingKeys
 
     /// <summary>Set when a damaged database was replaced: the backup date (yyyy-MM-dd) or "none".</summary>
     public const string RecoveredFrom = "recovered_from";
+
+    /// <summary>Row format of the last full cloud upload; older formats are uploaded again once (2 = rows carry DPI).</summary>
+    public const string CloudRowFormat = "cloud_row_format";
 }

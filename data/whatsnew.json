@@ -1,6 +1,17 @@
 {
   "releases": [
     {
+      "version": "0.1.0-beta.14",
+      "en": [
+        "Leaderboards show the DPI behind each player's distance and fastest flick.",
+        "Inflating distance with a DPI set far too low earns shame achievements (Clown, Blockhead, Fool, Booster) that everyone sees on the leaderboards."
+      ],
+      "ru": [
+        "В таблицах лидеров виден DPI, на котором набегано расстояние и поставлен рекорд флика.",
+        "За пробег, накрученный слишком низким DPI, теперь дают позорные ачивки — «Клоун», «Балбес», «Дурак», «Накрутчик» — и их видят все в таблицах лидеров."
+      ]
+    },
+    {
       "version": "0.1.0-beta.13",
       "en": [
         "Achievement notifications pop up right away unless a full-screen game is in front. Settings › “Show an example” checks that they work on your PC; the checkbox above it turns them off."

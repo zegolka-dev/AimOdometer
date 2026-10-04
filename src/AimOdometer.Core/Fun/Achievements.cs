@@ -9,7 +9,8 @@ public sealed record AchievementDefinition(
     [property: JsonPropertyName("type")] string Type,
     [property: JsonPropertyName("target")] double Target,
     [property: JsonPropertyName("icon")] string Icon,
-    [property: JsonPropertyName("game")] string? Game)
+    [property: JsonPropertyName("game")] string? Game,
+    [property: JsonPropertyName("shame")] bool Shame = false)
 {
     /// <summary>The icon as a Segoe Fluent Icons character.</summary>
     public string Glyph => char.ConvertFromUtf32(Convert.ToInt32(Icon, 16));
@@ -35,7 +36,9 @@ public sealed record AchievementSnapshot(
     long TotalClicks,
     double TotalWheelNotches,
     double MaxDeviceMeters,
-    int ActiveDays)
+    int ActiveDays,
+    double LowDpiBestDayMeters = 0,
+    double VeryLowDpiMeters = 0)
 {
     /// <summary>A game counts toward "different games" after this much movement in it.</summary>
     public const double DistinctGameMinimumMeters = 100;
@@ -84,6 +87,11 @@ public static class AchievementEngine
             "totalWheel" => s.TotalWheelNotches,
             "deviceDistance" => s.MaxDeviceMeters,
             "activeDays" => s.ActiveDays,
+
+            // Shame achievements (FairPlay): inflated distance.
+            "lowDpiDay" => s.LowDpiBestDayMeters,
+            "lowDpiDistance" => s.VeryLowDpiMeters,
+            "boost" => Math.Max(s.BestDayMeters / FairPlay.BoostDayMeters, s.PeakSpeedMetersPerSecond / FairPlay.BoostFlickMetersPerSecond),
             _ => 0,
         };
     }

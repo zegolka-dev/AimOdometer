@@ -18,7 +18,14 @@ public sealed record CloudDevice(Guid PcId, string Name, DateTimeOffset LastSync
 public sealed record SyncResponse(int Accepted, int Rejected);
 
 /// <summary>One line of a leaderboard. Other players are known by name and avatar only.</summary>
-public sealed record BoardRow(int Rank, string Name, string AvatarUrl, double Centimeters, bool IsMe);
+/// <summary>
+/// One leaderboard line. <paramref name="Dpi"/>: distance-weighted DPI of the period (null = unknown, synced before
+/// 0.1.0-beta.14); <paramref name="PeakSpeed"/> in cm/s with its <paramref name="PeakDpi"/>; <paramref name="Badges"/>:
+/// shame badges for inflated distance (clown, blockhead, fool, booster; see FairPlay).
+/// </summary>
+public sealed record BoardRow(
+    int Rank, string Name, string AvatarUrl, double Centimeters, bool IsMe,
+    double? Dpi = null, double PeakSpeed = 0, double? PeakDpi = null, IReadOnlyList<string>? Badges = null);
 
 /// <summary>The caller and their Steam friends who use AimOdometer. <paramref name="IsPrivate"/>: the Steam friend list is hidden.</summary>
 public sealed record FriendsBoard(bool IsPrivate, int FriendsOnSteam, IReadOnlyList<BoardRow> Rows);
@@ -153,9 +160,18 @@ public sealed class CloudClient : IDisposable
             Text(r, "name"),
             Text(r, "avatar"),
             r.GetProperty("centimeters").GetDouble(),
-            r.GetProperty("isMe").GetBoolean())).ToList();
+            r.GetProperty("isMe").GetBoolean(),
+            OptionalNumber(r, "dpi"), OptionalNumber(r, "peakSpeed") ?? 0, OptionalNumber(r, "peakDpi"), Badges(r))).ToList();
         return new FriendsBoard(root.GetProperty("private").GetBoolean(), root.GetProperty("friendsOnSteam").GetInt32(), rows);
     }
+
+    private static double? OptionalNumber(JsonElement row, string name) =>
+        row.TryGetProperty(name, out var value) && value.ValueKind == JsonValueKind.Number ? value.GetDouble() : null;
+
+    private static IReadOnlyList<string> Badges(JsonElement row) =>
+        row.TryGetProperty("badges", out var list) && list.ValueKind == JsonValueKind.Array
+            ? [.. list.EnumerateArray().Where(b => b.ValueKind == JsonValueKind.String).Select(b => b.GetString()!).Take(8)]
+            : [];
 
     /// <summary>World leaderboard (top 100) and the caller's own place.</summary>
     public async Task<WorldBoard> GetWorldBoardAsync(string period, string game, CancellationToken cancellation)
@@ -166,7 +182,8 @@ public sealed class CloudClient : IDisposable
             Text(r, "name"),
             Text(r, "avatar"),
             r.GetProperty("centimeters").GetDouble(),
-            r.GetProperty("isMe").GetBoolean())).ToList();
+            r.GetProperty("isMe").GetBoolean(),
+            OptionalNumber(r, "dpi"), OptionalNumber(r, "peakSpeed") ?? 0, OptionalNumber(r, "peakDpi"), Badges(r))).ToList();
         var me = root.TryGetProperty("me", out var m) && m.ValueKind == JsonValueKind.Object
             ? new WorldPlace(m.GetProperty("rank").GetInt32(), m.GetProperty("centimeters").GetDouble(), m.GetProperty("players").GetInt32())
             : null;

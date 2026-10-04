@@ -55,7 +55,7 @@ public class AchievementEngineTests
         Assert.All(all, a =>
         {
             Assert.True(a.Target > 0);
-            Assert.NotEqual(0, AchievementEngine.CurrentValue(a, Snapshot(1e9, 1e9, 1000, 1000, new() { ["steam:730"] = 1e9, ["steam:1172470"] = 1e9, ["valorant"] = 1e9, ["steam:570"] = 1e9, ["a"] = 1e9, ["b"] = 1e9, ["c"] = 1e9, ["d"] = 1e9, ["e"] = 1e9, ["f"] = 1e9 }, 1e9, 1e9, 10_000_000, 1e9, 1e9, 1000)));
+            Assert.NotEqual(0, AchievementEngine.CurrentValue(a, Snapshot(1e9, 1e9, 1000, 1000, new() { ["steam:730"] = 1e9, ["steam:1172470"] = 1e9, ["valorant"] = 1e9, ["steam:570"] = 1e9, ["a"] = 1e9, ["b"] = 1e9, ["c"] = 1e9, ["d"] = 1e9, ["e"] = 1e9, ["f"] = 1e9 }, 1e9, 1e9, 10_000_000, 1e9, 1e9, 1000) with { LowDpiBestDayMeters = 1e9, VeryLowDpiMeters = 1e9 }));
             Assert.Equal(1, a.Glyph.Length);
         });
     }

@@ -13,7 +13,7 @@ Deno.serve(async (req) => {
 
     const validation = validateSync(await req.json().catch(() => null));
     if (!validation.ok) return error(400, validation.error);
-    const { request, rejected } = validation;
+    const { request, rejected, boosted } = validation;
 
     const { data: device, error: deviceError } = await admin.from("devices")
       .upsert({ user_id: user.id, pc_id: request.pcId, name: request.pcName, last_sync_at: new Date().toISOString() },
@@ -24,6 +24,13 @@ Deno.serve(async (req) => {
 
     if (request.rows.length > 0) {
       const { error: e } = await admin.rpc("replace_daily_stats", { p_user: user.id, p_device: device.id, p_rows: request.rows });
+      if (e) throw new Error(e.message);
+    }
+
+    if (boosted) {
+      // Kept for good: the "booster" badge on leaderboards (fair_play_badges).
+      const { error: e } = await admin.from("profiles").update({ boosted_at: new Date().toISOString() })
+        .eq("user_id", user.id).is("boosted_at", null);
       if (e) throw new Error(e.message);
     }
 
