@@ -3,7 +3,7 @@ begin;
 create extension if not exists pgtap with schema extensions;
 set local search_path = public, extensions;
 
-select plan(12);
+select plan(15);
 
 -- F: clown (10 km in a day at 100 DPI). G: honest (800 and 1600 DPI). H: fool (35 m/s flick) and blockhead (200 m at
 -- 50 DPI). I: booster (caught by the sync).
@@ -48,6 +48,15 @@ select results_eq(
     $$values ('F'::text, array['clown'], 100::float8), ('G'::text, array[]::text[], 1400::float8)$$,
     'friends board carries DPI and badges');
 
+update public.profiles set titles = array['creator', 'beta-tester'] where user_id = '00000000-0000-4000-8000-0000000000f2';
+select results_eq(
+    $$select persona_name, titles from public.friends_board('00000000-0000-4000-8000-0000000000f2',
+        array['76561190000000101'], 'week', '*') order by persona_name$$,
+    $$values ('F'::text, array[]::text[]), ('G'::text, array['creator', 'beta-tester'])$$,
+    'friends board carries titles');
+select throws_ok($$update public.profiles set titles = array['admin'] where user_id = '00000000-0000-4000-8000-0000000000f1'$$,
+    '23514', null, 'only known titles');
+
 refresh materialized view public.world_ranks;
 select ok(
     (select badges = array['clown'] and dpi = 100 from public.world_board('week', '*', 100) where persona_name = 'F'),
@@ -70,6 +79,8 @@ select throws_ok($$select public.fair_play_badges('00000000-0000-4000-8000-00000
     'clients cannot call the badge function');
 select throws_ok($$update public.profiles set boosted_at = null where user_id = '00000000-0000-4000-8000-0000000000f4'$$,
     '42501', null, 'a booster cannot clear the mark');
+select throws_ok($$update public.profiles set titles = array['creator'] where user_id = '00000000-0000-4000-8000-0000000000f4'$$,
+    '42501', null, 'players cannot give themselves a title');
 select lives_ok($$update public.profiles set show_in_world = false where user_id = '00000000-0000-4000-8000-0000000000f4'$$,
     'privacy switches still work');
 

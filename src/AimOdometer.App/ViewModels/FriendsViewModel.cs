@@ -30,12 +30,28 @@ public sealed record BoardGame(string Key, string Name)
     public override string ToString() => Name;
 }
 
-/// <summary>A shame badge next to a name: inflated distance (FairPlay).</summary>
-public sealed record BoardBadge(string Name, string Description);
+/// <summary>What a tag next to a name means; decides its look (creator violet, beta tester sky blue, shame red).</summary>
+public enum BoardTagKind
+{
+    Creator,
+    BetaTester,
+    Shame,
+}
+
+/// <summary>A tag next to a name: an honorary title or a shame badge for inflated distance (FairPlay).</summary>
+public sealed record BoardTag(BoardTagKind Kind, string Name, string Description)
+{
+    public string Glyph => Kind switch
+    {
+        BoardTagKind.Creator => "\uE735",    // filled star
+        BoardTagKind.BetaTester => "\uEBE8", // bug
+        _ => "\uE7BA",                       // warning
+    };
+}
 
 /// <summary>One leaderboard line as shown. <paramref name="Measured"/>: the DPI behind the distance and the fastest flick.</summary>
 public sealed record BoardItem(string Rank, string Name, Uri? Avatar, string Distance, bool IsMe, string? Measured = null,
-    IReadOnlyList<BoardBadge>? Badges = null)
+    IReadOnlyList<BoardTag>? Badges = null)
 {
     public bool HasBadges => Badges is { Count: > 0 };
 }
@@ -254,6 +270,26 @@ public sealed partial class FriendsViewModel : PageViewModel
 
     private static readonly HashSet<string> KnownBadges = new(StringComparer.Ordinal) { "clown", "blockhead", "fool", "booster" };
 
+    /// <summary>Titles first (creator, then beta tester), then shame badges; unknown ids from a newer server are skipped.</summary>
+    private static List<BoardTag> Tags(BoardRow row)
+    {
+        var titles = row.Titles ?? [];
+        var tags = new List<BoardTag>();
+        if (titles.Contains("creator"))
+        {
+            tags.Add(new BoardTag(BoardTagKind.Creator, L["Title.creator"], L["Title.creator.Desc"]));
+        }
+
+        if (titles.Contains("beta-tester"))
+        {
+            tags.Add(new BoardTag(BoardTagKind.BetaTester, L["Title.beta-tester"], L["Title.beta-tester.Desc"]));
+        }
+
+        tags.AddRange((row.Badges ?? []).Where(KnownBadges.Contains)
+            .Select(b => new BoardTag(BoardTagKind.Shame, L[$"Badge.{b}"], L[$"Badge.{b}.Desc"])));
+        return tags;
+    }
+
     /// <summary>"800 DPI · flick 4.7 m/s at 1600 DPI": what the distance and the record were measured with.</summary>
     private static string? Measured(BoardRow row)
     {
@@ -281,7 +317,7 @@ public sealed partial class FriendsViewModel : PageViewModel
             var avatar = Uri.TryCreate(row.AvatarUrl, UriKind.Absolute, out var url) && url.Scheme == Uri.UriSchemeHttps ? url : null;
             var name = row.Name.Length > 0 ? row.Name : L["Friends.NoName"];
             Rows.Add(new BoardItem(Format.Number(row.Rank), row.IsMe ? L.Format("Friends.Me", name) : name, avatar, Format.Distance(row.Centimeters), row.IsMe,
-                Measured(row), [.. (row.Badges ?? []).Where(KnownBadges.Contains).Select(b => new BoardBadge(L[$"Badge.{b}"], L[$"Badge.{b}.Desc"]))]));
+                Measured(row), Tags(row)));
         }
     }
 }

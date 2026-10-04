@@ -5,6 +5,13 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), ver
 
 ## [Unreleased]
 
+## [0.1.0-beta.15] - 2026-10-05
+
+### Added
+- Honorary titles on leaderboards (`profiles.titles`, set by the author only; migration `20261005000100_titles.sql`):
+  "Creator" in the app's violet with a star and a soft glow, "Beta tester" in sky blue with a bug icon. Everyone signed
+  in during the beta is a beta tester. Tags show titles first, then shame badges, always with an icon and a word.
+
 ## [0.1.0-beta.14] - 2026-10-05
 
 ### Added

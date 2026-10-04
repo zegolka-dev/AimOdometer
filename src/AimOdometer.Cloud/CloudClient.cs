@@ -21,11 +21,13 @@ public sealed record SyncResponse(int Accepted, int Rejected);
 /// <summary>
 /// One leaderboard line. <paramref name="Dpi"/>: distance-weighted DPI of the period (null = unknown, synced before
 /// 0.1.0-beta.14); <paramref name="PeakSpeed"/> in cm/s with its <paramref name="PeakDpi"/>; <paramref name="Badges"/>:
-/// shame badges for inflated distance (clown, blockhead, fool, booster; see FairPlay).
+/// shame badges for inflated distance (clown, blockhead, fool, booster; see FairPlay); <paramref name="Titles"/>:
+/// honorary titles set by the author (creator, beta-tester).
 /// </summary>
 public sealed record BoardRow(
     int Rank, string Name, string AvatarUrl, double Centimeters, bool IsMe,
-    double? Dpi = null, double PeakSpeed = 0, double? PeakDpi = null, IReadOnlyList<string>? Badges = null);
+    double? Dpi = null, double PeakSpeed = 0, double? PeakDpi = null, IReadOnlyList<string>? Badges = null,
+    IReadOnlyList<string>? Titles = null);
 
 /// <summary>The caller and their Steam friends who use AimOdometer. <paramref name="IsPrivate"/>: the Steam friend list is hidden.</summary>
 public sealed record FriendsBoard(bool IsPrivate, int FriendsOnSteam, IReadOnlyList<BoardRow> Rows);
@@ -161,15 +163,15 @@ public sealed class CloudClient : IDisposable
             Text(r, "avatar"),
             r.GetProperty("centimeters").GetDouble(),
             r.GetProperty("isMe").GetBoolean(),
-            OptionalNumber(r, "dpi"), OptionalNumber(r, "peakSpeed") ?? 0, OptionalNumber(r, "peakDpi"), Badges(r))).ToList();
+            OptionalNumber(r, "dpi"), OptionalNumber(r, "peakSpeed") ?? 0, OptionalNumber(r, "peakDpi"), Strings(r, "badges"), Strings(r, "titles"))).ToList();
         return new FriendsBoard(root.GetProperty("private").GetBoolean(), root.GetProperty("friendsOnSteam").GetInt32(), rows);
     }
 
     private static double? OptionalNumber(JsonElement row, string name) =>
         row.TryGetProperty(name, out var value) && value.ValueKind == JsonValueKind.Number ? value.GetDouble() : null;
 
-    private static IReadOnlyList<string> Badges(JsonElement row) =>
-        row.TryGetProperty("badges", out var list) && list.ValueKind == JsonValueKind.Array
+    private static IReadOnlyList<string> Strings(JsonElement row, string name) =>
+        row.TryGetProperty(name, out var list) && list.ValueKind == JsonValueKind.Array
             ? [.. list.EnumerateArray().Where(b => b.ValueKind == JsonValueKind.String).Select(b => b.GetString()!).Take(8)]
             : [];
 
@@ -183,7 +185,7 @@ public sealed class CloudClient : IDisposable
             Text(r, "avatar"),
             r.GetProperty("centimeters").GetDouble(),
             r.GetProperty("isMe").GetBoolean(),
-            OptionalNumber(r, "dpi"), OptionalNumber(r, "peakSpeed") ?? 0, OptionalNumber(r, "peakDpi"), Badges(r))).ToList();
+            OptionalNumber(r, "dpi"), OptionalNumber(r, "peakSpeed") ?? 0, OptionalNumber(r, "peakDpi"), Strings(r, "badges"), Strings(r, "titles"))).ToList();
         var me = root.TryGetProperty("me", out var m) && m.ValueKind == JsonValueKind.Object
             ? new WorldPlace(m.GetProperty("rank").GetInt32(), m.GetProperty("centimeters").GetDouble(), m.GetProperty("players").GetInt32())
             : null;

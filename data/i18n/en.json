@@ -558,5 +558,9 @@
   "Badge.booster.Desc": "Tried to upload an impossible day or flick: it was not counted.",
   "Friends.DistanceDpi": "{0} DPI",
   "Friends.FlickAtDpi": "flick {0} at {1} DPI",
-  "Friends.Flick": "flick {0}"
+  "Friends.Flick": "flick {0}",
+  "Title.creator": "Creator",
+  "Title.creator.Desc": "Made AimOdometer.",
+  "Title.beta-tester": "Beta tester",
+  "Title.beta-tester.Desc": "Tested AimOdometer before its release."
 }

@@ -72,12 +72,37 @@
                       </ItemsControl.ItemsPanel>
                       <ItemsControl.ItemTemplate>
                         <DataTemplate>
-                          <!-- Shame badge: inflated distance; the tooltip says why. -->
-                          <Border CornerRadius="9" Padding="8,1" Margin="0,0,6,0" Background="{StaticResource DangerSoftBrush}"
-                                  BorderBrush="{StaticResource DangerBrush}" BorderThickness="1" ToolTip="{Binding Description}"
+                          <!-- Tag: honorary title or shame badge (icon + word, never color alone); the tooltip says why. -->
+                          <Border x:Name="Tag" CornerRadius="10" Padding="7,2,9,2" Margin="0,0,6,0" BorderThickness="1"
+                                  Background="{StaticResource DangerSoftBrush}" BorderBrush="{StaticResource DangerBrush}"
+                                  ToolTip="{Binding Description}"
                                   AutomationProperties.Name="{Binding Name}" AutomationProperties.HelpText="{Binding Description}">
-                            <TextBlock Text="{Binding Name}" FontSize="12" FontWeight="SemiBold" Foreground="{StaticResource DangerBrush}" />
+                            <StackPanel Orientation="Horizontal">
+                              <TextBlock x:Name="TagIcon" Style="{StaticResource Icon}" Text="{Binding Glyph}" FontSize="11" Margin="0,0,5,0"
+                                         Foreground="{StaticResource DangerBrush}" />
+                              <TextBlock x:Name="TagText" Text="{Binding Name}" FontSize="12" FontWeight="SemiBold" VerticalAlignment="Center"
+                                         Foreground="{StaticResource DangerBrush}" />
+                            </StackPanel>
                           </Border>
+                          <DataTemplate.Triggers>
+                            <DataTrigger Binding="{Binding Kind}" Value="Creator">
+                              <Setter TargetName="Tag" Property="Background" Value="{StaticResource CreatorTagBrush}" />
+                              <Setter TargetName="Tag" Property="BorderBrush" Value="{StaticResource CreatorTagBorderBrush}" />
+                              <Setter TargetName="Tag" Property="Effect">
+                                <Setter.Value>
+                                  <DropShadowEffect Color="{StaticResource AccentColor}" BlurRadius="12" ShadowDepth="0" Opacity="0.75" />
+                                </Setter.Value>
+                              </Setter>
+                              <Setter TargetName="TagIcon" Property="Foreground" Value="White" />
+                              <Setter TargetName="TagText" Property="Foreground" Value="White" />
+                            </DataTrigger>
+                            <DataTrigger Binding="{Binding Kind}" Value="BetaTester">
+                              <Setter TargetName="Tag" Property="Background" Value="{StaticResource BetaTagSoftBrush}" />
+                              <Setter TargetName="Tag" Property="BorderBrush" Value="{StaticResource BetaTagBrush}" />
+                              <Setter TargetName="TagIcon" Property="Foreground" Value="{StaticResource BetaTagBrush}" />
+                              <Setter TargetName="TagText" Property="Foreground" Value="{StaticResource BetaTagBrush}" />
+                            </DataTrigger>
+                          </DataTemplate.Triggers>
                         </DataTemplate>
                       </ItemsControl.ItemTemplate>
                     </ItemsControl>

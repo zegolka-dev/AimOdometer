@@ -110,6 +110,7 @@ function fairPlay(r: FairPlayColumns) {
     peakSpeed: r.peak_speed,
     peakDpi: r.peak_dpi === null ? null : Math.round(r.peak_dpi),
     badges: r.badges ?? [],
+    titles: r.titles ?? [],
   };
 }
 
@@ -118,6 +119,7 @@ interface FairPlayColumns {
   peak_speed: number;
   peak_dpi: number | null;
   badges: string[] | null;
+  titles: string[] | null; // honorary: creator, beta-tester
 }
 
 interface FriendRow extends FairPlayColumns {

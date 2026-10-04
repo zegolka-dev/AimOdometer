@@ -558,5 +558,9 @@
   "Badge.booster.Desc": "Пытался загрузить невозможный день или флик — его не засчитали.",
   "Friends.DistanceDpi": "{0} DPI",
   "Friends.FlickAtDpi": "флик {0} на {1} DPI",
-  "Friends.Flick": "флик {0}"
+  "Friends.Flick": "флик {0}",
+  "Title.creator": "Создатель",
+  "Title.creator.Desc": "Сделал AimOdometer.",
+  "Title.beta-tester": "Бета-тестер",
+  "Title.beta-tester.Desc": "Тестировал AimOdometer до выхода."
 }

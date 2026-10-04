@@ -37,6 +37,15 @@
   <SolidColorBrush x:Key="DangerBrush" Color="{StaticResource DangerColor}" />
   <SolidColorBrush x:Key="DangerSoftBrush" Color="{StaticResource DangerColor}" Opacity="0.16" />
 
+  <!-- Leaderboard titles: the creator wears the app's violet (with a glow in the view), beta testers sky blue. -->
+  <LinearGradientBrush x:Key="CreatorTagBrush" StartPoint="0,0" EndPoint="1,1">
+    <GradientStop Color="#7C3AED" Offset="0" />
+    <GradientStop Color="#A78BFA" Offset="1" />
+  </LinearGradientBrush>
+  <SolidColorBrush x:Key="CreatorTagBorderBrush" Color="#C4B5FD" />
+  <SolidColorBrush x:Key="BetaTagBrush" Color="#38BDF8" />
+  <SolidColorBrush x:Key="BetaTagSoftBrush" Color="#38BDF8" Opacity="0.14" />
+
   <!-- Categorical chart series, in order. -->
   <Color x:Key="Series1Color">#8B5CF6</Color>
   <Color x:Key="Series2Color">#F43F5E</Color>

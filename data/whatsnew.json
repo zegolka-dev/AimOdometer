@@ -1,6 +1,15 @@
 {
   "releases": [
     {
+      "version": "0.1.0-beta.15",
+      "en": [
+        "Everyone who signed in during the beta now wears the “Beta tester” tag on the leaderboards. Thank you!"
+      ],
+      "ru": [
+        "Все, кто вошёл в аккаунт во время беты, теперь носят тег «Бета-тестер» в таблицах лидеров. Спасибо!"
+      ]
+    },
+    {
       "version": "0.1.0-beta.14",
       "en": [
         "Leaderboards show the DPI behind each player's distance and fastest flick.",
