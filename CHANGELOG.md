@@ -5,6 +5,11 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), ver
 
 ## [Unreleased]
 
+## [0.1.0-beta.3] - 2026-10-04
+
+### Added
+- "What's new" window on the first start after an update (notes in `data/whatsnew.json`).
+
 ## [0.1.0-beta.2] - 2026-10-04
 
 ### Added

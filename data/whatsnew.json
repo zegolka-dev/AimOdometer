@@ -1,0 +1,28 @@
+{
+  "releases": [
+    {
+      "version": "0.1.0-beta.3",
+      "en": [
+        "This window: after every update AimOdometer tells you what is new.",
+        "Settings › About: \"Check for updates\" shows whether you have the latest version."
+      ],
+      "ru": [
+        "Это окно: после каждого обновления AimOdometer рассказывает, что нового.",
+        "Настройки › О программе: «Проверить обновления» показывает, последняя ли у тебя версия."
+      ]
+    },
+    {
+      "version": "0.1.0-beta.1",
+      "en": [
+        "Automatic updates: new versions install themselves when the window opens.",
+        "Sign in through Steam: your statistics from all your PCs together (Settings).",
+        "Map: where your mouse distance would have taken you, along real roads."
+      ],
+      "ru": [
+        "Автообновления: новые версии ставятся сами при открытии окна.",
+        "Вход через Steam: статистика со всех твоих ПК вместе (Настройки).",
+        "Карта: куда бы ты дошёл по настоящим дорогам с пробегом своей мыши."
+      ]
+    }
+  ]
+}

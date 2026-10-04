@@ -72,6 +72,12 @@ public sealed partial class MainViewModel : ObservableObject, ICalibrationHost, 
 
     public bool IsShareVisible => Share is not null;
 
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(HasOverlay), nameof(IsWhatsNewVisible))]
+    public partial WhatsNewViewModel? WhatsNew { get; set; }
+
+    public bool IsWhatsNewVisible => WhatsNew is not null && Onboarding is null;
+
     /// <summary>Calibration can open on top of onboarding; then only calibration is shown.</summary>
     public bool IsOnboardingVisible => Onboarding is not null && Calibration is null;
 
@@ -84,7 +90,7 @@ public sealed partial class MainViewModel : ObservableObject, ICalibrationHost, 
     public partial StatusKind Status { get; set; } = StatusKind.Unknown;
 
     /// <summary>True while a modal overlay (onboarding, calibration) is shown.</summary>
-    public bool HasOverlay => Onboarding is not null || Calibration is not null || Share is not null;
+    public bool HasOverlay => Onboarding is not null || Calibration is not null || Share is not null || WhatsNew is not null;
 
     /// <summary>Raw mouse reports from the window, routed to whichever overlay is open.</summary>
     public void OnRawReport(RawMouseReport report)
@@ -94,6 +100,7 @@ public sealed partial class MainViewModel : ObservableObject, ICalibrationHost, 
 
     public void Start()
     {
+        WhatsNew = WhatsNewViewModel.ForStart(_data, () => WhatsNew = null);
         CurrentPage.Refresh();
         _ = StartTrackerLinkAsync();
     }

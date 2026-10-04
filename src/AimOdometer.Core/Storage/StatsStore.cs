@@ -726,4 +726,5 @@ public static class SettingKeys
     public const string CloudSyncedThrough = "cloud_synced_through";
     public const string CloudLastSync = "cloud_last_sync";
     public const string AutoUpdate = "auto_update";
+    public const string LastSeenVersion = "last_seen_version";
 }

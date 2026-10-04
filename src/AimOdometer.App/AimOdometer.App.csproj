@@ -26,6 +26,8 @@
     <Resource Include="..\..\assets\logo-512.png" Link="Assets\logo.png" />
     <!-- Languages are plain JSON files next to the exe: adding a language = adding one file. -->
     <None Include="..\..\data\i18n\*.json" Link="i18n\%(Filename)%(Extension)" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
+    <!-- Release notes for the "What's new" window. -->
+    <None Include="..\..\data\whatsnew.json" Link="whatsnew.json" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
     <!-- Map tab page and MapLibre GL JS (bundled: no CDN), served to WebView2 from a virtual host. -->
     <None Include="MapWeb\**" Link="map\%(RecursiveDir)%(Filename)%(Extension)" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
   </ItemGroup>

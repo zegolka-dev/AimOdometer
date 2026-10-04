@@ -74,6 +74,13 @@ try {
         Find-All $type | Where-Object { $_.Current.AutomationId -eq $id } | Select-Object -First 1
     }
 
+    # "What's new" (an existing database without a remembered version): screenshot and close it.
+    if ($whatsNew = Find-Id "WhatsNewOk") {
+        Save-Shot "whatsnew"
+        Invoke-Element $whatsNew
+        "visited: what's new"
+    }
+
     # Share overlay from the overview: open, save a square and a story card, check their pixel sizes, close.
     if ($share = Find-Id "ShareButton") {
         Invoke-Element $share
