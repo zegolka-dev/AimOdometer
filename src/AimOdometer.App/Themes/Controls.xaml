@@ -51,6 +51,58 @@
     <Setter Property="VerticalAlignment" Value="Center" />
   </Style>
 
+  <!-- Motion: short, eased state changes (hover fades in fast and out slower; press shrinks a little) -->
+  <CubicEase x:Key="EaseOut" EasingMode="EaseOut" />
+  <BackEase x:Key="Settle" EasingMode="EaseOut" Amplitude="0.6" />
+  <Storyboard x:Key="HoverIn">
+    <DoubleAnimation Storyboard.TargetName="Hover" Storyboard.TargetProperty="Opacity" To="1" Duration="0:0:0.12" EasingFunction="{StaticResource EaseOut}" />
+  </Storyboard>
+  <Storyboard x:Key="HoverOut">
+    <DoubleAnimation Storyboard.TargetName="Hover" Storyboard.TargetProperty="Opacity" To="0" Duration="0:0:0.22" EasingFunction="{StaticResource EaseOut}" />
+  </Storyboard>
+  <Storyboard x:Key="SelectIn">
+    <DoubleAnimation Storyboard.TargetName="Selected" Storyboard.TargetProperty="Opacity" To="1" Duration="0:0:0.18" EasingFunction="{StaticResource EaseOut}" />
+  </Storyboard>
+  <Storyboard x:Key="SelectOut">
+    <DoubleAnimation Storyboard.TargetName="Selected" Storyboard.TargetProperty="Opacity" To="0" Duration="0:0:0.15" EasingFunction="{StaticResource EaseOut}" />
+  </Storyboard>
+  <Storyboard x:Key="PressIn">
+    <DoubleAnimation Storyboard.TargetName="Scale" Storyboard.TargetProperty="ScaleX" To="0.96" Duration="0:0:0.08" EasingFunction="{StaticResource EaseOut}" />
+    <DoubleAnimation Storyboard.TargetName="Scale" Storyboard.TargetProperty="ScaleY" To="0.96" Duration="0:0:0.08" EasingFunction="{StaticResource EaseOut}" />
+  </Storyboard>
+  <Storyboard x:Key="PressOut">
+    <DoubleAnimation Storyboard.TargetName="Scale" Storyboard.TargetProperty="ScaleX" To="1" Duration="0:0:0.22" EasingFunction="{StaticResource Settle}" />
+    <DoubleAnimation Storyboard.TargetName="Scale" Storyboard.TargetProperty="ScaleY" To="1" Duration="0:0:0.22" EasingFunction="{StaticResource Settle}" />
+  </Storyboard>
+  <Storyboard x:Key="BarIn">
+    <DoubleAnimation Storyboard.TargetName="Selected" Storyboard.TargetProperty="Opacity" To="1" Duration="0:0:0.18" EasingFunction="{StaticResource EaseOut}" />
+    <DoubleAnimation Storyboard.TargetName="BarScale" Storyboard.TargetProperty="ScaleY" To="1" Duration="0:0:0.28" EasingFunction="{StaticResource Settle}" />
+  </Storyboard>
+  <Storyboard x:Key="BarOut">
+    <DoubleAnimation Storyboard.TargetName="Selected" Storyboard.TargetProperty="Opacity" To="0" Duration="0:0:0.15" EasingFunction="{StaticResource EaseOut}" />
+    <DoubleAnimation Storyboard.TargetName="BarScale" Storyboard.TargetProperty="ScaleY" To="0" Duration="0:0:0.12" EasingFunction="{StaticResource EaseOut}" />
+  </Storyboard>
+
+  <!-- Keyboard focus ring: WPF shows FocusVisualStyle only for keyboard focus, never after a mouse click -->
+  <Style x:Key="FocusRing">
+    <Setter Property="Control.Template">
+      <Setter.Value>
+        <ControlTemplate>
+          <Border Margin="-3" CornerRadius="12" BorderThickness="2" BorderBrush="{StaticResource AccentTextBrush}" />
+        </ControlTemplate>
+      </Setter.Value>
+    </Setter>
+  </Style>
+  <Style x:Key="FocusRingPill">
+    <Setter Property="Control.Template">
+      <Setter.Value>
+        <ControlTemplate>
+          <Border Margin="-3" CornerRadius="19" BorderThickness="2" BorderBrush="{StaticResource AccentTextBrush}" />
+        </ControlTemplate>
+      </Setter.Value>
+    </Setter>
+  </Style>
+
   <!-- Surfaces -->
   <Style x:Key="Card" TargetType="Border">
     <Setter Property="Background" Value="{StaticResource SurfaceBrush}" />
@@ -69,15 +121,20 @@
     <Setter Property="FontSize" Value="14" />
     <Setter Property="Cursor" Value="Hand" />
     <Setter Property="Margin" Value="0,2" />
-    <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+    <Setter Property="FocusVisualStyle" Value="{StaticResource FocusRing}" />
     <Setter Property="Template">
       <Setter.Value>
         <ControlTemplate TargetType="RadioButton">
-          <Border x:Name="Root" Background="Transparent" CornerRadius="10" Padding="12,10">
+          <Border x:Name="Root" Background="Transparent" CornerRadius="10" RenderTransformOrigin="0.5,0.5">
+            <Border.RenderTransform><ScaleTransform x:Name="Scale" /></Border.RenderTransform>
             <Grid>
-              <Border x:Name="Bar" Width="3" CornerRadius="2" Background="{StaticResource AccentBrush}"
-                      HorizontalAlignment="Left" Margin="-12,2,0,2" Visibility="Collapsed" />
-              <StackPanel Orientation="Horizontal">
+              <Border x:Name="Hover" Background="{StaticResource SurfaceElevatedBrush}" CornerRadius="10" Opacity="0" />
+              <Border x:Name="Selected" Background="{StaticResource AccentSoftBrush}" CornerRadius="10" Opacity="0" />
+              <Border Width="3" CornerRadius="2" Background="{StaticResource AccentBrush}" HorizontalAlignment="Left"
+                      Margin="0,10" RenderTransformOrigin="0.5,0.5">
+                <Border.RenderTransform><ScaleTransform x:Name="BarScale" ScaleY="0" /></Border.RenderTransform>
+              </Border>
+              <StackPanel Orientation="Horizontal" Margin="12,10">
                 <TextBlock Style="{StaticResource Icon}" Text="{TemplateBinding Tag}" Margin="0,0,12,0" />
                 <ContentPresenter VerticalAlignment="Center" />
               </StackPanel>
@@ -85,17 +142,18 @@
           </Border>
           <ControlTemplate.Triggers>
             <Trigger Property="IsMouseOver" Value="True">
-              <Setter TargetName="Root" Property="Background" Value="{StaticResource SurfaceElevatedBrush}" />
+              <Trigger.EnterActions><BeginStoryboard Storyboard="{StaticResource HoverIn}" /></Trigger.EnterActions>
+              <Trigger.ExitActions><BeginStoryboard Storyboard="{StaticResource HoverOut}" /></Trigger.ExitActions>
               <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}" />
             </Trigger>
             <Trigger Property="IsChecked" Value="True">
-              <Setter TargetName="Root" Property="Background" Value="{StaticResource AccentSoftBrush}" />
-              <Setter TargetName="Bar" Property="Visibility" Value="Visible" />
+              <Trigger.EnterActions><BeginStoryboard Storyboard="{StaticResource BarIn}" /></Trigger.EnterActions>
+              <Trigger.ExitActions><BeginStoryboard Storyboard="{StaticResource BarOut}" /></Trigger.ExitActions>
               <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}" />
             </Trigger>
-            <Trigger Property="IsKeyboardFocused" Value="True">
-              <Setter TargetName="Root" Property="BorderBrush" Value="{StaticResource AccentTextBrush}" />
-              <Setter TargetName="Root" Property="BorderThickness" Value="2" />
+            <Trigger Property="IsPressed" Value="True">
+              <Trigger.EnterActions><BeginStoryboard Storyboard="{StaticResource PressIn}" /></Trigger.EnterActions>
+              <Trigger.ExitActions><BeginStoryboard Storyboard="{StaticResource PressOut}" /></Trigger.ExitActions>
             </Trigger>
           </ControlTemplate.Triggers>
         </ControlTemplate>
@@ -109,26 +167,33 @@
     <Setter Property="FontSize" Value="13" />
     <Setter Property="Cursor" Value="Hand" />
     <Setter Property="Margin" Value="0,0,6,0" />
-    <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+    <Setter Property="FocusVisualStyle" Value="{StaticResource FocusRingPill}" />
     <Setter Property="Template">
       <Setter.Value>
         <ControlTemplate TargetType="RadioButton">
           <Border x:Name="Root" Background="{StaticResource SurfaceBrush}" BorderBrush="{StaticResource BorderBrush}"
-                  BorderThickness="1" CornerRadius="16" Padding="14,6">
-            <ContentPresenter HorizontalAlignment="Center" />
+                  BorderThickness="1" CornerRadius="16" RenderTransformOrigin="0.5,0.5">
+            <Border.RenderTransform><ScaleTransform x:Name="Scale" /></Border.RenderTransform>
+            <Grid>
+              <Border x:Name="Hover" Background="{StaticResource SurfaceElevatedBrush}" CornerRadius="15" Opacity="0" />
+              <Border x:Name="Selected" Background="{StaticResource AccentSoftBrush}" CornerRadius="15" Opacity="0" />
+              <ContentPresenter HorizontalAlignment="Center" Margin="14,6" />
+            </Grid>
           </Border>
           <ControlTemplate.Triggers>
             <Trigger Property="IsMouseOver" Value="True">
-              <Setter TargetName="Root" Property="Background" Value="{StaticResource SurfaceElevatedBrush}" />
+              <Trigger.EnterActions><BeginStoryboard Storyboard="{StaticResource HoverIn}" /></Trigger.EnterActions>
+              <Trigger.ExitActions><BeginStoryboard Storyboard="{StaticResource HoverOut}" /></Trigger.ExitActions>
             </Trigger>
             <Trigger Property="IsChecked" Value="True">
-              <Setter TargetName="Root" Property="Background" Value="{StaticResource AccentSoftBrush}" />
+              <Trigger.EnterActions><BeginStoryboard Storyboard="{StaticResource SelectIn}" /></Trigger.EnterActions>
+              <Trigger.ExitActions><BeginStoryboard Storyboard="{StaticResource SelectOut}" /></Trigger.ExitActions>
               <Setter TargetName="Root" Property="BorderBrush" Value="{StaticResource AccentBrush}" />
               <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}" />
             </Trigger>
-            <Trigger Property="IsKeyboardFocused" Value="True">
-              <Setter TargetName="Root" Property="BorderBrush" Value="{StaticResource AccentTextBrush}" />
-              <Setter TargetName="Root" Property="BorderThickness" Value="2" />
+            <Trigger Property="IsPressed" Value="True">
+              <Trigger.EnterActions><BeginStoryboard Storyboard="{StaticResource PressIn}" /></Trigger.EnterActions>
+              <Trigger.ExitActions><BeginStoryboard Storyboard="{StaticResource PressOut}" /></Trigger.ExitActions>
             </Trigger>
           </ControlTemplate.Triggers>
         </ControlTemplate>
@@ -143,23 +208,25 @@
     <Setter Property="FontWeight" Value="SemiBold" />
     <Setter Property="Cursor" Value="Hand" />
     <Setter Property="MinWidth" Value="120" />
-    <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+    <Setter Property="FocusVisualStyle" Value="{StaticResource FocusRing}" />
     <Setter Property="Template">
       <Setter.Value>
         <ControlTemplate TargetType="Button">
-          <Border x:Name="Root" Background="{StaticResource AccentBrush}" CornerRadius="10" Padding="18,9">
-            <ContentPresenter HorizontalAlignment="Center" />
+          <Border x:Name="Root" Background="{StaticResource AccentBrush}" CornerRadius="10" RenderTransformOrigin="0.5,0.5">
+            <Border.RenderTransform><ScaleTransform x:Name="Scale" /></Border.RenderTransform>
+            <Grid>
+              <Border x:Name="Hover" Background="#24FFFFFF" CornerRadius="9" Opacity="0" />
+              <ContentPresenter HorizontalAlignment="Center" Margin="18,9" />
+            </Grid>
           </Border>
           <ControlTemplate.Triggers>
             <Trigger Property="IsMouseOver" Value="True">
-              <Setter TargetName="Root" Property="Background" Value="#9D74F7" />
+              <Trigger.EnterActions><BeginStoryboard Storyboard="{StaticResource HoverIn}" /></Trigger.EnterActions>
+              <Trigger.ExitActions><BeginStoryboard Storyboard="{StaticResource HoverOut}" /></Trigger.ExitActions>
             </Trigger>
             <Trigger Property="IsPressed" Value="True">
-              <Setter TargetName="Root" Property="Background" Value="#7443E8" />
-            </Trigger>
-            <Trigger Property="IsKeyboardFocused" Value="True">
-              <Setter TargetName="Root" Property="BorderBrush" Value="White" />
-              <Setter TargetName="Root" Property="BorderThickness" Value="2" />
+              <Trigger.EnterActions><BeginStoryboard Storyboard="{StaticResource PressIn}" /></Trigger.EnterActions>
+              <Trigger.ExitActions><BeginStoryboard Storyboard="{StaticResource PressOut}" /></Trigger.ExitActions>
             </Trigger>
             <Trigger Property="IsEnabled" Value="False">
               <Setter TargetName="Root" Property="Opacity" Value="0.45" />
@@ -173,21 +240,25 @@
     <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}" />
     <Setter Property="FontSize" Value="14" />
     <Setter Property="Cursor" Value="Hand" />
-    <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+    <Setter Property="FocusVisualStyle" Value="{StaticResource FocusRing}" />
     <Setter Property="Template">
       <Setter.Value>
         <ControlTemplate TargetType="Button">
-          <Border x:Name="Root" Background="{StaticResource SurfaceElevatedBrush}" BorderBrush="{StaticResource BorderBrush}"
-                  BorderThickness="1" CornerRadius="10" Padding="16,8">
-            <ContentPresenter HorizontalAlignment="Center" />
+          <Border x:Name="Root" Background="{StaticResource SurfaceElevatedBrush}" BorderBrush="{StaticResource BorderBrush}" BorderThickness="1" CornerRadius="10" RenderTransformOrigin="0.5,0.5">
+            <Border.RenderTransform><ScaleTransform x:Name="Scale" /></Border.RenderTransform>
+            <Grid>
+              <Border x:Name="Hover" Background="{StaticResource SurfaceHoverBrush}" CornerRadius="9" Opacity="0" />
+              <ContentPresenter HorizontalAlignment="Center" Margin="16,8" />
+            </Grid>
           </Border>
           <ControlTemplate.Triggers>
             <Trigger Property="IsMouseOver" Value="True">
-              <Setter TargetName="Root" Property="Background" Value="{StaticResource SurfaceHoverBrush}" />
+              <Trigger.EnterActions><BeginStoryboard Storyboard="{StaticResource HoverIn}" /></Trigger.EnterActions>
+              <Trigger.ExitActions><BeginStoryboard Storyboard="{StaticResource HoverOut}" /></Trigger.ExitActions>
             </Trigger>
-            <Trigger Property="IsKeyboardFocused" Value="True">
-              <Setter TargetName="Root" Property="BorderBrush" Value="{StaticResource AccentTextBrush}" />
-              <Setter TargetName="Root" Property="BorderThickness" Value="2" />
+            <Trigger Property="IsPressed" Value="True">
+              <Trigger.EnterActions><BeginStoryboard Storyboard="{StaticResource PressIn}" /></Trigger.EnterActions>
+              <Trigger.ExitActions><BeginStoryboard Storyboard="{StaticResource PressOut}" /></Trigger.ExitActions>
             </Trigger>
             <Trigger Property="IsEnabled" Value="False">
               <Setter TargetName="Root" Property="Opacity" Value="0.45" />

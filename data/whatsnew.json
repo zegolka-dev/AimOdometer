@@ -1,6 +1,15 @@
 {
   "releases": [
     {
+      "version": "0.1.0-beta.9",
+      "en": [
+        "Smoother: buttons and menus react to the mouse with soft animations, charts grow in."
+      ],
+      "ru": [
+        "Плавнее: кнопки и меню мягко реагируют на мышь, графики вырастают при открытии."
+      ]
+    },
+    {
       "version": "0.1.0-beta.8",
       "en": [
         "If the statistics file gets damaged (for example, the PC loses power), AimOdometer restores yesterday's backup by itself instead of refusing to start.",

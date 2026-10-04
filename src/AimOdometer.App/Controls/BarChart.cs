@@ -2,6 +2,7 @@ using System.Globalization;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Windows.Media.Animation;
 
 namespace AimOdometer.App.Controls;
 
@@ -16,11 +17,33 @@ public sealed class BarChart : FrameworkElement
 {
     public static readonly DependencyProperty BarsProperty = DependencyProperty.Register(
         nameof(Bars), typeof(IReadOnlyList<ChartBar>), typeof(BarChart),
-        new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.AffectsRender, (d, _) => ((BarChart)d)._hover = -1));
+        new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.AffectsRender, (d, _) => ((BarChart)d).OnBarsChanged()));
+
+    /// <summary>0..1 while new bars grow in, left to right.</summary>
+    public static readonly DependencyProperty GrowProperty = DependencyProperty.Register(
+        nameof(Grow), typeof(double), typeof(BarChart),
+        new FrameworkPropertyMetadata(1.0, FrameworkPropertyMetadataOptions.AffectsRender));
 
     private const double LabelHeight = 20;
     private const double TooltipHeight = 26;
     private int _hover = -1;
+
+    public double Grow
+    {
+        get => (double)GetValue(GrowProperty);
+        set => SetValue(GrowProperty, value);
+    }
+
+    private void OnBarsChanged()
+    {
+        _hover = -1;
+        if (SystemParameters.ClientAreaAnimation)
+        {
+            BeginAnimation(GrowProperty, new DoubleAnimation(0, 1, TimeSpan.FromMilliseconds(520)) { EasingFunction = GrowEase });
+        }
+    }
+
+    private static readonly CubicEase GrowEase = new() { EasingMode = EasingMode.EaseOut };
 
     public BarChart()
     {
@@ -92,7 +115,9 @@ public sealed class BarChart : FrameworkElement
 
         for (var i = 0; i < bars.Count; i++)
         {
-            var height = bars[i].Value <= 0 ? 0 : Math.Max(3, bars[i].Value / max * chartHeight);
+            // Staggered: each bar starts a little after the one on its left.
+            var grow = Math.Clamp((Grow - (0.35 * i / bars.Count)) / 0.65, 0, 1);
+            var height = bars[i].Value <= 0 ? 0 : Math.Max(3, bars[i].Value / max * chartHeight) * grow;
             var rect = new Rect((i * slot) + (gap / 2), chartTop + chartHeight - height, barWidth, height);
             if (height > 0)
             {

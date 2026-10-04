@@ -5,6 +5,14 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), ver
 
 ## [Unreleased]
 
+## [0.1.0-beta.9] - 2026-10-04
+
+### Changed
+- Motion: buttons, navigation items and period pickers fade their hover state in and out and shrink slightly when
+  pressed; the selected navigation item's accent bar grows in; bar charts grow in left to right when they appear or the
+  period changes (skipped when Windows animations are off).
+- The focus ring shows only for keyboard focus (Tab), no longer around an item clicked with the mouse.
+
 ## [0.1.0-beta.8] - 2026-10-04
 
 ### Fixed

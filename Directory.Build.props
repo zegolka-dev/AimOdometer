@@ -10,7 +10,7 @@
     <Authors>AimOdometer contributors</Authors>
     <Product>AimOdometer</Product>
     <Copyright>Copyright (c) 2026 AimOdometer contributors</Copyright>
-    <Version>0.1.0-beta.8</Version>
+    <Version>0.1.0-beta.9</Version>
     <!-- x64 only for now (see docs/PLAN.md, assumption A1). -->
     <PlatformTarget>x64</PlatformTarget>
     <RuntimeIdentifier Condition="'$(RuntimeIdentifier)' == ''">win-x64</RuntimeIdentifier>
