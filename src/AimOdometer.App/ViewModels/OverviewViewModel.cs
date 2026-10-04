@@ -123,7 +123,7 @@ public sealed partial class OverviewViewModel(AppData data) : PageViewModel(data
         TodayComparison = ComparisonText(_periods.Today.Centimeters + unsavedCm);
         AllTimeComparison = ComparisonText(_periods.AllTime.Centimeters + unsavedCm);
         MoonText = Loc.Instance.Format("Overview.Moon",
-            (Core.Fun.Comparisons.MoonProgress(_periods.AllTime.Centimeters + unsavedCm) * 100).ToString("0.######", Loc.Instance.Culture) + "%");
+            Format.PercentPrecise(Core.Fun.Comparisons.MoonProgress(_periods.AllTime.Centimeters + unsavedCm)));
     }
 
     /// <summary>"That's 1.3 Burj Khalifas" style text, empty for no distance.</summary>

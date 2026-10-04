@@ -28,7 +28,7 @@
         <StackPanel>
           <TextBlock Style="{StaticResource CardLabel}" Text="{l:T Common.Today}" FontSize="14" />
           <StackPanel Orientation="Horizontal" Margin="0,2,0,0">
-            <TextBlock Style="{StaticResource HeroNumber}" Text="{Binding TodayNumber}" />
+            <TextBlock Style="{StaticResource HeroNumber}" c:Motion.CountUp="{Binding TodayNumber}" />
             <TextBlock Text="{Binding TodayUnit}" FontFamily="{StaticResource NumberFont}" FontSize="26"
                        Foreground="{StaticResource AccentTextBrush}" VerticalAlignment="Bottom" Margin="10,0,0,12" />
           </StackPanel>
@@ -52,19 +52,19 @@
       <Border Style="{StaticResource Card}" Margin="6,0">
         <StackPanel>
           <TextBlock Style="{StaticResource CardLabel}" Text="{l:T Common.ThisWeek}" />
-          <TextBlock Style="{StaticResource BigNumber}" Text="{Binding Week}" />
+          <TextBlock Style="{StaticResource BigNumber}" c:Motion.CountUp="{Binding Week}" />
         </StackPanel>
       </Border>
       <Border Style="{StaticResource Card}" Margin="6,0">
         <StackPanel>
           <TextBlock Style="{StaticResource CardLabel}" Text="{l:T Common.ThisMonth}" />
-          <TextBlock Style="{StaticResource BigNumber}" Text="{Binding Month}" />
+          <TextBlock Style="{StaticResource BigNumber}" c:Motion.CountUp="{Binding Month}" />
         </StackPanel>
       </Border>
       <Border Style="{StaticResource Card}" Margin="6,0">
         <StackPanel>
           <TextBlock Style="{StaticResource CardLabel}" Text="{l:T Common.AllTime}" />
-          <TextBlock Style="{StaticResource BigNumber}" Text="{Binding AllTime}" />
+          <TextBlock Style="{StaticResource BigNumber}" c:Motion.CountUp="{Binding AllTime}" />
           <TextBlock Style="{StaticResource Hint}" Text="{Binding AllTimeComparison}" Margin="0,4,0,0" />
           <TextBlock Style="{StaticResource Hint}" Text="{Binding MoonText}" />
         </StackPanel>

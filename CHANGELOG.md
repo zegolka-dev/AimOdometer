@@ -5,6 +5,13 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), ver
 
 ## [Unreleased]
 
+## [0.1.0-beta.12] - 2026-10-04
+
+### Changed
+- Overview numbers roll like an odometer: from 0 when the page appears, then only the difference on live updates
+  (`Motion.CountUp`).
+- "Of the way to the Moon" shows three significant digits in the culture's percent style ("0,0259 %", not "0,025854%").
+
 ## [0.1.0-beta.11] - 2026-10-04
 
 ### Changed

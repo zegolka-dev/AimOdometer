@@ -1,3 +1,4 @@
+using System.Globalization;
 using AimOdometer.App.Localization;
 using AimOdometer.Core;
 
@@ -50,6 +51,14 @@ public static class Format
     public static string Number(double value, string format = "N0") => value.ToString(format, L.Culture);
 
     public static string Percent(double fraction) => fraction.ToString("P0", L.Culture);
+
+    /// <summary>A small share with three significant digits in the culture's percent style: "0.0259%", "0,0259 %".</summary>
+    public static string PercentPrecise(double fraction)
+    {
+        var percent = fraction * 100;
+        var decimals = percent <= 0 ? 0 : Math.Clamp(2 - (int)Math.Floor(Math.Log10(percent)), 0, 6);
+        return fraction.ToString("P" + decimals.ToString(CultureInfo.InvariantCulture), L.Culture);
+    }
 
     public static string Date(DateOnly date) => date.ToString("d MMM yyyy", L.Culture);
 
