@@ -7,7 +7,8 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), ver
 
 ### Added
 - Demo leaderboards for promo recordings (`DemoSocial`): only in a test window (`AIMODOMETER_DATA_DIR`) and only when
-  `AIMODOMETER_DEMO_SOCIAL` names a JSON file with friends and world rows; real users never see it.
+  `AIMODOMETER_DEMO_SOCIAL` names a JSON file with friends and world rows; real users never see it. In the same test
+  window `AIMODOMETER_UI_SCALE` (1 to 3) enlarges the whole UI for sharp full-screen promo captures.
 - Website download counter for the author: a click on a download button sends the button, page language and the
   referring site's host to the `download-click` Edge Function, which stores it in `site_downloads` (no policies, so no
   client can read it) with a daily-changing hash of the IP instead of the address. `tools/Read-Downloads.ps1` shows

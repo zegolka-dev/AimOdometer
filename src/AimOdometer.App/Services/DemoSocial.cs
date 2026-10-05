@@ -18,9 +18,20 @@ public static class DemoSocial
 {
     public const string Variable = "AIMODOMETER_DEMO_SOCIAL";
 
+    /// <summary>Enlarges the whole UI (e.g. 1.33) so a full-screen promo capture stays sharp; test window only.</summary>
+    public const string ScaleVariable = "AIMODOMETER_UI_SCALE";
+
     private static readonly Lazy<DemoBoards?> Loaded = new(Load);
 
     public static DemoBoards? Boards => Loaded.Value;
+
+    /// <summary>The UI scale from <see cref="ScaleVariable"/> (1 to 3), or null outside a test window.</summary>
+    public static double? UiScale =>
+        AppIdentity.IsDataDirectoryOverridden
+        && double.TryParse(Environment.GetEnvironmentVariable(ScaleVariable), System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out var scale)
+        && scale is > 1 and <= 3
+            ? scale
+            : null;
 
     /// <summary>The same boards for every period, scaled so switching the period visibly changes the numbers.</summary>
     public static double PeriodFactor(string period) => period switch { "week" => 1, "month" => 3.9, _ => 14.2 };

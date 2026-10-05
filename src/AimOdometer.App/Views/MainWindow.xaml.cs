@@ -19,6 +19,11 @@ public partial class MainWindow : Window
     public MainWindow()
     {
         InitializeComponent();
+        if (DemoSocial.UiScale is { } scale)
+        {
+            ((FrameworkElement)Content).LayoutTransform = new ScaleTransform(scale, scale);
+        }
+
         ApplyLanguage();
         Loc.Instance.LanguageChanged += OnLanguageChanged;
         DataContextChanged += (_, e) =>
