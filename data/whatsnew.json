@@ -1,6 +1,15 @@
 {
   "releases": [
     {
+      "version": "0.1.0-beta.21",
+      "en": [
+        "Fixed: some games (for example Watch_Dogs 2 started from Steam) were not recognised while you played, and the distance went to \"Desktop and other\". Now they are counted as the game."
+      ],
+      "ru": [
+        "Исправлено: некоторые игры (например, Watch_Dogs 2 из Steam) не распознавались во время игры, и пробег уходил в «Рабочий стол и прочее». Теперь он засчитывается игре."
+      ]
+    },
+    {
       "version": "0.1.0-beta.20",
       "en": [
         "Your daily streak is now a flame on the overview. It grows and changes colour at 20, 50, 100 days and beyond, all the way to Legend at 1000. Your friends see it next to your name on the leaderboards.",

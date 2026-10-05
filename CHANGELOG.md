@@ -5,6 +5,8 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), ver
 
 ## [Unreleased]
 
+## [0.1.0-beta.21] - 2026-10-05
+
 ### Fixed
 - Games whose window took the foreground without Windows reporting it (Watch_Dogs 2 started from Steam): the movement
   kept going to the previous window, usually "Desktop and other". The tracker now also checks the foreground window
