@@ -1,6 +1,17 @@
 {
   "releases": [
     {
+      "version": "0.1.0-beta.20",
+      "en": [
+        "Your daily streak is now a flame on the overview. It grows and changes colour at 20, 50, 100 days and beyond, all the way to Legend at 1000. Your friends see it next to your name on the leaderboards.",
+        "Like AimOdometer? \"Support the author\" at the bottom of the sidebar: Boosty or PayPal, any amount. The app stays free either way."
+      ],
+      "ru": [
+        "Ежедневная серия теперь огонёк на обзоре. Он растёт и меняет цвет на 20, 50, 100 днях и дальше, до «Легенды» на 1000. Друзья видят его рядом с твоим ником в таблицах лидеров.",
+        "Нравится AimOdometer? Внизу боковой панели есть «Поддержать автора»: Boosty или PayPal, любая сумма. Программа в любом случае остаётся бесплатной."
+      ]
+    },
+    {
       "version": "0.1.0-beta.19",
       "en": [
         "AimOdometer now reminds you with a notification when your mouse pad, sleeve, glides or mouse reach 90% of their lifetime. Add them on the Gear page."

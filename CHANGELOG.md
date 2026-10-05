@@ -5,6 +5,8 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), ver
 
 ## [Unreleased]
 
+## [0.1.0-beta.20] - 2026-10-05
+
 ### Added
 - Demo leaderboards for promo recordings (`DemoSocial`): only in a test window (`AIMODOMETER_DATA_DIR`) and only when
   `AIMODOMETER_DEMO_SOCIAL` names a JSON file with friends and world rows; real users never see it. In the same test
