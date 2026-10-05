@@ -182,3 +182,29 @@ export function validateFeedback(body: unknown): Feedback | null {
     language: short(b.language, 10),
   };
 }
+
+export interface DownloadClick {
+  asset: "setup" | "portable";
+  language: "en" | "ru";
+  place: "hero" | "middle" | "final";
+  referrer: string | null;
+}
+
+/** A download button click from the website; the referrer is cut down to a host name. */
+export function validateDownloadClick(body: unknown): DownloadClick | null {
+  if (typeof body !== "object" || body === null) return null;
+  const b = body as Record<string, unknown>;
+  const { asset, language, place } = b;
+  if (asset !== "setup" && asset !== "portable") return null;
+  if (language !== "en" && language !== "ru") return null;
+  if (place !== "hero" && place !== "middle" && place !== "final") return null;
+  let referrer: string | null = null;
+  if (typeof b.referrer === "string" && b.referrer.length > 0) {
+    try {
+      referrer = new URL(b.referrer).hostname.slice(0, 100) || null;
+    } catch {
+      referrer = null;
+    }
+  }
+  return { asset, language, place, referrer };
+}

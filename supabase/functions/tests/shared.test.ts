@@ -1,7 +1,7 @@
 // Unit tests of the pure server code. Run: npx deno test supabase/functions/tests
 import { assert, assertEquals, assertFalse } from "jsr:@std/assert@1";
 import { friendList, playerSummary, readAssertion, STEAM_OPENID, steamLoginUrl, verifyWithSteam } from "../_shared/steam.ts";
-import { LIMITS, validateBoard, validateFeedback, validateStart, validateSync } from "../_shared/validate.ts";
+import { LIMITS, validateBoard, validateDownloadClick, validateFeedback, validateStart, validateSync } from "../_shared/validate.ts";
 import { base64Url, randomToken, safeEqual, sha256Base64Url } from "../_shared/crypto.ts";
 
 const RETURN_TO = "https://x.supabase.co/functions/v1/auth-steam/callback?pending=abc";
@@ -202,5 +202,15 @@ Deno.test("feedback: valid messages are trimmed and limited", () => {
   assertEquals(validateFeedback({ kind: "bug", message: "x".repeat(4000), contact: "c".repeat(500) })?.contact?.length, 200);
   for (const bad of [null, { kind: "spam", message: "hello" }, { kind: "bug", message: "hi" }, { kind: "bug", message: "x".repeat(4001) }, { kind: "bug" }]) {
     assertEquals(validateFeedback(bad), null);
+  }
+});
+
+Deno.test("download click: fields are checked and the referrer becomes a host", () => {
+  assertEquals(validateDownloadClick({ asset: "setup", language: "ru", place: "hero", referrer: "https://www.youtube.com/watch?v=1" }), {
+    asset: "setup", language: "ru", place: "hero", referrer: "www.youtube.com",
+  });
+  assertEquals(validateDownloadClick({ asset: "portable", language: "en", place: "final", referrer: "not a url" })?.referrer, null);
+  for (const bad of [null, "x", { asset: "virus", language: "en", place: "hero" }, { asset: "setup", language: "de", place: "hero" }, { asset: "setup", language: "en", place: "footer" }]) {
+    assertEquals(validateDownloadClick(bad), null);
   }
 });

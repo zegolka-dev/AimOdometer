@@ -432,3 +432,6 @@ verify_jwt = false
 
 [functions.feedback]
 verify_jwt = false
+
+[functions.download-click]
+verify_jwt = false

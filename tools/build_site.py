@@ -280,8 +280,8 @@ def page(t, file, title, description, body, landing=False):
 """
 
 
-def glow_button(t, label):
-    return f'<a class="btn-glow" href="{RELEASES}" data-asset="AimOdometerApp-win-Setup.exe">{icon("download")}<span>{html.escape(label)}</span></a>'
+def glow_button(t, label, place):
+    return f'<a class="btn-glow" href="{RELEASES}" data-asset="AimOdometerApp-win-Setup.exe" data-place="{place}">{icon("download")}<span>{html.escape(label)}</span></a>'
 
 
 def tile(p, name, lang, alt=""):
@@ -353,7 +353,7 @@ def landing(t):
   </div>
   <div class="hero-bottom">
     <p {fade(0.35, 0, 20, "hero-lead")}>{html.escape(t['hero_lead'])}</p>
-    <div {fade(0.5, 0, 20)}>{glow_button(t, t['download'])}</div>
+    <div {fade(0.5, 0, 20)}>{glow_button(t, t['download'], 'hero')}</div>
   </div>
 </section>
 
@@ -370,7 +370,7 @@ def landing(t):
     <h2 id="about-title" {fade(0, 0, 40)}><span class="giant">{html.escape(t['about_title'])}</span></h2>
     <p class="reveal"><span class="sr-only">{html.escape(t['about_text'])}</span><span class="reveal-text" aria-hidden="true">{letters}</span></p>
     <div class="stats">{stats}</div>
-    <div {fade(0.2, 0, 20)}>{glow_button(t, t['download_long'])}</div>
+    <div {fade(0.2, 0, 20)}>{glow_button(t, t['download_long'], 'middle')}</div>
   </div>
 </section>
 
@@ -410,8 +410,8 @@ def landing(t):
 <section class="final" id="download" aria-labelledby="final-title">
   <h2 id="final-title" {fade(0, 0, 40)}><span class="giant">{html.escape(t['final_title'])}</span></h2>
   <div {fade(0.15, 0, 20, "final-actions")}>
-    {glow_button(t, t['download_long'])}
-    <a class="btn-ghost" href="{RELEASES}" data-asset="AimOdometerApp-win-Portable.zip">{html.escape(t['portable'])}</a>
+    {glow_button(t, t['download_long'], 'final')}
+    <a class="btn-ghost" href="{RELEASES}" data-asset="AimOdometerApp-win-Portable.zip" data-place="final">{html.escape(t['portable'])}</a>
   </div>
   <p class="meta" data-release="{html.escape(t['meta'])}">{t['meta_fallback']}</p>
   <p class="meta signing">{t['signing_note']}</p>
