@@ -36,16 +36,9 @@
       </StackPanel>
       <TextBlock Style="{StaticResource PageSubtitle}" Text="{l:T Support.Subtitle}" FontSize="13" TextWrapping="Wrap" Margin="0,6,0,18" />
 
-      <StackPanel Visibility="{Binding HasRussia, Converter={StaticResource BoolToVisibility}}">
-        <TextBlock Style="{StaticResource CardLabel}" Text="{l:T Support.FromRussia}" Margin="0,0,0,8" />
-        <ItemsControl ItemsSource="{Binding Russia}" ItemTemplate="{StaticResource Option}" Focusable="False" />
-      </StackPanel>
-      <StackPanel Visibility="{Binding HasWorld, Converter={StaticResource BoolToVisibility}}" Margin="0,8,0,0">
-        <TextBlock Style="{StaticResource CardLabel}" Text="{l:T Support.FromWorld}" Margin="0,0,0,8" />
-        <ItemsControl ItemsSource="{Binding World}" ItemTemplate="{StaticResource Option}" Focusable="False" />
-      </StackPanel>
+      <ItemsControl ItemsSource="{Binding Options}" ItemTemplate="{StaticResource Option}" Focusable="False" />
 
-      <Grid Margin="0,12,0,0">
+      <Grid Margin="0,10,0,0">
         <TextBlock Style="{StaticResource Hint}" Text="{l:T Support.Free}" TextWrapping="Wrap" VerticalAlignment="Center" Margin="0,0,140,0" />
         <Button Style="{StaticResource SecondaryButton}" Content="{l:T Common.Close}" Command="{Binding CloseCommand}" HorizontalAlignment="Right"
                 AutomationProperties.AutomationId="SupportClose" />

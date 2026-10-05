@@ -42,18 +42,10 @@ public sealed partial class SupportOptionViewModel(SupportService service) : Obs
     }
 }
 
-/// <summary>"Support the author": the payment services, grouped by where the money comes from.</summary>
+/// <summary>"Support the author": the payment services, each with a note on who it suits.</summary>
 public sealed partial class SupportViewModel(Action close) : ObservableObject
 {
-    public IReadOnlyList<SupportOptionViewModel> Russia { get; } =
-        [.. SupportLinks.Available.Where(s => s.Region == SupportRegion.Russia).Select(s => new SupportOptionViewModel(s))];
-
-    public IReadOnlyList<SupportOptionViewModel> World { get; } =
-        [.. SupportLinks.Available.Where(s => s.Region == SupportRegion.World).Select(s => new SupportOptionViewModel(s))];
-
-    public bool HasRussia => Russia.Count > 0;
-
-    public bool HasWorld => World.Count > 0;
+    public IReadOnlyList<SupportOptionViewModel> Options { get; } = [.. SupportLinks.Available.Select(s => new SupportOptionViewModel(s))];
 
     [RelayCommand]
     private void Close() => close();

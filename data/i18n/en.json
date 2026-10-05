@@ -571,10 +571,8 @@
   "Support.Button": "Support the author",
   "Support.Title": "Support the author",
   "Support.Subtitle": "AimOdometer is made by one person in their free time. If it is useful to you, you can thank the author with any amount: it helps keep the app growing.",
-  "Support.FromRussia": "From Russia",
-  "Support.FromWorld": "From other countries",
-  "Support.boosty.Note": "Russian cards and SBP. Once or every month",
+  "Support.boosty.Note": "From any country: Russian cards, SBP or a foreign card. Once or every month",
   "Support.donationalerts.Note": "Russian cards and SBP. A quick one-off tip",
-  "Support.paypal.Note": "From any country: a PayPal account or a bank card",
+  "Support.paypal.Note": "Outside Russia: PayPal or a bank card",
   "Support.Free": "The app stays free and without ads either way."
 }
