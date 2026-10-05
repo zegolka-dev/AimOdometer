@@ -22,6 +22,8 @@ internal sealed unsafe class TrackerHost : IDisposable
     private const nuint HourTimerId = 2;
     private const nuint ResumeTimerId = 3;
     private const nuint CrashTestTimerId = 4;
+    private const nuint ForegroundCheckTimerId = 5;
+    private const uint ForegroundCheckIntervalMs = 1000;
     private const uint FlushIntervalMs = 60_000;
     private const int RawBufferSize = 64 * 1024;
     private const int MaxRetainedFailedRows = 10_000;
@@ -129,6 +131,7 @@ internal sealed unsafe class TrackerHost : IDisposable
 
         _foreground = new ForegroundTracker(_store, _accumulator, Flush);
         _foreground.Start();
+        _ = User32.SetTimer(_hwnd, ForegroundCheckTimerId, ForegroundCheckIntervalMs, 0);
 
         using var process = Process.GetCurrentProcess();
         _pipe = new PipeServer(_hwnd, process.SessionId);
@@ -361,6 +364,9 @@ internal sealed unsafe class TrackerHost : IDisposable
                 break;
             case ResumeTimerId:
                 Resume();
+                break;
+            case ForegroundCheckTimerId:
+                _foreground?.Recheck();
                 break;
             case CrashTestTimerId:
                 Flush();

@@ -8,7 +8,8 @@ using AimOdometer.Win32;
 namespace AimOdometer.Tracker;
 
 /// <summary>
-/// Follows the foreground window with out-of-context WinEvent hooks (event-driven, no polling, nothing injected).
+/// Follows the foreground window with out-of-context WinEvent hooks (event-driven, nothing injected), plus a cheap
+/// once-a-second check for changes the hook missed (<see cref="Recheck"/>).
 /// Tells the accumulator which app receives the movement and measures foreground time per app.
 /// Time does not count while the window is minimized, the session is locked, the PC sleeps, or tracking is paused.
 /// Which app is which game is decided later, in the UI; the tracker stores only executable paths.
@@ -31,6 +32,7 @@ internal sealed unsafe class ForegroundTracker : IDisposable
     private long _segmentStart;
     private bool _sessionActive = true;
     private bool _minimized;
+    private int _missedEvents;
 
     /// <param name="flush">Writes pending data; called when the accumulator's per-flush app table is full.</param>
     public ForegroundTracker(StatsStore store, InputAccumulator accumulator, Action flush)
@@ -58,6 +60,36 @@ internal sealed unsafe class ForegroundTracker : IDisposable
         }
 
         OnForegroundChanged(WinEvents.GetForegroundWindow());
+    }
+
+    /// <summary>
+    /// Safety net for foreground changes the hook never reported. Some full-screen games take the foreground without
+    /// EVENT_SYSTEM_FOREGROUND reaching an out-of-context hook (seen with Watch_Dogs 2 started from Steam: hours of play
+    /// went to explorer.exe). Called once a second; costs one GetForegroundWindow call. A momentary "no foreground
+    /// window" during a switch is ignored; the hook reports a real one.
+    /// </summary>
+    public void Recheck()
+    {
+        if (!_sessionActive)
+        {
+            return;
+        }
+
+        var hwnd = WinEvents.GetForegroundWindow();
+        if (hwnd != 0 && hwnd != _foregroundWindow)
+        {
+            if (_missedEvents++ < 50)
+            {
+                Log.Warning($"Foreground changed without an event: 0x{hwnd:X} (was 0x{_foregroundWindow:X})");
+            }
+
+            OnForegroundChanged(hwnd);
+        }
+        else if (hwnd != 0 && WinEvents.IsIconic(hwnd) != _minimized)
+        {
+            CloseSegment();
+            _minimized = !_minimized;
+        }
     }
 
     /// <summary>Session lock/unlock, sleep/resume, pause/resume.</summary>
