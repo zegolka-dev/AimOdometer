@@ -12,8 +12,8 @@ public static class SupportLinks
 {
     public static IReadOnlyList<SupportService> All { get; } =
     [
-        new("boosty", "Boosty", "", "B", "#F15F2C"),
-        new("paypal", "PayPal", "", "P", "#0070E0"),
+        new("boosty", "Boosty", "https://boosty.to/zegolka", "B", "#F15F2C"),
+        new("paypal", "PayPal", "https://paypal.me/zegolka", "P", "#0070E0"),
     ];
 
     public static IReadOnlyList<SupportService> Available => [.. All.Where(s => IsLink(s.Url))];
