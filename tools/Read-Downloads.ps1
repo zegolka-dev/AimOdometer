@@ -46,7 +46,9 @@ try {
     $ErrorActionPreference = "Continue"
     foreach ($title in $queries.Keys) {
         Write-Host "`n== $title" -ForegroundColor Cyan
-        & npx supabase db query --linked ($queries[$title] -replace "\r?\n", " ") 2>$null
+        $json = (& npx supabase db query --linked ($queries[$title] -replace "\r?\n", " ") 2>$null) -join "`n"
+        $rows = ($json | ConvertFrom-Json).rows
+        if ($rows) { $rows | Format-Table -AutoSize | Out-String -Width 200 | Write-Host } else { Write-Host "  (nothing yet)" }
     }
 }
 finally {
