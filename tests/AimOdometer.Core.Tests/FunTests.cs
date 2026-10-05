@@ -191,3 +191,31 @@ public sealed class AchievementServiceAndGearTests : IDisposable
         Assert.Empty(store.GetGear());
     }
 }
+
+public class StreakTierTests
+{
+    [Theory]
+    [InlineData(0, null)]
+    [InlineData(1, "spark")]
+    [InlineData(19, "spark")]
+    [InlineData(20, "flame")]
+    [InlineData(50, "blaze")]
+    [InlineData(99, "blaze")]
+    [InlineData(100, "neon")]
+    [InlineData(250, "blue")]
+    [InlineData(300, "plasma")]
+    [InlineData(400, "gold")]
+    [InlineData(999, "aurora")]
+    [InlineData(1000, "legend")]
+    [InlineData(5000, "legend")]
+    public void TierFollowsTheThresholds(int days, string? id) => Assert.Equal(id, StreakTiers.For(days)?.Id);
+
+    [Fact]
+    public void NextTierIsTheFirstThresholdAbove()
+    {
+        Assert.Equal(20, StreakTiers.Next(1)!.MinDays);
+        Assert.Equal(100, StreakTiers.Next(75)!.MinDays);
+        Assert.Equal(1000, StreakTiers.Next(500)!.MinDays);
+        Assert.Null(StreakTiers.Next(1000));
+    }
+}

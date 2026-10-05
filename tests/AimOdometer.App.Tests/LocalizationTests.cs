@@ -115,6 +115,8 @@ public partial class LocalizationTests
         expected.AddRange(EnumMembers(Path.Combine(AppSource, "ViewModels", "ShareViewModel.cs"), "ShareKind").Select(m => $"Share.Kind.{m}"));
         expected.AddRange(["Share.Card.Day", "Share.Card.Week", "Share.Card.Month", "Share.Card.AllTime"]);
         expected.AddRange(SupportServiceIds().Select(id => $"Support.{id}.Note"));
+        expected.AddRange(StreakTierId().Matches(File.ReadAllText(Path.Combine(RepoRoot, "src", "AimOdometer.Core", "Fun", "StreakTiers.cs")))
+            .Select(m => $"Streak.Tier.{m.Groups[1].Value}"));
 
         Assert.True(expected.Count > 90);
         var missing = expected.Where(k => !english.ContainsKey(k)).ToList();
@@ -142,6 +144,9 @@ public partial class LocalizationTests
 
     [GeneratedRegex("""new\("(?<id>[a-z]+)", "[^"]+", "(?<url>[^"]*)",""")]
     private static partial Regex SupportEntry();
+
+    [GeneratedRegex("""new\(\d+, \d+, "([a-z]+)"\)""")]
+    private static partial Regex StreakTierId();
 
     private static IEnumerable<string> EnumMembers(string file, string name)
     {

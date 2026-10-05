@@ -37,7 +37,6 @@
   "Overview.Clicks": "Кликов сегодня",
   "Overview.ActiveTime": "Время в движении",
   "Overview.PeakSpeed": "Самый быстрый флик",
-  "Overview.StreakDays": "Серия {0} дн. подряд - не прерывай",
   "Overview.NoStreak": "Проходи хотя бы 1 м в день, чтобы начать серию",
   "Overview.Last14Days": "Последние 14 дней",
   "Overview.TopGamesToday": "Игры сегодня",
@@ -573,5 +572,19 @@
   "Support.Subtitle": "AimOdometer делает один человек в свободное время. Если программа тебе полезна, можешь отблагодарить автора любой суммой: это помогает ей развиваться.",
   "Support.boosty.Note": "Из любой страны: карты РФ, СБП или зарубежная карта. Разово или каждый месяц",
   "Support.paypal.Note": "Для тех, кто за рубежом: PayPal или банковская карта",
-  "Support.Free": "Программа в любом случае остаётся бесплатной и без рекламы."
+  "Support.Free": "Программа в любом случае остаётся бесплатной и без рекламы.",
+  "Streak.DaysInRow": "дн. подряд",
+  "Streak.Next": "До огонька «{0}» осталось {1} дн.",
+  "Streak.Top": "Высший огонёк. Легенда!",
+  "Streak.NotToday": "Сегодня ещё не засчитано: пройди мышью 1 м, чтобы не прервать серию",
+  "Streak.Tip": "Серия {0} дн. подряд: {1}",
+  "Streak.Tier.spark": "Искра",
+  "Streak.Tier.flame": "Огонёк",
+  "Streak.Tier.blaze": "Пламя",
+  "Streak.Tier.neon": "Неон",
+  "Streak.Tier.blue": "Синее пламя",
+  "Streak.Tier.plasma": "Плазма",
+  "Streak.Tier.gold": "Золотой огонь",
+  "Streak.Tier.aurora": "Аврора",
+  "Streak.Tier.legend": "Легенда"
 }

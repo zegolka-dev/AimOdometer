@@ -1,7 +1,8 @@
 <UserControl x:Class="AimOdometer.App.Views.FriendsView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:l="clr-namespace:AimOdometer.App.Localization">
+             xmlns:l="clr-namespace:AimOdometer.App.Localization"
+             xmlns:c="clr-namespace:AimOdometer.App.Controls">
   <StackPanel MaxWidth="900" HorizontalAlignment="Left">
     <TextBlock Style="{StaticResource PageTitle}" Text="{l:T Friends.Title}" />
     <TextBlock Style="{StaticResource PageSubtitle}" Text="{l:T Friends.Subtitle}" Margin="0,0,0,20" />
@@ -65,6 +66,14 @@
                 <StackPanel Grid.Column="2" VerticalAlignment="Center" Margin="0,0,12,0">
                   <WrapPanel>
                     <TextBlock Text="{Binding Name}" FontSize="15" TextTrimming="CharacterEllipsis" VerticalAlignment="Center" Margin="0,0,8,0" />
+                    <!-- Streak: the same flame as on the overview, small, with the number of days -->
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,8,0" Background="Transparent"
+                                ToolTip="{Binding StreakTip}" AutomationProperties.Name="{Binding StreakTip}"
+                                Visibility="{Binding HasStreak, Converter={StaticResource BoolToVisibility}}">
+                      <c:StreakFlame Days="{Binding Streak}" Width="18" Height="18" />
+                      <TextBlock Text="{Binding StreakText}" FontFamily="{StaticResource NumberFont}" FontSize="13" FontWeight="SemiBold"
+                                 Foreground="{Binding StreakBrush}" VerticalAlignment="Center" Margin="2,1,0,0" />
+                    </StackPanel>
                     <ItemsControl ItemsSource="{Binding Badges}" Focusable="False" VerticalAlignment="Center"
                                   Visibility="{Binding HasBadges, Converter={StaticResource BoolToVisibility}}">
                       <ItemsControl.ItemsPanel>

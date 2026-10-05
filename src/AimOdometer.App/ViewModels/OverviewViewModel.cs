@@ -4,6 +4,7 @@ using System.Windows.Media;
 using AimOdometer.App.Controls;
 using AimOdometer.App.Localization;
 using AimOdometer.App.Services;
+using AimOdometer.Core.Fun;
 using AimOdometer.Core.Games;
 using AimOdometer.Core.Stats;
 using AimOdometer.Core.Storage;
@@ -51,6 +52,26 @@ public sealed partial class OverviewViewModel(AppData data) : PageViewModel(data
     [ObservableProperty]
     public partial string StreakText { get; set; } = string.Empty;
 
+    /// <summary>Days in a row (0 = no streak); <see cref="StreakLit"/> false: alive, but today does not count yet.</summary>
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(HasStreak), nameof(StreakNumber), nameof(StreakTier), nameof(StreakBrush))]
+    public partial int StreakDays { get; set; }
+
+    [ObservableProperty]
+    public partial bool StreakLit { get; set; }
+
+    public bool HasStreak => StreakDays > 0;
+
+    public string StreakNumber => Format.Number(StreakDays);
+
+    public string StreakTier => StreakFlame.TierName(StreakDays);
+
+    public System.Windows.Media.Brush StreakBrush => StreakFlame.TextBrush(StreakDays);
+
+    /// <summary>Progress from this flame to the next one (0..1); 1 at the top tier.</summary>
+    [ObservableProperty]
+    public partial double StreakProgress { get; set; }
+
     [ObservableProperty]
     public partial string TodayComparison { get; set; } = string.Empty;
 
@@ -71,6 +92,8 @@ public sealed partial class OverviewViewModel(AppData data) : PageViewModel(data
 
     public ObservableCollection<TopGameItem> TopGames { get; } = [];
 
+    private Streak? _streak;
+
     public override void Refresh()
     {
         var today = DateOnly.FromDateTime(DateTime.Now);
@@ -85,9 +108,8 @@ public sealed partial class OverviewViewModel(AppData data) : PageViewModel(data
         TodayPeak = Format.Speed(todayTotal.PeakSpeedCmPerSecond);
 
         var records = StatsSummary.Records(days, today, firstDay);
-        StreakText = records.CurrentStreak is { } streak
-            ? Loc.Instance.Format("Overview.StreakDays", streak.Days)
-            : Loc.Instance["Overview.NoStreak"];
+        _streak = records.CurrentStreak;
+        ShowStreak(_periods.Today.Centimeters);
 
         Bars = [.. StatsSummary.Series(days, today.AddDays(-(ChartDays - 1)), today).Select(d => new ChartBar(
             d.Centimeters,
@@ -96,6 +118,32 @@ public sealed partial class OverviewViewModel(AppData data) : PageViewModel(data
             d.Date == today))];
 
         LoadTopGames(today);
+    }
+
+    /// <summary>
+    /// The streak card: once today reaches 1 m the flame lights up and a streak that ended yesterday grows by a day,
+    /// right away from the live total (the database catches up within a minute).
+    /// </summary>
+    private void ShowStreak(double todayCentimeters)
+    {
+        var today = DateOnly.FromDateTime(DateTime.Now);
+        var countsToday = todayCentimeters >= StatsSummary.ActiveDayMinimumCm;
+        var days = _streak switch
+        {
+            null => countsToday ? 1 : 0,
+            { } s when s.End == today => s.Days,
+            { } s => countsToday ? s.Days + 1 : s.Days,
+        };
+        StreakDays = days;
+        StreakLit = countsToday;
+
+        var tier = StreakTiers.For(days);
+        var next = StreakTiers.Next(days);
+        StreakProgress = tier is null ? 0 : next is null ? 1 : (double)(days - tier.MinDays) / (next.MinDays - tier.MinDays);
+        StreakText = days == 0 ? Loc.Instance["Overview.NoStreak"]
+            : !countsToday ? Loc.Instance["Streak.NotToday"]
+            : next is null ? Loc.Instance["Streak.Top"]
+            : Loc.Instance.Format("Streak.Next", Loc.Instance[$"Streak.Tier.{next.Id}"], Format.Number(next.MinDays - days));
     }
 
     public override void OnLiveUpdate(TrackerConnection tracker)
@@ -107,6 +155,7 @@ public sealed partial class OverviewViewModel(AppData data) : PageViewModel(data
 
         // The tracker's "today" includes movement not yet written to the database (up to a minute).
         ShowTotals(Math.Max(0, status.TodayCentimeters - _periods.Today.Centimeters));
+        ShowStreak(Math.Max(status.TodayCentimeters, _periods.Today.Centimeters));
     }
 
     private void ShowTotals(double unsavedCm)

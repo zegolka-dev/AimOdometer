@@ -12,7 +12,7 @@ public sealed record DemoBoards(IReadOnlyList<BoardRow> Friends, IReadOnlyList<B
 /// Leaderboards without the cloud, for recording promo videos: active only in a test window (a data folder set with
 /// AIMODOMETER_DATA_DIR) and only when AIMODOMETER_DEMO_SOCIAL names a JSON file. Real users never see it.
 /// The file: {"friends": [row...], "world": [row...], "me": {"rank", "centimeters", "players"}}, a row being
-/// {"name", "avatar" (https or a local file), "centimeters", "isMe", "dpi", "peakSpeed", "peakDpi", "badges", "titles"}.
+/// {"name", "avatar" (https or a local file), "centimeters", "isMe", "dpi", "peakSpeed", "peakDpi", "badges", "titles", "streak"}.
 /// </summary>
 public static class DemoSocial
 {
@@ -51,7 +51,8 @@ public static class DemoSocial
             r.TryGetProperty("peakSpeed", out var peak) ? peak.GetDouble() : 0,
             r.TryGetProperty("peakDpi", out var peakDpi) ? peakDpi.GetDouble() : null,
             Strings(r, "badges"),
-            Strings(r, "titles")))];
+            Strings(r, "titles"),
+            r.TryGetProperty("streak", out var streak) ? streak.GetInt32() : 0))];
 
     private static List<string> Strings(JsonElement row, string name) =>
         row.TryGetProperty(name, out var list) ? [.. list.EnumerateArray().Select(x => x.GetString() ?? string.Empty)] : [];

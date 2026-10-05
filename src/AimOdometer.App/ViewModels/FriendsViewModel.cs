@@ -1,5 +1,6 @@
 using System.Collections.ObjectModel;
 using System.Windows;
+using AimOdometer.App.Controls;
 using AimOdometer.App.Localization;
 using AimOdometer.App.Services;
 using AimOdometer.Cloud;
@@ -49,11 +50,22 @@ public sealed record BoardTag(BoardTagKind Kind, string Name, string Description
     };
 }
 
-/// <summary>One leaderboard line as shown. <paramref name="Measured"/>: the DPI behind the distance and the fastest flick.</summary>
+/// <summary>
+/// One leaderboard line as shown. <paramref name="Measured"/>: the DPI behind the distance and the fastest flick;
+/// <paramref name="Streak"/>: days in a row, shown as the same flame as on the overview.
+/// </summary>
 public sealed record BoardItem(string Rank, string Name, Uri? Avatar, string Distance, bool IsMe, string? Measured = null,
-    IReadOnlyList<BoardTag>? Badges = null)
+    IReadOnlyList<BoardTag>? Badges = null, int Streak = 0)
 {
     public bool HasBadges => Badges is { Count: > 0 };
+
+    public bool HasStreak => Streak > 0;
+
+    public string StreakText => Format.Number(Streak);
+
+    public string StreakTip => Loc.Instance.Format("Streak.Tip", Format.Number(Streak), StreakFlame.TierName(Streak));
+
+    public System.Windows.Media.Brush StreakBrush => StreakFlame.TextBrush(Streak);
 }
 
 /// <summary>
@@ -337,7 +349,7 @@ public sealed partial class FriendsViewModel : PageViewModel
                 && (url.Scheme == Uri.UriSchemeHttps || (url.IsFile && DemoSocial.Boards is not null)) ? url : null;
             var name = row.Name.Length > 0 ? row.Name : L["Friends.NoName"];
             Rows.Add(new BoardItem(Format.Number(row.Rank), row.IsMe ? L.Format("Friends.Me", name) : name, avatar, Format.Distance(row.Centimeters), row.IsMe,
-                Measured(row), Tags(row)));
+                Measured(row), Tags(row), row.Streak));
         }
     }
 }

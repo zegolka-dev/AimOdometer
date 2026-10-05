@@ -41,7 +41,7 @@ public sealed class SocialClientTests : IDisposable
     {
         var server = new FakeServer((_, _) => (HttpStatusCode.OK, """
             {"private":false,"friendsOnSteam":1,"rows":[
-              {"name":"C","avatar":"","centimeters":1200000,"isMe":false,"dpi":100,"peakSpeed":900,"peakDpi":100,"badges":["clown",7],"titles":["beta-tester"]},
+              {"name":"C","avatar":"","centimeters":1200000,"isMe":false,"dpi":100,"peakSpeed":900,"peakDpi":100,"badges":["clown",7],"titles":["beta-tester"],"streak":123},
               {"name":"me","avatar":"","centimeters":300,"isMe":true,"dpi":null,"peakSpeed":0,"peakDpi":null,"badges":[]}]}
             """));
         using var client = new CloudClient(SignedIn(), server, new FixedTime(Now));
@@ -52,6 +52,8 @@ public sealed class SocialClientTests : IDisposable
         Assert.Equal(["beta-tester"], c.Titles!);
         Assert.Null(board.Rows[1].Dpi);
         Assert.Null(board.Rows[1].PeakDpi);
+        Assert.Equal(123, c.Streak);
+        Assert.Equal(0, board.Rows[1].Streak); // no streak sent: none shown
     }
 
     [Fact]

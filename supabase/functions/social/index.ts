@@ -103,7 +103,7 @@ async function cachedFriends(userId: string): Promise<{ steamIds: string[]; isPr
   }
 }
 
-// What the distance and the fastest flick were measured with, and badges for inflated distance (FairPlay.cs).
+// What the distance and the fastest flick were measured with, badges for inflated distance (FairPlay.cs), the streak.
 function fairPlay(r: FairPlayColumns) {
   return {
     dpi: r.dpi === null ? null : Math.round(r.dpi),
@@ -111,6 +111,7 @@ function fairPlay(r: FairPlayColumns) {
     peakDpi: r.peak_dpi === null ? null : Math.round(r.peak_dpi),
     badges: r.badges ?? [],
     titles: r.titles ?? [],
+    streak: r.streak ?? 0,
   };
 }
 
@@ -120,6 +121,7 @@ interface FairPlayColumns {
   peak_dpi: number | null;
   badges: string[] | null;
   titles: string[] | null; // honorary: creator, beta-tester
+  streak: number | null; // days in a row with at least 1 m (player_streak)
 }
 
 interface FriendRow extends FairPlayColumns {

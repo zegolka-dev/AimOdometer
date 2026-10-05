@@ -17,6 +17,13 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), ver
   off). It opens a window with the payment services, each with a note on who it suits (Boosty: any country, Russian or
   foreign cards and SBP; PayPal: abroad); each opens the author's page in the browser. Services live in `SupportLinks`; one without an https link is hidden, and with none
   the sidebar link is hidden.
+- Streak flames: the daily streak (days in a row with at least 1 m) is a flame that grows and changes its look at 20,
+  50, 100, 200, 300, 400, 500 and 1000 days (Spark, Flame, Blaze, Neon, Blue fire, Plasma, Golden fire, Aurora,
+  Legend): a hot core, a glow, sparks, a halo, and a gentle flicker from 100 days when shown large. The overview shows
+  it with the number of days, the tier and progress to the next flame; the flame is grey until today counts and lights
+  up live once the mouse has moved 1 m. Leaderboards show the same flame, small, with the number next to each name.
+  `StreakTiers` (Core), `StreakFlame` (vector control), `player_streak` in the cloud (migration
+  20261006000000_streaks.sql) and a `streak` field on board rows; older clients ignore it.
 
 ### Changed
 - English sidebar: "Complaints and suggestions" is now "Complaints and ideas", so it no longer gets cut off.

@@ -37,7 +37,6 @@
   "Overview.Clicks": "Clicks today",
   "Overview.ActiveTime": "Time moving",
   "Overview.PeakSpeed": "Fastest flick",
-  "Overview.StreakDays": "{0}-day streak, keep it going",
   "Overview.NoStreak": "Move at least 1 m a day to start a streak",
   "Overview.Last14Days": "Last 14 days",
   "Overview.TopGamesToday": "Top games today",
@@ -573,5 +572,19 @@
   "Support.Subtitle": "AimOdometer is made by one person in their free time. If it is useful to you, you can thank the author with any amount: it helps keep the app growing.",
   "Support.boosty.Note": "From any country: Russian cards, SBP or a foreign card. Once or every month",
   "Support.paypal.Note": "Outside Russia: PayPal or a bank card",
-  "Support.Free": "The app stays free and without ads either way."
+  "Support.Free": "The app stays free and without ads either way.",
+  "Streak.DaysInRow": "days in a row",
+  "Streak.Next": "{1} more days to {0}",
+  "Streak.Top": "The top flame. Legendary!",
+  "Streak.NotToday": "Today does not count yet: move your mouse 1 m to keep the streak",
+  "Streak.Tip": "{0}-day streak: {1}",
+  "Streak.Tier.spark": "Spark",
+  "Streak.Tier.flame": "Flame",
+  "Streak.Tier.blaze": "Blaze",
+  "Streak.Tier.neon": "Neon",
+  "Streak.Tier.blue": "Blue fire",
+  "Streak.Tier.plasma": "Plasma",
+  "Streak.Tier.gold": "Golden fire",
+  "Streak.Tier.aurora": "Aurora",
+  "Streak.Tier.legend": "Legend"
 }
