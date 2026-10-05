@@ -44,6 +44,9 @@
               <TextBlock Text="{l:T Feedback.Button}" />
             </StackPanel>
           </Button>
+          <Button Content="{l:T Support.Button}" Style="{StaticResource SupportLink}" Command="{Binding OpenSupportCommand}" HorizontalAlignment="Left" Margin="0,10,0,0"
+                  AutomationProperties.Name="{l:T Support.Button}" AutomationProperties.AutomationId="OpenSupport"
+                  Visibility="{Binding CanSupport, Converter={StaticResource BoolToVisibility}}" />
         </StackPanel>
 
         <!-- Live tracker status -->
@@ -113,6 +116,7 @@
     <Grid Grid.ColumnSpan="2" Background="#CC07071A" c:Motion.Appear="Fade" Visibility="{Binding HasOverlay, Converter={StaticResource BoolToVisibility}}">
       <v:OnboardingView c:Motion.Appear="Pop" DataContext="{Binding Onboarding}" Visibility="{Binding DataContext.IsOnboardingVisible, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource BoolToVisibility}}" />
       <v:FeedbackView c:Motion.Appear="Pop" DataContext="{Binding Feedback}" Visibility="{Binding DataContext.IsFeedbackVisible, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource BoolToVisibility}}" />
+      <v:SupportView c:Motion.Appear="Pop" DataContext="{Binding Support}" Visibility="{Binding DataContext.IsSupportVisible, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource BoolToVisibility}}" />
       <v:WhatsNewView c:Motion.Appear="Pop" DataContext="{Binding WhatsNew}" Visibility="{Binding DataContext.IsWhatsNewVisible, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource BoolToVisibility}}" />
       <v:ShareView c:Motion.Appear="Pop" DataContext="{Binding Share}" Visibility="{Binding DataContext.IsShareVisible, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource BoolToVisibility}}" />
       <v:CalibrationView c:Motion.Appear="Pop" DataContext="{Binding Calibration}" Visibility="{Binding DataContext.IsCalibrationVisible, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource BoolToVisibility}}" />

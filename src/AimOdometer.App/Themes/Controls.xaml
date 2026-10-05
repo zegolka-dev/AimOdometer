@@ -297,6 +297,127 @@
     </Setter>
   </Style>
 
+  <!-- "Support the author": quiet muted text that lights up violet to pink on hover or keyboard focus, a shine runs
+       through the letters and the heart beats once. With animations off in Windows only the colour fades. -->
+  <LinearGradientBrush x:Key="SupportGlowBrush" StartPoint="0,0" EndPoint="1,0">
+    <GradientStop Color="#C4B5FD" Offset="0" />
+    <GradientStop Color="#F0ABFC" Offset="0.55" />
+    <GradientStop Color="#FB7185" Offset="1" />
+  </LinearGradientBrush>
+  <Style x:Key="SupportLink" TargetType="Button">
+    <Setter Property="Cursor" Value="Hand" />
+    <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+    <Setter Property="Template">
+      <Setter.Value>
+        <ControlTemplate TargetType="Button">
+          <ControlTemplate.Resources>
+            <Storyboard x:Key="LightUp">
+              <DoubleAnimation Storyboard.TargetName="Lit" Storyboard.TargetProperty="Opacity" To="1" Duration="0:0:0.22" EasingFunction="{StaticResource EaseOut}" />
+              <DoubleAnimation Storyboard.TargetName="Dim" Storyboard.TargetProperty="Opacity" To="0" Duration="0:0:0.22" EasingFunction="{StaticResource EaseOut}" />
+              <DoubleAnimation Storyboard.TargetName="HeartFill" Storyboard.TargetProperty="Opacity" To="1" Duration="0:0:0.22" EasingFunction="{StaticResource EaseOut}" />
+              <DoubleAnimation Storyboard.TargetName="Glow" Storyboard.TargetProperty="Opacity" To="1" Duration="0:0:0.3" EasingFunction="{StaticResource EaseOut}" />
+            </Storyboard>
+            <Storyboard x:Key="Fade">
+              <DoubleAnimation Storyboard.TargetName="Lit" Storyboard.TargetProperty="Opacity" To="0" Duration="0:0:0.35" EasingFunction="{StaticResource EaseOut}" />
+              <DoubleAnimation Storyboard.TargetName="Dim" Storyboard.TargetProperty="Opacity" To="1" Duration="0:0:0.35" EasingFunction="{StaticResource EaseOut}" />
+              <DoubleAnimation Storyboard.TargetName="HeartFill" Storyboard.TargetProperty="Opacity" To="0" Duration="0:0:0.35" EasingFunction="{StaticResource EaseOut}" />
+              <DoubleAnimation Storyboard.TargetName="Glow" Storyboard.TargetProperty="Opacity" To="0" Duration="0:0:0.35" EasingFunction="{StaticResource EaseOut}" />
+            </Storyboard>
+            <Storyboard x:Key="Shine">
+              <DoubleAnimation Storyboard.TargetName="Sweep" Storyboard.TargetProperty="X" From="-1" To="1" BeginTime="0:0:0.06" Duration="0:0:0.75" EasingFunction="{StaticResource EaseOut}" />
+              <DoubleAnimationUsingKeyFrames Storyboard.TargetName="Beat" Storyboard.TargetProperty="ScaleX">
+                <EasingDoubleKeyFrame KeyTime="0:0:0.14" Value="1.25" EasingFunction="{StaticResource EaseOut}" />
+                <EasingDoubleKeyFrame KeyTime="0:0:0.42" Value="1" EasingFunction="{StaticResource Settle}" />
+              </DoubleAnimationUsingKeyFrames>
+              <DoubleAnimationUsingKeyFrames Storyboard.TargetName="Beat" Storyboard.TargetProperty="ScaleY">
+                <EasingDoubleKeyFrame KeyTime="0:0:0.14" Value="1.25" EasingFunction="{StaticResource EaseOut}" />
+                <EasingDoubleKeyFrame KeyTime="0:0:0.42" Value="1" EasingFunction="{StaticResource Settle}" />
+              </DoubleAnimationUsingKeyFrames>
+            </Storyboard>
+          </ControlTemplate.Resources>
+          <Border x:Name="Root" Background="Transparent" Padding="2" CornerRadius="4">
+            <StackPanel Orientation="Horizontal">
+              <Grid Margin="0,0,8,0" VerticalAlignment="Center" RenderTransformOrigin="0.5,0.5">
+                <Grid.RenderTransform><ScaleTransform x:Name="Beat" /></Grid.RenderTransform>
+                <TextBlock Style="{StaticResource Icon}" Text="&#xEB51;" Foreground="{StaticResource TextMutedBrush}" />
+                <TextBlock x:Name="HeartFill" Style="{StaticResource Icon}" Text="&#xEB52;" Foreground="#FB7185" Opacity="0">
+                  <TextBlock.Effect>
+                    <DropShadowEffect x:Name="Glow" Color="#F43F5E" BlurRadius="12" ShadowDepth="0" Opacity="0" />
+                  </TextBlock.Effect>
+                </TextBlock>
+              </Grid>
+              <Grid>
+                <TextBlock x:Name="Dim" Text="{Binding Content, RelativeSource={RelativeSource TemplatedParent}}" Foreground="{StaticResource TextMutedBrush}" />
+                <TextBlock x:Name="Lit" Text="{Binding Content, RelativeSource={RelativeSource TemplatedParent}}" Foreground="{StaticResource SupportGlowBrush}" Opacity="0" />
+                <!-- The shine: white letters seen only through a narrow band that slides from left to right -->
+                <TextBlock Text="{Binding Content, RelativeSource={RelativeSource TemplatedParent}}" Foreground="White" IsHitTestVisible="False">
+                  <TextBlock.OpacityMask>
+                    <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                      <LinearGradientBrush.RelativeTransform><TranslateTransform x:Name="Sweep" X="-1" /></LinearGradientBrush.RelativeTransform>
+                      <GradientStop Color="#00FFFFFF" Offset="0.3" />
+                      <GradientStop Color="#CCFFFFFF" Offset="0.5" />
+                      <GradientStop Color="#00FFFFFF" Offset="0.7" />
+                    </LinearGradientBrush>
+                  </TextBlock.OpacityMask>
+                </TextBlock>
+              </Grid>
+            </StackPanel>
+          </Border>
+          <ControlTemplate.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+              <Trigger.EnterActions><BeginStoryboard Storyboard="{StaticResource LightUp}" /></Trigger.EnterActions>
+              <Trigger.ExitActions><BeginStoryboard Storyboard="{StaticResource Fade}" /></Trigger.ExitActions>
+            </Trigger>
+            <Trigger Property="IsKeyboardFocused" Value="True">
+              <Setter TargetName="Root" Property="Background" Value="{StaticResource AccentSoftBrush}" />
+              <Trigger.EnterActions><BeginStoryboard Storyboard="{StaticResource LightUp}" /></Trigger.EnterActions>
+              <Trigger.ExitActions><BeginStoryboard Storyboard="{StaticResource Fade}" /></Trigger.ExitActions>
+            </Trigger>
+            <MultiDataTrigger>
+              <MultiDataTrigger.Conditions>
+                <Condition Binding="{Binding IsMouseOver, RelativeSource={RelativeSource Self}}" Value="True" />
+                <Condition Binding="{Binding Source={x:Static SystemParameters.ClientAreaAnimation}}" Value="True" />
+              </MultiDataTrigger.Conditions>
+              <MultiDataTrigger.EnterActions><BeginStoryboard Storyboard="{StaticResource Shine}" /></MultiDataTrigger.EnterActions>
+            </MultiDataTrigger>
+          </ControlTemplate.Triggers>
+        </ControlTemplate>
+      </Setter.Value>
+    </Setter>
+  </Style>
+
+  <!-- A payment service in the support window: a card that lifts its border on hover -->
+  <Style x:Key="SupportOption" TargetType="Button">
+    <Setter Property="Cursor" Value="Hand" />
+    <Setter Property="FocusVisualStyle" Value="{StaticResource FocusRing}" />
+    <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+    <Setter Property="Template">
+      <Setter.Value>
+        <ControlTemplate TargetType="Button">
+          <Border x:Name="Root" Background="{StaticResource SurfaceElevatedBrush}" BorderBrush="{StaticResource BorderBrush}" BorderThickness="1"
+                  CornerRadius="12" RenderTransformOrigin="0.5,0.5">
+            <Border.RenderTransform><ScaleTransform x:Name="Scale" /></Border.RenderTransform>
+            <Grid>
+              <Border x:Name="Hover" Background="{StaticResource SurfaceHoverBrush}" CornerRadius="11" Opacity="0" />
+              <ContentPresenter Margin="14,12" />
+            </Grid>
+          </Border>
+          <ControlTemplate.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+              <Setter TargetName="Root" Property="BorderBrush" Value="{StaticResource AccentBrush}" />
+              <Trigger.EnterActions><BeginStoryboard Storyboard="{StaticResource HoverIn}" /></Trigger.EnterActions>
+              <Trigger.ExitActions><BeginStoryboard Storyboard="{StaticResource HoverOut}" /></Trigger.ExitActions>
+            </Trigger>
+            <Trigger Property="IsPressed" Value="True">
+              <Trigger.EnterActions><BeginStoryboard Storyboard="{StaticResource PressIn}" /></Trigger.EnterActions>
+              <Trigger.ExitActions><BeginStoryboard Storyboard="{StaticResource PressOut}" /></Trigger.ExitActions>
+            </Trigger>
+          </ControlTemplate.Triggers>
+        </ControlTemplate>
+      </Setter.Value>
+    </Setter>
+  </Style>
+
   <!-- Thin horizontal bar used for shares and progress -->
   <Style x:Key="ShareBar" TargetType="ProgressBar">
     <Setter Property="Height" Value="6" />

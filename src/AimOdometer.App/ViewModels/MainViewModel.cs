@@ -80,13 +80,25 @@ public sealed partial class MainViewModel : ObservableObject, ICalibrationHost, 
     [NotifyPropertyChangedFor(nameof(HasOverlay), nameof(IsWhatsNewVisible))]
     public partial WhatsNewViewModel? WhatsNew { get; set; }
 
-    public bool IsWhatsNewVisible => WhatsNew is not null && Onboarding is null && Feedback is null;
+    public bool IsWhatsNewVisible => WhatsNew is not null && Onboarding is null && Feedback is null && Support is null;
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(HasOverlay), nameof(IsFeedbackVisible), nameof(IsWhatsNewVisible))]
     public partial FeedbackViewModel? Feedback { get; set; }
 
     public bool IsFeedbackVisible => Feedback is not null;
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(HasOverlay), nameof(IsSupportVisible), nameof(IsWhatsNewVisible))]
+    public partial SupportViewModel? Support { get; set; }
+
+    public bool IsSupportVisible => Support is not null;
+
+    /// <summary>The sidebar "Support the author" link shows only when at least one payment link is filled in.</summary>
+    public bool CanSupport { get; } = SupportLinks.Available.Count > 0;
+
+    [CommunityToolkit.Mvvm.Input.RelayCommand]
+    private void OpenSupport() => Support = new SupportViewModel(() => Support = null);
 
     [CommunityToolkit.Mvvm.Input.RelayCommand]
     private void OpenFeedback() => Feedback = new FeedbackViewModel(_cloud, () => Feedback = null);
@@ -107,7 +119,7 @@ public sealed partial class MainViewModel : ObservableObject, ICalibrationHost, 
     public partial StatusKind Status { get; set; } = StatusKind.Unknown;
 
     /// <summary>True while a modal overlay (onboarding, calibration) is shown.</summary>
-    public bool HasOverlay => Onboarding is not null || Calibration is not null || Share is not null || WhatsNew is not null || Feedback is not null;
+    public bool HasOverlay => Onboarding is not null || Calibration is not null || Share is not null || WhatsNew is not null || Feedback is not null || Support is not null;
 
     /// <summary>Raw mouse reports from the window, routed to whichever overlay is open.</summary>
     public void OnRawReport(RawMouseReport report)

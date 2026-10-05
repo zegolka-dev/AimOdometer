@@ -114,11 +114,34 @@ public partial class LocalizationTests
         expected.AddRange(EnumMembers(Path.Combine(RepoRoot, "src", "AimOdometer.Core", "Storage", "StatsStore.cs"), "GearKind").Select(m => $"Gear.Kind.{m}"));
         expected.AddRange(EnumMembers(Path.Combine(AppSource, "ViewModels", "ShareViewModel.cs"), "ShareKind").Select(m => $"Share.Kind.{m}"));
         expected.AddRange(["Share.Card.Day", "Share.Card.Week", "Share.Card.Month", "Share.Card.AllTime"]);
+        expected.AddRange(SupportServiceIds().Select(id => $"Support.{id}.Note"));
 
         Assert.True(expected.Count > 90);
         var missing = expected.Where(k => !english.ContainsKey(k)).ToList();
         Assert.True(missing.Count == 0, "Missing in en.json: " + string.Join(", ", missing));
     }
+
+    [Fact]
+    public void SupportServicesHaveUniqueIdsAndOnlyHttpsLinks()
+    {
+        var ids = SupportServiceIds().ToList();
+        Assert.Equal(3, ids.Count);
+        Assert.Equal(ids.Count, ids.Distinct().Count());
+
+        // A filled-in link must be a full https address; an empty one hides the service.
+        var source = File.ReadAllText(Path.Combine(AppSource, "Services", "SupportLinks.cs"));
+        foreach (Match m in SupportEntry().Matches(source))
+        {
+            var url = m.Groups["url"].Value;
+            Assert.True(url.Length == 0 || url.StartsWith("https://", StringComparison.Ordinal), $"{m.Groups["id"].Value}: '{url}' is not an https link");
+        }
+    }
+
+    private static IEnumerable<string> SupportServiceIds() =>
+        SupportEntry().Matches(File.ReadAllText(Path.Combine(AppSource, "Services", "SupportLinks.cs"))).Select(m => m.Groups["id"].Value);
+
+    [GeneratedRegex("""new\("(?<id>[a-z]+)", "[^"]+", "(?<url>[^"]*)",""")]
+    private static partial Regex SupportEntry();
 
     private static IEnumerable<string> EnumMembers(string file, string name)
     {

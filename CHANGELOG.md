@@ -12,6 +12,14 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), ver
   referring site's host to the `download-click` Edge Function, which stores it in `site_downloads` (no policies, so no
   client can read it) with a daily-changing hash of the IP instead of the address. `tools/Read-Downloads.ps1` shows
   clicks and people per day, buttons, referrers and GitHub's own download counts. The privacy page says so.
+- "Support the author" at the bottom of the sidebar: quiet grey text that lights up violet to pink on hover or keyboard
+  focus (a shine runs through the letters and the heart beats once; only the colour fades with Windows animations
+  off). It opens a window with the payment services grouped "From Russia" and "From other countries"; each opens the
+  author's page in the browser. Services live in `SupportLinks`; one without an https link is hidden, and with none
+  the sidebar link is hidden.
+
+### Changed
+- English sidebar: "Complaints and suggestions" is now "Complaints and ideas", so it no longer gets cut off.
 
 ## [0.1.0-beta.19] - 2026-10-05
 

@@ -1,0 +1,55 @@
+<UserControl x:Class="AimOdometer.App.Views.SupportView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:l="clr-namespace:AimOdometer.App.Localization">
+  <UserControl.Resources>
+    <!-- A service: brand-coloured monogram, name, who it suits, and an "opens in the browser" arrow -->
+    <DataTemplate x:Key="Option">
+      <Button Style="{StaticResource SupportOption}" Command="{Binding OpenCommand}" Margin="0,0,0,8"
+              AutomationProperties.Name="{Binding Name}" AutomationProperties.HelpText="{Binding Note}"
+              AutomationProperties.AutomationId="{Binding Id, StringFormat=Support.{0}}">
+        <Grid>
+          <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="Auto" />
+          </Grid.ColumnDefinitions>
+          <Border Width="40" Height="40" CornerRadius="10" Background="{Binding Color}">
+            <TextBlock Text="{Binding Monogram}" Foreground="White" FontWeight="Bold" FontSize="15" HorizontalAlignment="Center" VerticalAlignment="Center" />
+          </Border>
+          <StackPanel Grid.Column="1" Margin="14,0,12,0" VerticalAlignment="Center">
+            <TextBlock Text="{Binding Name}" FontSize="15" FontWeight="SemiBold" Foreground="{StaticResource TextPrimaryBrush}" />
+            <TextBlock Text="{Binding Note}" FontSize="13" Foreground="{StaticResource TextSecondaryBrush}" TextWrapping="Wrap" Margin="0,2,0,0" />
+          </StackPanel>
+          <TextBlock Grid.Column="2" Style="{StaticResource Icon}" Text="&#xE8A7;" FontSize="14" Foreground="{StaticResource TextMutedBrush}" />
+        </Grid>
+      </Button>
+    </DataTemplate>
+  </UserControl.Resources>
+
+  <Border Style="{StaticResource AccentCard}" Width="520" VerticalAlignment="Center" HorizontalAlignment="Center" Padding="28,24"
+          Background="{StaticResource SurfaceBrush}">
+    <StackPanel>
+      <StackPanel Orientation="Horizontal">
+        <TextBlock Style="{StaticResource Icon}" Text="&#xEB52;" FontSize="22" Foreground="#FB7185" Margin="0,0,12,0" />
+        <TextBlock Style="{StaticResource PageTitle}" Text="{l:T Support.Title}" FontSize="24" />
+      </StackPanel>
+      <TextBlock Style="{StaticResource PageSubtitle}" Text="{l:T Support.Subtitle}" FontSize="13" TextWrapping="Wrap" Margin="0,6,0,18" />
+
+      <StackPanel Visibility="{Binding HasRussia, Converter={StaticResource BoolToVisibility}}">
+        <TextBlock Style="{StaticResource CardLabel}" Text="{l:T Support.FromRussia}" Margin="0,0,0,8" />
+        <ItemsControl ItemsSource="{Binding Russia}" ItemTemplate="{StaticResource Option}" Focusable="False" />
+      </StackPanel>
+      <StackPanel Visibility="{Binding HasWorld, Converter={StaticResource BoolToVisibility}}" Margin="0,8,0,0">
+        <TextBlock Style="{StaticResource CardLabel}" Text="{l:T Support.FromWorld}" Margin="0,0,0,8" />
+        <ItemsControl ItemsSource="{Binding World}" ItemTemplate="{StaticResource Option}" Focusable="False" />
+      </StackPanel>
+
+      <Grid Margin="0,12,0,0">
+        <TextBlock Style="{StaticResource Hint}" Text="{l:T Support.Free}" TextWrapping="Wrap" VerticalAlignment="Center" Margin="0,0,140,0" />
+        <Button Style="{StaticResource SecondaryButton}" Content="{l:T Common.Close}" Command="{Binding CloseCommand}" HorizontalAlignment="Right"
+                AutomationProperties.AutomationId="SupportClose" />
+      </Grid>
+    </StackPanel>
+  </Border>
+</UserControl>

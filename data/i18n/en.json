@@ -513,7 +513,7 @@
   "Settings.DeleteLocal": "Delete statistics on this PC",
   "Settings.DeleteTitle": "Delete statistics on this PC",
   "Settings.DeleteConfirm": "Delete all AimOdometer statistics, settings and achievements on this PC and sign out here? The cloud account is not touched (delete it in the Steam account section). This cannot be undone. AimOdometer will restart.",
-  "Feedback.Button": "Complaints and suggestions",
+  "Feedback.Button": "Complaints and ideas",
   "Feedback.Title": "Complaints and suggestions",
   "Feedback.Subtitle": "Something broken, a game not detected, an idea? Write it here: the author reads every message.",
   "Feedback.Bug": "Problem",
@@ -567,5 +567,14 @@
   "Cloud.SlowText": "Some internet providers block steamcommunity.com, where Steam signs you in. Turn on a VPN just for this minute and open the page again. You stay signed in afterwards, so the VPN is needed only once.",
   "Cloud.ReopenPage": "Open the Steam page again",
   "Stats.CustomFrom": "Period start",
-  "Stats.CustomTo": "Period end"
+  "Stats.CustomTo": "Period end",
+  "Support.Button": "Support the author",
+  "Support.Title": "Support the author",
+  "Support.Subtitle": "AimOdometer is made by one person in their free time. If it is useful to you, you can thank the author with any amount: it helps keep the app growing.",
+  "Support.FromRussia": "From Russia",
+  "Support.FromWorld": "From other countries",
+  "Support.boosty.Note": "Russian cards and SBP. Once or every month",
+  "Support.donationalerts.Note": "Russian cards and SBP. A quick one-off tip",
+  "Support.paypal.Note": "From any country: a PayPal account or a bank card",
+  "Support.Free": "The app stays free and without ads either way."
 }
