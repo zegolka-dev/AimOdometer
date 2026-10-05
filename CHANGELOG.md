@@ -15,7 +15,7 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), ver
 - "Support the author" at the bottom of the sidebar: quiet grey text that lights up violet to pink on hover or keyboard
   focus (a shine runs through the letters and the heart beats once; only the colour fades with Windows animations
   off). It opens a window with the payment services, each with a note on who it suits (Boosty: any country, Russian or
-  foreign cards; DonationAlerts: Russian cards and SBP; PayPal: abroad); each opens the author's page in the browser. Services live in `SupportLinks`; one without an https link is hidden, and with none
+  foreign cards and SBP; PayPal: abroad); each opens the author's page in the browser. Services live in `SupportLinks`; one without an https link is hidden, and with none
   the sidebar link is hidden.
 
 ### Changed

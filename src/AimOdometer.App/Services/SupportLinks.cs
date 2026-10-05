@@ -4,8 +4,8 @@ namespace AimOdometer.App.Services;
 public sealed record SupportService(string Id, string Name, string Url, string Monogram, string Color);
 
 /// <summary>
-/// The "Support the author" services, in the order shown: Boosty takes Russian and foreign cards, DonationAlerts
-/// only Russian ones, PayPal is for people abroad. A service without an https link is not shown; with none at all, the sidebar
+/// The "Support the author" services, in the order shown: Boosty takes Russian and foreign cards, PayPal is for
+/// people abroad. A service without an https link is not shown; with none at all, the sidebar
 /// link is hidden. The links are public pages, not secrets.
 /// </summary>
 public static class SupportLinks
@@ -13,7 +13,6 @@ public static class SupportLinks
     public static IReadOnlyList<SupportService> All { get; } =
     [
         new("boosty", "Boosty", "", "B", "#F15F2C"),
-        new("donationalerts", "DonationAlerts", "", "DA", "#F59E0B"),
         new("paypal", "PayPal", "", "P", "#0070E0"),
     ];
 

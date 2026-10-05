@@ -125,7 +125,7 @@ public partial class LocalizationTests
     public void SupportServicesHaveUniqueIdsAndOnlyHttpsLinks()
     {
         var ids = SupportServiceIds().ToList();
-        Assert.Equal(3, ids.Count);
+        Assert.Equal(2, ids.Count);
         Assert.Equal(ids.Count, ids.Distinct().Count());
 
         // A filled-in link must be a full https address; an empty one hides the service.
