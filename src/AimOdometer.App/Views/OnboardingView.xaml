@@ -77,7 +77,16 @@
         <StackPanel Visibility="{Binding IsAutostart, Converter={StaticResource BoolToVisibility}}">
           <TextBlock Style="{StaticResource PageTitle}" Text="{l:T Onboarding.AutostartTitle}" />
           <TextBlock Style="{StaticResource PageSubtitle}" Text="{l:T Onboarding.AutostartText}" Margin="0,4,0,20" />
-          <CheckBox IsChecked="{Binding Autostart}" Content="{l:T Settings.Autostart}" />
+          <CheckBox IsChecked="{Binding Autostart}" AutomationProperties.Name="{l:T Settings.Autostart}">
+            <CheckBox.Content>
+            <StackPanel Orientation="Horizontal">
+              <TextBlock Text="{l:T Settings.Autostart}" VerticalAlignment="Center" />
+              <Border Style="{StaticResource RecommendedTag}">
+                <TextBlock Text="{l:T Settings.Recommended}" FontSize="11" FontWeight="SemiBold" Foreground="{StaticResource AccentTextBrush}" />
+              </Border>
+            </StackPanel>
+          </CheckBox.Content>
+          </CheckBox>
           <TextBlock Style="{StaticResource Hint}" Text="{l:T Onboarding.PrivacyNote}" FontSize="13" Margin="0,24,0,0" />
         </StackPanel>
       </Grid>

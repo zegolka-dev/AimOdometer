@@ -418,6 +418,17 @@
     </Setter>
   </Style>
 
+  <!-- "Recommended": a small accent pill next to a setting most people should keep on -->
+  <Style x:Key="RecommendedTag" TargetType="Border">
+    <Setter Property="CornerRadius" Value="9" />
+    <Setter Property="Padding" Value="8,1,8,2" />
+    <Setter Property="Margin" Value="10,0,0,0" />
+    <Setter Property="VerticalAlignment" Value="Center" />
+    <Setter Property="Background" Value="{StaticResource AccentSoftBrush}" />
+    <Setter Property="BorderBrush" Value="{StaticResource AccentBrush}" />
+    <Setter Property="BorderThickness" Value="1" />
+  </Style>
+
   <!-- Thin horizontal bar used for shares and progress -->
   <Style x:Key="ShareBar" TargetType="ProgressBar">
     <Setter Property="Height" Value="6" />

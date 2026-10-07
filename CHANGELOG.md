@@ -5,6 +5,14 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), ver
 
 ## [Unreleased]
 
+## [0.1.0-beta.22] - 2026-10-08
+
+### Added
+- "Recommended" tags on "Start with Windows" (settings and first run) and "Install updates automatically", with a
+  hint under autostart: without it nothing is counted after a restart until the app is opened.
+- The overview warns when start with Windows is off (and the administrator task does not start the tracker either),
+  with a "Turn on" button. Released quietly: no What's new entry.
+
 ## [0.1.0-beta.21] - 2026-10-05
 
 ### Fixed

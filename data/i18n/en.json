@@ -586,5 +586,10 @@
   "Streak.Tier.plasma": "Plasma",
   "Streak.Tier.gold": "Golden fire",
   "Streak.Tier.aurora": "Aurora",
-  "Streak.Tier.legend": "Legend"
+  "Streak.Tier.legend": "Legend",
+  "Settings.Recommended": "Recommended",
+  "Settings.AutostartHint": "Without it, after a restart the distance is not counted until you open AimOdometer yourself.",
+  "Overview.AutostartOffTitle": "Start with Windows is off",
+  "Overview.AutostartOffText": "After a restart AimOdometer does not count anything until you open it. Turn it on so no session is lost.",
+  "Overview.AutostartEnable": "Turn on"
 }

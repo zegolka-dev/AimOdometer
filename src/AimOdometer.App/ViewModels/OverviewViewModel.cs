@@ -94,8 +94,30 @@ public sealed partial class OverviewViewModel(AppData data) : PageViewModel(data
 
     private Streak? _streak;
 
+    /// <summary>Start-with-Windows is off (and the elevated task does not start the tracker either).</summary>
+    [ObservableProperty]
+    public partial bool AutostartOff { get; set; }
+
+    [CommunityToolkit.Mvvm.Input.RelayCommand]
+    private void EnableAutostart()
+    {
+        if (SettingsViewModel.TrackerExe() is not { } exe)
+        {
+            return;
+        }
+
+        AimOdometer.Core.Autostart.Set(true, exe);
+        Data.SetSetting(AimOdometer.Core.Storage.SettingKeys.Autostart, "1");
+        AutostartOff = false;
+    }
+
     public override void Refresh()
     {
+        AutostartOff = !AimOdometer.Core.AppIdentity.IsDataDirectoryOverridden
+            && Data.Setting(AimOdometer.Core.Storage.SettingKeys.ElevatedTracker) != "1"
+            && !AimOdometer.Core.Autostart.IsEnabled()
+            && SettingsViewModel.TrackerExe() is not null;
+
         var today = DateOnly.FromDateTime(DateTime.Now);
         var firstDay = CultureInfo.CurrentCulture.DateTimeFormat.FirstDayOfWeek;
         var days = Data.Store.GetDailyTotals();

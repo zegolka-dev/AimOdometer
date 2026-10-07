@@ -586,5 +586,10 @@
   "Streak.Tier.plasma": "Плазма",
   "Streak.Tier.gold": "Золотой огонь",
   "Streak.Tier.aurora": "Аврора",
-  "Streak.Tier.legend": "Легенда"
+  "Streak.Tier.legend": "Легенда",
+  "Settings.Recommended": "Рекомендуем",
+  "Settings.AutostartHint": "Без этого после перезагрузки пробег не считается, пока ты сам не откроешь AimOdometer.",
+  "Overview.AutostartOffTitle": "Запуск вместе с Windows выключен",
+  "Overview.AutostartOffText": "После перезагрузки AimOdometer ничего не считает, пока ты его не откроешь. Включи, чтобы не терять ни одной сессии.",
+  "Overview.AutostartEnable": "Включить"
 }

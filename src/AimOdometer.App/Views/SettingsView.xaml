@@ -131,7 +131,17 @@
     <Border Style="{StaticResource Card}" Margin="0,0,0,12">
       <StackPanel>
         <TextBlock Style="{StaticResource SectionTitle}" Text="{l:T Settings.Startup}" />
-        <CheckBox IsChecked="{Binding Autostart}" Content="{l:T Settings.Autostart}" Margin="0,0,0,10" />
+        <CheckBox IsChecked="{Binding Autostart}" AutomationProperties.Name="{l:T Settings.Autostart}">
+          <CheckBox.Content>
+            <StackPanel Orientation="Horizontal">
+              <TextBlock Text="{l:T Settings.Autostart}" VerticalAlignment="Center" />
+              <Border Style="{StaticResource RecommendedTag}">
+                <TextBlock Text="{l:T Settings.Recommended}" FontSize="11" FontWeight="SemiBold" Foreground="{StaticResource AccentTextBrush}" />
+              </Border>
+            </StackPanel>
+          </CheckBox.Content>
+        </CheckBox>
+        <TextBlock Style="{StaticResource Hint}" Text="{l:T Settings.AutostartHint}" Margin="28,4,0,10" TextWrapping="Wrap" />
         <CheckBox IsChecked="{Binding ShowTrayIcon}" Content="{l:T Settings.ShowTrayIcon}" />
         <TextBlock Style="{StaticResource Hint}" Text="{l:T Settings.ShowTrayIconHint}" Margin="28,4,0,0" />
         <CheckBox IsChecked="{Binding CountElevatedGames}" Content="{l:T Settings.Elevated}" Margin="0,10,0,0" />
@@ -144,7 +154,16 @@
                 HorizontalAlignment="Left" Margin="28,8,0,0" />
         <TextBlock Text="{Binding NotificationTestMessage}" FontSize="13" Foreground="{StaticResource AccentTextBrush}" Margin="28,6,0,0" TextWrapping="Wrap"
                    Visibility="{Binding NotificationTestMessage, Converter={StaticResource NullToCollapsed}}" />
-        <CheckBox IsChecked="{Binding AutoUpdate}" Content="{l:T Settings.AutoUpdate}" Margin="0,10,0,0" />
+        <CheckBox IsChecked="{Binding AutoUpdate}" Margin="0,10,0,0" AutomationProperties.Name="{l:T Settings.AutoUpdate}">
+          <CheckBox.Content>
+            <StackPanel Orientation="Horizontal">
+              <TextBlock Text="{l:T Settings.AutoUpdate}" VerticalAlignment="Center" />
+              <Border Style="{StaticResource RecommendedTag}">
+                <TextBlock Text="{l:T Settings.Recommended}" FontSize="11" FontWeight="SemiBold" Foreground="{StaticResource AccentTextBrush}" />
+              </Border>
+            </StackPanel>
+          </CheckBox.Content>
+        </CheckBox>
         <TextBlock Style="{StaticResource Hint}" Text="{l:T Settings.AutoUpdateHint}" Margin="28,4,0,0" TextWrapping="Wrap" />
       </StackPanel>
     </Border>
