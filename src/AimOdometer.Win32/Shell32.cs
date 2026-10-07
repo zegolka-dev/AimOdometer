@@ -29,6 +29,9 @@ internal static unsafe partial class Shell32
     public const uint NinSelect = 0x0400;
     public const uint NinKeySelect = 0x0401;
 
+    /// <summary>NIN_BALLOONUSERCLICK: the user clicked our notification.</summary>
+    public const uint NinBalloonUserClick = 0x0405;
+
     [StructLayout(LayoutKind.Sequential)]
     public struct NotifyIconDataW
     {

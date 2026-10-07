@@ -586,6 +586,9 @@ internal sealed unsafe class TrackerHost : IDisposable
             case User32.WmMouseMove:
                 UpdateTooltip(force: false);
                 break;
+            case Shell32.NinBalloonUserClick:
+                TryOpenStatistics(); // the window shows what the notification was about
+                break;
             case Shell32.NinSelect or Shell32.NinKeySelect:
                 if (!TryOpenStatistics())
                 {
@@ -785,6 +788,53 @@ internal sealed unsafe class TrackerHost : IDisposable
 
         NotifyPendingAchievements();
         NotifyWornGear();
+        NotifyElevatedGame();
+    }
+
+    /// <summary>
+    /// A game the foreground tracker saw running as administrator while this tracker is not: Windows hides the mouse
+    /// from us in it. One notification per game (clicking opens the window, which offers to turn counting on), under
+    /// the same rules as achievements, so during a full-screen game it waits until the game is left.
+    /// </summary>
+    private void NotifyElevatedGame()
+    {
+        if (_catalog is null || ElevatedTask.IsElevated)
+        {
+            return;
+        }
+
+        try
+        {
+            static HashSet<long> Ids(string? list) => [.. (list ?? string.Empty).Split(',', StringSplitOptions.RemoveEmptyEntries)
+                .Select(id => long.TryParse(id, System.Globalization.CultureInfo.InvariantCulture, out var v) ? v : 0)];
+            var announced = Ids(_store.GetSetting(SettingKeys.ElevatedAnnounced));
+            var fresh = Ids(_store.GetSetting(SettingKeys.ElevatedApps)).Where(id => !announced.Contains(id)).ToList();
+            if (fresh.Count == 0)
+            {
+                return;
+            }
+
+            var game = _store.GetApps().Where(a => fresh.Contains(a.Id))
+                .Select(a => _catalog.Classify(a.Id, a.ExePath).Game).FirstOrDefault(g => g is not null);
+            if (game is not null && _store.GetSetting(SettingKeys.ElevatedTracker) != "1" && _notificationsEnabled)
+            {
+                int state;
+                if (Shell32.SHQueryUserNotificationState(&state) != 0 || state != Shell32.QunsAcceptsNotifications || _tray is null)
+                {
+                    return; // try again next minute
+                }
+
+                _tray.ShowBalloon(_strings.ElevatedGameTitle, string.Format(TrayStrings.Culture, _strings.ElevatedGameFormat, game.Name));
+                Log.Warning($"Notified: {game.Name} runs as administrator");
+            }
+
+            announced.UnionWith(fresh);
+            _store.SetSetting(SettingKeys.ElevatedAnnounced, string.Join(',', announced.TakeLast(100)));
+        }
+        catch (SqliteException ex)
+        {
+            Log.Error("Administrator game notification failed", ex);
+        }
     }
 
     /// <summary>

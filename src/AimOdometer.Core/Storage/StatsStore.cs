@@ -777,4 +777,7 @@ public static class SettingKeys
 
     /// <summary>Apps the tracker saw running as administrator while it did not (comma-separated app ids).</summary>
     public const string ElevatedApps = "elevated_apps";
+
+    /// <summary>Apps from <see cref="ElevatedApps"/> the tracker already announced or checked (comma-separated ids).</summary>
+    public const string ElevatedAnnounced = "elevated_announced";
 }

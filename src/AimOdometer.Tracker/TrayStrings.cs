@@ -28,6 +28,8 @@ internal sealed record TrayStrings(
     string ShameTitle,
     string GearWornTitle,
     string GearWornFormat,
+    string ElevatedGameTitle,
+    string ElevatedGameFormat,
     UnitLabels Units)
 {
     public static readonly TrayStrings English = new(
@@ -51,6 +53,8 @@ internal sealed record TrayStrings(
         ShameTitle: "Shame achievement!",
         GearWornTitle: "Time to replace your gear",
         GearWornFormat: "{0} has used {1}% of its lifetime",
+        ElevatedGameTitle: "AimOdometer can't see your mouse in a game",
+        ElevatedGameFormat: "{0} runs as administrator, so its distance is not counted. Click to turn counting on.",
         Units: UnitLabels.English);
 
     public static readonly TrayStrings Russian = new(
@@ -74,6 +78,8 @@ internal sealed record TrayStrings(
         ShameTitle: "Позорная ачивка!",
         GearWornTitle: "Пора менять снаряжение",
         GearWornFormat: "{0}: израсходовано {1}% ресурса",
+        ElevatedGameTitle: "AimOdometer не видит мышь в игре",
+        ElevatedGameFormat: "«{0}» запущена от имени администратора, поэтому пробег в ней не считается. Нажми, чтобы включить подсчёт.",
         Units: new UnitLabels("см", "м", "км", "дюйм", "фут", "миль"));
 
     /// <summary>Picks strings by the language setting ("ru", "en") or, for "auto"/empty, by the Windows UI language.</summary>

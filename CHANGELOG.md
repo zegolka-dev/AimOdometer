@@ -14,6 +14,8 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), ver
 - The tracker notices a game that runs as administrator while it does not (Windows hides the mouse from it then) and
   the overview offers "Turn counting on" for that game by name. First run: "Count games that run as administrator" is
   on by default (one UAC prompt when finishing).
+- A tray notification when such a game is found (once per game, never during a full-screen game; clicking it opens
+  the window with "Turn counting on"). Clicking any AimOdometer notification now opens the window.
 
 ### Fixed
 - Full-screen games that Windows did not make the foreground window (the desktop stayed in front): the full-screen
