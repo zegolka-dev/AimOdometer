@@ -157,8 +157,6 @@
   "Onboarding.MouseTitle": "Set up your mouse",
   "Onboarding.MouseText": "Type the DPI of the mouse you play with (you'll find it in G HUB, Synapse or your mouse's app), or pick a preset. Not sure? Use Measure DPI with a ruler.",
   "Onboarding.DpiHint": "Find the DPI in your mouse's software (G HUB, Synapse and others), or measure it with a ruler.",
-  "Onboarding.AutostartTitle": "Start with Windows",
-  "Onboarding.AutostartText": "So no session goes uncounted. It uses about 4 MB of memory and no CPU while the mouse is still.",
   "Onboarding.PrivacyNote": "Your keyboard is never read. Statistics stay on this PC unless you sign in with Steam later.",
   "Nav.Achievements": "Achievements",
   "Common.Close": "Close",
@@ -593,8 +591,14 @@
   "Overview.AutostartOffText": "After a restart AimOdometer does not count anything until you open it. Turn it on so no session is lost.",
   "Overview.AutostartEnable": "Turn on",
   "Onboarding.Elevated": "Count games that run as administrator",
-  "Onboarding.ElevatedHint": "Needed for Genshin Impact, some EA app games and others that start as administrator. Windows asks for permission once.",
+  "Onboarding.ElevatedHint": "Genshin Impact, Honkai: Star Rail, ZZZ and some EA app games run as administrator. While such a game is in front, Windows hides the mouse from normal programs, so without this they show 0 m. After \"Start counting\" Windows asks for permission once. The rights are used only for this: the counter still reads nothing but the mouse.",
   "Overview.ElevatedTitle": "{0} runs as administrator",
   "Overview.ElevatedText": "While such a game is in front, Windows hides the mouse from normal programs, so its distance is not counted. Turn counting on: Windows asks for permission once.",
-  "Overview.ElevatedEnable": "Turn counting on"
+  "Overview.ElevatedEnable": "Turn counting on",
+  "Onboarding.SettingsTitle": "Important settings",
+  "Onboarding.SettingsText": "We have already ticked what AimOdometer needs to count all of your distance. We recommend keeping all of them: without them some games and whole sessions simply never make it into your statistics.",
+  "Onboarding.AutostartHint": "The most important one. AimOdometer counts only while it runs. Without autostart, after every restart nothing is counted until you open the app yourself, and whole gaming sessions are lost. In the background it takes about 4 MB of memory and no CPU while the mouse is still.",
+  "Onboarding.AutoUpdateHint": "Fixes and new games in the list arrive by themselves, nothing to download. Without updates, bugs that stop a game from being counted stay with you. Updates never touch your statistics.",
+  "Onboarding.Notifications": "Show notifications",
+  "Onboarding.NotificationsHint": "New achievements, a reminder when your pad or glides are worn out, and a heads-up when a game is not counted, with what to click to fix it. During a full-screen game they wait and never get in the way."
 }

@@ -73,32 +73,59 @@
           <TextBlock Style="{StaticResource Hint}" Text="{l:T Onboarding.DpiHint}" FontSize="13" Margin="0,4,0,0" />
         </StackPanel>
 
-        <!-- 5. Autostart -->
+        <!-- 5. Important settings: all on, each says what is lost without it -->
         <StackPanel Visibility="{Binding IsAutostart, Converter={StaticResource BoolToVisibility}}">
-          <TextBlock Style="{StaticResource PageTitle}" Text="{l:T Onboarding.AutostartTitle}" />
-          <TextBlock Style="{StaticResource PageSubtitle}" Text="{l:T Onboarding.AutostartText}" Margin="0,4,0,20" />
-          <CheckBox IsChecked="{Binding Autostart}" AutomationProperties.Name="{l:T Settings.Autostart}">
-            <CheckBox.Content>
-            <StackPanel Orientation="Horizontal">
-              <TextBlock Text="{l:T Settings.Autostart}" VerticalAlignment="Center" />
-              <Border Style="{StaticResource RecommendedTag}">
-                <TextBlock Text="{l:T Settings.Recommended}" FontSize="11" FontWeight="SemiBold" Foreground="{StaticResource AccentTextBrush}" />
-              </Border>
+          <TextBlock Style="{StaticResource PageTitle}" Text="{l:T Onboarding.SettingsTitle}" />
+          <TextBlock Style="{StaticResource PageSubtitle}" Text="{l:T Onboarding.SettingsText}" TextWrapping="Wrap" Margin="0,4,0,16" />
+          <ScrollViewer MaxHeight="330" VerticalScrollBarVisibility="Auto">
+            <StackPanel Margin="0,0,14,0">
+            <CheckBox IsChecked="{Binding Autostart}" AutomationProperties.Name="{l:T Settings.Autostart}" AutomationProperties.HelpText="{l:T Onboarding.AutostartHint}">
+              <CheckBox.Content>
+                <StackPanel Orientation="Horizontal">
+                  <TextBlock Text="{l:T Settings.Autostart}" FontWeight="SemiBold" VerticalAlignment="Center" />
+                  <Border Style="{StaticResource RecommendedTag}">
+                    <TextBlock Text="{l:T Settings.Recommended}" FontSize="11" FontWeight="SemiBold" Foreground="{StaticResource AccentTextBrush}" />
+                  </Border>
+                </StackPanel>
+              </CheckBox.Content>
+            </CheckBox>
+            <TextBlock Style="{StaticResource Hint}" Text="{l:T Onboarding.AutostartHint}" FontSize="13" LineHeight="19" Margin="28,4,0,0" TextWrapping="Wrap" />
+            <CheckBox IsChecked="{Binding CountElevatedGames}" Margin="0,16,0,0" AutomationProperties.Name="{l:T Onboarding.Elevated}" AutomationProperties.HelpText="{l:T Onboarding.ElevatedHint}">
+              <CheckBox.Content>
+                <StackPanel Orientation="Horizontal">
+                  <TextBlock Text="{l:T Onboarding.Elevated}" FontWeight="SemiBold" VerticalAlignment="Center" />
+                  <Border Style="{StaticResource RecommendedTag}">
+                    <TextBlock Text="{l:T Settings.Recommended}" FontSize="11" FontWeight="SemiBold" Foreground="{StaticResource AccentTextBrush}" />
+                  </Border>
+                </StackPanel>
+              </CheckBox.Content>
+            </CheckBox>
+            <TextBlock Style="{StaticResource Hint}" Text="{l:T Onboarding.ElevatedHint}" FontSize="13" LineHeight="19" Margin="28,4,0,0" TextWrapping="Wrap" />
+            <CheckBox IsChecked="{Binding AutoUpdate}" Margin="0,16,0,0" AutomationProperties.Name="{l:T Settings.AutoUpdate}" AutomationProperties.HelpText="{l:T Onboarding.AutoUpdateHint}">
+              <CheckBox.Content>
+                <StackPanel Orientation="Horizontal">
+                  <TextBlock Text="{l:T Settings.AutoUpdate}" FontWeight="SemiBold" VerticalAlignment="Center" />
+                  <Border Style="{StaticResource RecommendedTag}">
+                    <TextBlock Text="{l:T Settings.Recommended}" FontSize="11" FontWeight="SemiBold" Foreground="{StaticResource AccentTextBrush}" />
+                  </Border>
+                </StackPanel>
+              </CheckBox.Content>
+            </CheckBox>
+            <TextBlock Style="{StaticResource Hint}" Text="{l:T Onboarding.AutoUpdateHint}" FontSize="13" LineHeight="19" Margin="28,4,0,0" TextWrapping="Wrap" />
+            <CheckBox IsChecked="{Binding Notifications}" Margin="0,16,0,0" AutomationProperties.Name="{l:T Onboarding.Notifications}" AutomationProperties.HelpText="{l:T Onboarding.NotificationsHint}">
+              <CheckBox.Content>
+                <StackPanel Orientation="Horizontal">
+                  <TextBlock Text="{l:T Onboarding.Notifications}" FontWeight="SemiBold" VerticalAlignment="Center" />
+                  <Border Style="{StaticResource RecommendedTag}">
+                    <TextBlock Text="{l:T Settings.Recommended}" FontSize="11" FontWeight="SemiBold" Foreground="{StaticResource AccentTextBrush}" />
+                  </Border>
+                </StackPanel>
+              </CheckBox.Content>
+            </CheckBox>
+            <TextBlock Style="{StaticResource Hint}" Text="{l:T Onboarding.NotificationsHint}" FontSize="13" LineHeight="19" Margin="28,4,0,0" TextWrapping="Wrap" />
             </StackPanel>
-          </CheckBox.Content>
-          </CheckBox>
-          <CheckBox IsChecked="{Binding CountElevatedGames}" Margin="0,14,0,0" AutomationProperties.Name="{l:T Onboarding.Elevated}">
-            <CheckBox.Content>
-              <StackPanel Orientation="Horizontal">
-                <TextBlock Text="{l:T Onboarding.Elevated}" VerticalAlignment="Center" />
-                <Border Style="{StaticResource RecommendedTag}">
-                  <TextBlock Text="{l:T Settings.Recommended}" FontSize="11" FontWeight="SemiBold" Foreground="{StaticResource AccentTextBrush}" />
-                </Border>
-              </StackPanel>
-            </CheckBox.Content>
-          </CheckBox>
-          <TextBlock Style="{StaticResource Hint}" Text="{l:T Onboarding.ElevatedHint}" Margin="28,4,0,0" TextWrapping="Wrap" />
-          <TextBlock Style="{StaticResource Hint}" Text="{l:T Onboarding.PrivacyNote}" FontSize="13" Margin="0,24,0,0" />
+          </ScrollViewer>
+          <TextBlock Style="{StaticResource Hint}" Text="{l:T Onboarding.PrivacyNote}" FontSize="13" Margin="0,16,0,0" />
         </StackPanel>
       </Grid>
     </DockPanel>

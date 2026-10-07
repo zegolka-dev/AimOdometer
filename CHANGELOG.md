@@ -16,6 +16,9 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), ver
   on by default (one UAC prompt when finishing).
 - A tray notification when such a game is found (once per game, never during a full-screen game; clicking it opens
   the window with "Turn counting on"). Clicking any AimOdometer notification now opens the window.
+- First run: the last step is "Important settings" with start with Windows, games that run as administrator,
+  automatic updates and notifications, all ticked and marked Recommended, each explaining what is lost without it.
+  Skipping the setup keeps them all on.
 
 ### Fixed
 - Full-screen games that Windows did not make the foreground window (the desktop stayed in front): the full-screen

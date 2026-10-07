@@ -30,6 +30,8 @@ public sealed partial class OnboardingViewModel : ObservableObject
         Metric = data.Units == UnitSystem.Metric;
         Autostart = true;
         CountElevatedGames = !ElevatedTask.IsElevated;
+        AutoUpdate = true;
+        Notifications = true;
         ShowTrayIcon = true;
     }
 
@@ -67,6 +69,12 @@ public sealed partial class OnboardingViewModel : ObservableObject
     /// <summary>On by default: games that run as administrator (Genshin, some EA app games) are counted too.</summary>
     [ObservableProperty]
     public partial bool CountElevatedGames { get; set; }
+
+    [ObservableProperty]
+    public partial bool AutoUpdate { get; set; }
+
+    [ObservableProperty]
+    public partial bool Notifications { get; set; }
 
     [ObservableProperty]
     public partial bool ShowTrayIcon { get; set; }
@@ -144,6 +152,8 @@ public sealed partial class OnboardingViewModel : ObservableObject
         }
 
         _data.SetSetting(SettingKeys.Autostart, Autostart ? "1" : "0");
+        _data.SetSetting(SettingKeys.AutoUpdate, AutoUpdate ? "1" : "0");
+        _data.SetSetting(SettingKeys.Notifications, Notifications ? "1" : "0");
         _data.SetSetting(DoneSettingKey, "1");
         _finished();
         if (CountElevatedGames && !AppIdentity.IsDataDirectoryOverridden && _data.Setting(SettingKeys.ElevatedTracker) != "1")
