@@ -5,6 +5,8 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), ver
 
 ## [Unreleased]
 
+## [0.1.0-beta.23] - 2026-10-08
+
 ### Added
 - Games from other launchers are detected without a list: anything in the game library folders of the EA app,
   Epic, Ubisoft Connect, GOG, Xbox / Game Pass, Riot or Rockstar counts as a game named after its folder; the
