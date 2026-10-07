@@ -774,4 +774,7 @@ public static class SettingKeys
 
     /// <summary>Gear item ids already announced as "time to replace" (comma separated).</summary>
     public const string GearAnnounced = "gear_announced";
+
+    /// <summary>Apps the tracker saw running as administrator while it did not (comma-separated app ids).</summary>
+    public const string ElevatedApps = "elevated_apps";
 }

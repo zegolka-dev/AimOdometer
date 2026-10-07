@@ -5,6 +5,20 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), ver
 
 ## [Unreleased]
 
+### Added
+- Games from other launchers are detected without a list: anything in the game library folders of the EA app,
+  Epic, Ubisoft Connect, GOG, Xbox / Game Pass, Riot or Rockstar counts as a game named after its folder; the
+  launchers, anti-cheats, installers and crash reporters next to them do not (`GameCatalog.LauncherGame`).
+- Built-in list: Titanfall 2, Battlefield 1, V and 4, STAR WARS Battlefront II, Watch_Dogs 2, Far Cry 5 and 6
+  (merged with their Steam versions).
+- The tracker notices a game that runs as administrator while it does not (Windows hides the mouse from it then) and
+  the overview offers "Turn counting on" for that game by name. First run: "Count games that run as administrator" is
+  on by default (one UAC prompt when finishing).
+
+### Fixed
+- Full-screen games that Windows did not make the foreground window (the desktop stayed in front): the full-screen
+  window under the pointer now gets the movement (`ForegroundTracker.OnScreen`).
+
 ## [0.1.0-beta.22] - 2026-10-08
 
 ### Added

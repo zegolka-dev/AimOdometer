@@ -24,6 +24,10 @@ internal sealed unsafe class ForegroundTracker : IDisposable
     private readonly Dictionary<string, long> _appIdByPath = new(StringComparer.OrdinalIgnoreCase);
     private readonly Dictionary<long, double> _pendingSeconds = [];
     private readonly char[] _pathBuffer = new char[1024];
+    private readonly bool _selfElevated = AimOdometer.Core.ElevatedTask.IsElevated;
+    private readonly HashSet<long> _elevationChecked = [];
+    private nint _shellCheckWindow;
+    private bool _shellCheckResult;
 
     private nint _foregroundHook;
     private nint _minimizeHook;
@@ -75,7 +79,7 @@ internal sealed unsafe class ForegroundTracker : IDisposable
             return;
         }
 
-        var hwnd = WinEvents.GetForegroundWindow();
+        var hwnd = OnScreen(WinEvents.GetForegroundWindow());
         if (hwnd != 0 && hwnd != _foregroundWindow)
         {
             if (_missedEvents++ < 50)
@@ -89,6 +93,114 @@ internal sealed unsafe class ForegroundTracker : IDisposable
         {
             CloseSegment();
             _minimized = !_minimized;
+        }
+    }
+
+    /// <summary>
+    /// The window the user actually sees. Windows sometimes keeps the desktop (explorer.exe) as the foreground window
+    /// while a full-screen game covers the whole monitor (seen with Watch_Dogs 2); then the full-screen window under the
+    /// pointer is the one that gets the mouse. Any other foreground window is taken as it is.
+    /// </summary>
+    internal nint OnScreen(nint foreground)
+    {
+        if (foreground != 0 && !IsShell(foreground))
+        {
+            return foreground;
+        }
+
+        WinEvents.Pt cursor;
+        if (!WinEvents.GetCursorPos(&cursor))
+        {
+            return foreground;
+        }
+
+        var root = WinEvents.GetAncestor(WinEvents.WindowFromPoint(cursor), WinEvents.GaRoot);
+        return root != 0 && root != foreground && !IsShell(root) && CoversItsMonitor(root) ? root : foreground;
+    }
+
+    private bool IsShell(nint hwnd)
+    {
+        if (hwnd != _shellCheckWindow)
+        {
+            uint processId = 0;
+            _ = WinEvents.GetWindowThreadProcessId(hwnd, &processId);
+            var path = processId == 0 ? null : QueryImagePath(processId) ?? QueryExeName(processId);
+            _shellCheckWindow = hwnd;
+            _shellCheckResult = path is not null && Path.GetFileName(path).Equals("explorer.exe", StringComparison.OrdinalIgnoreCase);
+        }
+
+        return _shellCheckResult;
+    }
+
+    private static bool CoversItsMonitor(nint hwnd)
+    {
+        WinEvents.Rect window;
+        var info = new WinEvents.MonitorInfo { Size = (uint)sizeof(WinEvents.MonitorInfo) };
+        var monitor = WinEvents.MonitorFromWindow(hwnd, WinEvents.MonitorDefaultToNearest);
+        if (!WinEvents.GetWindowRect(hwnd, &window) || monitor == 0 || !WinEvents.GetMonitorInfo(monitor, &info))
+        {
+            return false;
+        }
+
+        return window.Left <= info.Monitor.Left && window.Top <= info.Monitor.Top
+            && window.Right >= info.Monitor.Right && window.Bottom >= info.Monitor.Bottom;
+    }
+
+    /// <summary>
+    /// True when the process runs with administrator rights while this tracker does not: Windows then hides the mouse
+    /// from us whenever its window is in front. A process whose token we may not even read counts as elevated.
+    /// </summary>
+    internal static bool IsElevatedProcess(uint processId)
+    {
+        var process = WinEvents.OpenProcess(WinEvents.ProcessQueryLimitedInformation, false, processId);
+        if (process == 0)
+        {
+            return false;
+        }
+
+        try
+        {
+            nint token;
+            if (!WinEvents.OpenProcessToken(process, WinEvents.TokenQuery, &token))
+            {
+                return Marshal.GetLastPInvokeError() == 5; // ERROR_ACCESS_DENIED: a higher integrity level than ours
+            }
+
+            try
+            {
+                int elevated = 0;
+                uint size = 0;
+                return WinEvents.GetTokenInformation(token, WinEvents.TokenElevationClass, &elevated, sizeof(int), &size) && elevated != 0;
+            }
+            finally
+            {
+                Kernel32.CloseHandle(token);
+            }
+        }
+        finally
+        {
+            Kernel32.CloseHandle(process);
+        }
+    }
+
+    /// <summary>Remembers an app that runs as administrator, for the window to offer counting it.</summary>
+    private void RecordElevated(long appId, string path)
+    {
+        Log.Warning($"{path} runs as administrator: Windows hides the mouse from this tracker while it is in front");
+        try
+        {
+            var known = (_store.GetSetting(SettingKeys.ElevatedApps) ?? string.Empty)
+                .Split(',', StringSplitOptions.RemoveEmptyEntries).ToList();
+            var id = appId.ToString(System.Globalization.CultureInfo.InvariantCulture);
+            if (!known.Contains(id))
+            {
+                known.Add(id);
+                _store.SetSetting(SettingKeys.ElevatedApps, string.Join(',', known.TakeLast(50)));
+            }
+        }
+        catch (SqliteException ex)
+        {
+            Log.Error("Cannot remember an app that runs as administrator", ex);
         }
     }
 
@@ -236,6 +348,11 @@ internal sealed unsafe class ForegroundTracker : IDisposable
                 Log.Error($"Cannot record app '{path}'", ex);
                 return 0;
             }
+        }
+
+        if (!_selfElevated && _elevationChecked.Add(appId) && IsElevatedProcess(processId))
+        {
+            RecordElevated(appId, path);
         }
 
         return appId;

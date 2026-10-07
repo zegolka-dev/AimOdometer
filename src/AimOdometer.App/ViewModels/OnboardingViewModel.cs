@@ -29,6 +29,7 @@ public sealed partial class OnboardingViewModel : ObservableObject
         Language = Languages.FirstOrDefault(l => l.Code == Loc.Instance.Code) ?? (Languages.Count > 0 ? Languages[0] : null);
         Metric = data.Units == UnitSystem.Metric;
         Autostart = true;
+        CountElevatedGames = !ElevatedTask.IsElevated;
         ShowTrayIcon = true;
     }
 
@@ -62,6 +63,10 @@ public sealed partial class OnboardingViewModel : ObservableObject
 
     [ObservableProperty]
     public partial bool Autostart { get; set; }
+
+    /// <summary>On by default: games that run as administrator (Genshin, some EA app games) are counted too.</summary>
+    [ObservableProperty]
+    public partial bool CountElevatedGames { get; set; }
 
     [ObservableProperty]
     public partial bool ShowTrayIcon { get; set; }
@@ -141,5 +146,9 @@ public sealed partial class OnboardingViewModel : ObservableObject
         _data.SetSetting(SettingKeys.Autostart, Autostart ? "1" : "0");
         _data.SetSetting(DoneSettingKey, "1");
         _finished();
+        if (CountElevatedGames && !AppIdentity.IsDataDirectoryOverridden && _data.Setting(SettingKeys.ElevatedTracker) != "1")
+        {
+            _ = SettingsViewModel.SetElevatedAsync(_data, true); // one UAC prompt; declining keeps the normal tracker
+        }
     }
 }

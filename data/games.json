@@ -56,7 +56,15 @@
     { "id": "baldurs-gate-3", "name": "Baldur's Gate 3", "exe": ["bg3.exe", "bg3_dx11.exe"], "steamAppId": 1086940 },
     { "id": "helldivers-2", "name": "HELLDIVERS 2", "exe": ["helldivers2.exe"], "steamAppId": 553850 },
     { "id": "palworld", "name": "Palworld", "exe": ["Palworld-Win64-Shipping.exe", "Palworld-WinGDK-Shipping.exe"], "steamAppId": 1623730 },
-    { "id": "lethal-company", "name": "Lethal Company", "exe": ["Lethal Company.exe"], "steamAppId": 1966720 }
+    { "id": "lethal-company", "name": "Lethal Company", "exe": ["Lethal Company.exe"], "steamAppId": 1966720 },
+    { "id": "titanfall-2", "name": "Titanfall 2", "exe": ["Titanfall2.exe"], "steamAppId": 1237970 },
+    { "id": "battlefield-1", "name": "Battlefield 1", "exe": ["bf1.exe"], "steamAppId": 1238840 },
+    { "id": "battlefield-v", "name": "Battlefield V", "exe": ["bfv.exe"], "steamAppId": 1238810 },
+    { "id": "battlefield-4", "name": "Battlefield 4", "exe": ["bf4.exe"], "steamAppId": 1238860 },
+    { "id": "star-wars-battlefront-ii", "name": "STAR WARS Battlefront II", "exe": ["starwarsbattlefrontii.exe"], "steamAppId": 1237950 },
+    { "id": "watch-dogs-2", "name": "Watch_Dogs 2", "exe": ["WatchDogs2.exe"], "steamAppId": 447040 },
+    { "id": "far-cry-5", "name": "Far Cry 5", "exe": ["FarCry5.exe"], "steamAppId": 552520 },
+    { "id": "far-cry-6", "name": "Far Cry 6", "exe": ["FarCry6.exe"], "steamAppId": 2369390 }
   ],
   "$comment_steamNonGames": "Steam apps that are tools, not games: time in them counts as 'Desktop & apps'.",
   "steamNonGames": [

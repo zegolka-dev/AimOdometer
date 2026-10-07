@@ -591,5 +591,10 @@
   "Settings.AutostartHint": "Без этого после перезагрузки пробег не считается, пока ты сам не откроешь AimOdometer.",
   "Overview.AutostartOffTitle": "Запуск вместе с Windows выключен",
   "Overview.AutostartOffText": "После перезагрузки AimOdometer ничего не считает, пока ты его не откроешь. Включи, чтобы не терять ни одной сессии.",
-  "Overview.AutostartEnable": "Включить"
+  "Overview.AutostartEnable": "Включить",
+  "Onboarding.Elevated": "Считать игры, запущенные от имени администратора",
+  "Onboarding.ElevatedHint": "Нужно для Genshin Impact, части игр из EA app и других игр, которые запускаются от администратора. Windows один раз спросит разрешение.",
+  "Overview.ElevatedTitle": "«{0}» запущена от имени администратора",
+  "Overview.ElevatedText": "Пока такая игра на экране, Windows прячет мышь от обычных программ, поэтому её пробег не считается. Включи подсчёт: Windows один раз спросит разрешение.",
+  "Overview.ElevatedEnable": "Включить подсчёт"
 }

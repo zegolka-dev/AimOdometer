@@ -111,8 +111,55 @@ public sealed partial class OverviewViewModel(AppData data) : PageViewModel(data
         AutostartOff = false;
     }
 
+    /// <summary>Title of the "game runs as administrator" warning, or null when there is nothing to warn about.</summary>
+    [ObservableProperty]
+    public partial string? ElevatedGameTitle { get; set; }
+
+    [ObservableProperty]
+    public partial string ElevatedGameText { get; set; } = string.Empty;
+
+    [CommunityToolkit.Mvvm.Input.RelayCommand]
+    private async Task EnableElevatedAsync()
+    {
+        if (AimOdometer.Core.AppIdentity.IsDataDirectoryOverridden)
+        {
+            return;
+        }
+
+        ElevatedGameText = Loc.Instance["Settings.ElevatedWorking"];
+        if (await SettingsViewModel.SetElevatedAsync(Data, true) is null)
+        {
+            ElevatedGameText = Loc.Instance["Settings.ElevatedDeclined"];
+            return;
+        }
+
+        ElevatedGameTitle = null;
+    }
+
+    /// <summary>The first game the tracker saw running as administrator while it was not, if counting them is off.</summary>
+    private void ShowElevatedGame()
+    {
+        ElevatedGameTitle = null;
+        if (Data.Setting(AimOdometer.Core.Storage.SettingKeys.ElevatedTracker) == "1"
+            || Data.Setting(AimOdometer.Core.Storage.SettingKeys.ElevatedApps) is not { Length: > 0 } list)
+        {
+            return;
+        }
+
+        var ids = list.Split(',', StringSplitOptions.RemoveEmptyEntries)
+            .Select(id => long.TryParse(id, CultureInfo.InvariantCulture, out var v) ? v : 0).ToHashSet();
+        var game = Data.Store.GetApps().Where(a => ids.Contains(a.Id))
+            .Select(a => Data.Catalog.Classify(a.Id, a.ExePath).Game).FirstOrDefault(g => g is not null);
+        if (game is not null)
+        {
+            ElevatedGameTitle = Loc.Instance.Format("Overview.ElevatedTitle", game.Name);
+            ElevatedGameText = Loc.Instance["Overview.ElevatedText"];
+        }
+    }
+
     public override void Refresh()
     {
+        ShowElevatedGame();
         AutostartOff = !AimOdometer.Core.AppIdentity.IsDataDirectoryOverridden
             && Data.Setting(AimOdometer.Core.Storage.SettingKeys.ElevatedTracker) != "1"
             && !AimOdometer.Core.Autostart.IsEnabled()

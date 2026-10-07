@@ -191,6 +191,51 @@ public sealed class GameCatalog
                 : new GameInfo(game.Id, game.Name, GameSource.BuiltIn, null));
         }
 
+        return LauncherGame(exePath) is { } folder
+            ? Named(new GameInfo("lib:" + folder.ToLowerInvariant(), folder, GameSource.BuiltIn, null))
+            : null;
+    }
+
+    /// <summary>Game library folders of other launchers: everything installed there is a game.</summary>
+    private static readonly string[] LauncherLibraries =
+    [
+        @"\EA Games\", @"\Origin Games\", @"\Epic Games\", @"\Ubisoft Game Launcher\games\", @"\GOG Galaxy\Games\",
+        @"\GOG Games\", @"\XboxGames\", @"\Riot Games\", @"\Rockstar Games\",
+    ];
+
+    /// <summary>Launchers' own folders and helper programs that live next to games but are not games.</summary>
+    private static readonly string[] NotGames =
+    [
+        "launcher", "crash", "setup", "install", "update", "redist", "anticheat", "battleye", "beservice", "uninst",
+        "helper", "service", "report", "cefprocess", "overlay", "riot client", "riotclient", "epic online services",
+    ];
+
+    /// <summary>
+    /// A game installed by EA app, Epic, Ubisoft Connect, GOG, Xbox / Game Pass, Riot or Rockstar that is in no list:
+    /// the name of its folder in the launcher's library, or null.
+    /// </summary>
+    internal static string? LauncherGame(string exePath)
+    {
+        foreach (var library in LauncherLibraries)
+        {
+            var at = exePath.IndexOf(library, StringComparison.OrdinalIgnoreCase);
+            if (at < 0)
+            {
+                continue;
+            }
+
+            var rest = exePath[(at + library.Length)..];
+            var slash = rest.IndexOf('\\');
+            if (slash <= 0)
+            {
+                return null; // an exe directly in the library folder
+            }
+
+            // The folder, the subfolders and the file name: an installer in "Game\__Installer\" is not the game.
+            var folder = rest[..slash];
+            return NotGames.Any(n => rest.Contains(n, StringComparison.OrdinalIgnoreCase)) ? null : folder;
+        }
+
         return null;
     }
 

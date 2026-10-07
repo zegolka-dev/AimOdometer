@@ -79,6 +79,41 @@ public class GameCatalogTests
     }
 
     [Fact]
+    public void TitanfallFromTheEaApp_CountsWithTheSteamVersion()
+    {
+        var game = Catalog().Detect(@"C:\Program Files\EA Games\Titanfall2\Titanfall2.exe");
+        Assert.Equal("steam:1237970", game!.Key);
+        Assert.Equal("Titanfall 2", game.Name);
+    }
+
+    [Theory]
+    [InlineData(@"C:\Program Files\EA Games\Mass Effect Legendary Edition\Game\ME3\Binaries\Win64\MassEffect3.exe", "Mass Effect Legendary Edition")]
+    [InlineData(@"D:\Epic Games\Splitgate\PortalWars\Binaries\Win64\PortalWars-Win64-Shipping.exe", "Splitgate")]
+    [InlineData(@"C:\Program Files (x86)\Ubisoft\Ubisoft Game Launcher\games\Ghost Recon Breakpoint\GRB.exe", "Ghost Recon Breakpoint")]
+    [InlineData(@"C:\XboxGames\Starfield\Content\Starfield.exe", "Starfield")]
+    [InlineData(@"C:\Program Files (x86)\GOG Galaxy\Games\Cyberpunk Phantom\game.exe", "Cyberpunk Phantom")]
+    public void UnknownGamesInLauncherLibraries_AreGames(string exe, string name)
+    {
+        var game = Catalog().Detect(exe);
+        Assert.Equal(name, game!.Name);
+        Assert.Equal("lib:" + name.ToLowerInvariant(), game.Key);
+    }
+
+    [Theory]
+    [InlineData(@"C:\Program Files\Epic Games\Launcher\Portal\Binaries\Win64\EpicGamesLauncher.exe")]
+    [InlineData(@"C:\Riot Games\Riot Client\RiotClientServices.exe")]
+    [InlineData(@"C:\Program Files\EA Games\Some Game\EAAntiCheat.GameServiceLauncher.exe")]
+    [InlineData(@"C:\Program Files\EA Games\Some Game\__Installer\Touchup.exe")]
+    [InlineData(@"C:\Program Files\EA Games\Some Game\UnityCrashHandler64.exe")]
+    [InlineData(@"C:\Program Files\Rockstar Games\Launcher\Launcher.exe")]
+    [InlineData(@"C:\Program Files\EA Games\setup.exe")]
+    [InlineData(@"C:\Program Files\Notepad++\notepad++.exe")]
+    public void LaunchersAndTheirTools_AreNotGames(string exe)
+    {
+        Assert.Null(Catalog().Detect(exe));
+    }
+
+    [Fact]
     public void BuiltInGame_WithSteamId_SharesTheSteamKey()
     {
         // Apex installed through the EA app counts together with the Steam version.

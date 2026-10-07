@@ -591,5 +591,10 @@
   "Settings.AutostartHint": "Without it, after a restart the distance is not counted until you open AimOdometer yourself.",
   "Overview.AutostartOffTitle": "Start with Windows is off",
   "Overview.AutostartOffText": "After a restart AimOdometer does not count anything until you open it. Turn it on so no session is lost.",
-  "Overview.AutostartEnable": "Turn on"
+  "Overview.AutostartEnable": "Turn on",
+  "Onboarding.Elevated": "Count games that run as administrator",
+  "Onboarding.ElevatedHint": "Needed for Genshin Impact, some EA app games and others that start as administrator. Windows asks for permission once.",
+  "Overview.ElevatedTitle": "{0} runs as administrator",
+  "Overview.ElevatedText": "While such a game is in front, Windows hides the mouse from normal programs, so its distance is not counted. Turn counting on: Windows asks for permission once.",
+  "Overview.ElevatedEnable": "Turn counting on"
 }

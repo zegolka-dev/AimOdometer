@@ -32,6 +32,20 @@
       </DockPanel>
     </Border>
 
+    <!-- A game runs as administrator and the tracker does not: its mouse is hidden from us -->
+    <Border Style="{StaticResource Card}" BorderBrush="{StaticResource WarningBrush}" Margin="0,0,0,16" Padding="20,14"
+            Visibility="{Binding ElevatedGameTitle, Converter={StaticResource NullToCollapsed}}" AutomationProperties.AutomationId="ElevatedBanner">
+      <DockPanel>
+        <Button DockPanel.Dock="Right" Style="{StaticResource PrimaryButton}" Content="{l:T Overview.ElevatedEnable}" Command="{Binding EnableElevatedCommand}"
+                VerticalAlignment="Center" Margin="16,0,0,0" />
+        <TextBlock DockPanel.Dock="Left" Style="{StaticResource Icon}" Text="&#xE7EF;" FontSize="20" Foreground="{StaticResource WarningBrush}" Margin="0,0,14,0" />
+        <StackPanel VerticalAlignment="Center">
+          <TextBlock Text="{Binding ElevatedGameTitle}" FontSize="15" FontWeight="SemiBold" TextWrapping="Wrap" />
+          <TextBlock Text="{Binding ElevatedGameText}" FontSize="13" Foreground="{StaticResource TextSecondaryBrush}" TextWrapping="Wrap" Margin="0,2,0,0" />
+        </StackPanel>
+      </DockPanel>
+    </Border>
+
     <!-- Today, live -->
     <Border Style="{StaticResource AccentCard}" Padding="28,22">
       <Grid>

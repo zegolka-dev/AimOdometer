@@ -180,11 +180,7 @@ public sealed partial class SettingsViewModel : PageViewModel
         }
 
         ElevatedMessage = L["Settings.ElevatedWorking"];
-        var tracker = TrackerConnection.TrackerExePath;
-        var ok = on
-            ? System.IO.File.Exists(tracker) && await Task.Run(() => ElevatedTask.Create(tracker))
-            : await Task.Run(ElevatedTask.Delete) || !await Task.Run(ElevatedTask.Exists);
-        if (!ok)
+        if (await SetElevatedAsync(Data, on) is not { } running)
         {
             _loading = true;
             CountElevatedGames = !on; // UAC was declined: nothing changed
@@ -193,10 +189,28 @@ public sealed partial class SettingsViewModel : PageViewModel
             return;
         }
 
-        Data.Store.SetSetting(SettingKeys.ElevatedTracker, on ? "1" : "0");
-        await Updates.StopTrackerAsync();
-        var running = await TrackerConnection.EnsureRunningAsync(elevated: on);
         ElevatedMessage = !running ? L["Settings.ElevatedNotRunning"] : on ? L["Settings.ElevatedOn"] : L["Settings.ElevatedOff"];
+    }
+
+    /// <summary>
+    /// Turns "count games that run as administrator" on or off for the real tracker (one UAC prompt). Null when the
+    /// user declined or it failed; otherwise whether the tracker answered afterwards. Settings, the overview and the
+    /// first run share it.
+    /// </summary>
+    internal static async Task<bool?> SetElevatedAsync(AppData data, bool on)
+    {
+        var tracker = TrackerConnection.TrackerExePath;
+        var ok = on
+            ? System.IO.File.Exists(tracker) && await Task.Run(() => ElevatedTask.Create(tracker))
+            : await Task.Run(ElevatedTask.Delete) || !await Task.Run(ElevatedTask.Exists);
+        if (!ok)
+        {
+            return null;
+        }
+
+        data.Store.SetSetting(SettingKeys.ElevatedTracker, on ? "1" : "0");
+        await Updates.StopTrackerAsync();
+        return await TrackerConnection.EnsureRunningAsync(elevated: on);
     }
 
     partial void OnAutoUpdateChanged(bool value)
